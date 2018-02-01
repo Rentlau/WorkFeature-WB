@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Gui::Dialog::DlgSettingsWorkFeature</class>
+ <widget class="QWidget" name="Gui::Dialog::DlgSettingsWorkFeature">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>563</width>
+    <height>512</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Work Feature</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../Icons/WF_wf.xpm</normaloff>../Icons/WF_wf.xpm</iconset>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="groupBox_13">
+     <property name="title">
+      <string>Preferences :</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout">
+      <property name="fieldGrowthPolicy">
+       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+      </property>
+      <item row="0" column="0">
+       <widget class="QRadioButton" name="radioButton_verbose">
+        <property name="toolTip">
+         <string>Toggle here if you want a lot of information printed into report View.</string>
+        </property>
+        <property name="text">
+         <string>Verbose</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoExclusive">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout_44">
+        <item>
+         <widget class="QLabel" name="label_10">
+          <property name="toolTip">
+           <string>Change the tolerance for the following functions:
+  - in &quot;Check&quot; TAB:
+	are Parallel?
+	are Perpendicular?
+	are Coplanar?</string>
+          </property>
+          <property name="text">
+           <string>Tolerance</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="tolerance_edit">
+          <property name="maximumSize">
+           <size>
+            <width>60</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Change the tolerance for the following functions:
+  - in &quot;Check&quot; TAB:
+	are Parallel?
+	are Perpendicular?
+	are Coplanar?</string>
+          </property>
+          <property name="text">
+           <string>1e-10</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
+ <resources/>
+ <connections/>
+</ui>

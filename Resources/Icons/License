@@ -1,0 +1,39 @@
+***************************************************************************
+*   FreeCAD Work Features / version 2014-12                               *
+*   Copyright (c) 2014 <rentlau_64>                                       *
+*                                                                         *
+*   Icons files : WF_Axes.svg, WF_centerObjectsPoint.svg,                 *
+*                 WF_centerLinePoint.svg, WF_extremaLinePoint.svg,        *
+*                 WF_centerCirclePoint.svg, WF_alongLinePoint.svg,        * 
+*                 WF_centerFacePoint.svg, WF_lineFacePoint.svg,           * 
+*                 WF_pointLinePoint.svg, WF_pointFacePoint.svg,           *
+*                 WF_objectBasePoint.svg, WF_point.svg,                   *
+*                 WF_centerObjectsAxes.svg, WF_2pointsLine.svg,           * 
+*                 WF_cylinderAxis.svg, WF_twoLinesAxis.svg,               * 
+*                 WF_FaceAxis.svg, WF_pointLineAxis.svg,                  *
+*                 WF_linePointAxis.svg, WF_linePlaneAxis.svg,             * 
+*                 WF_2PlanesAxis.svg, WF_baseObjectsAxes.svg,             *
+*                 WF_axis.svg, WF_threePointsPlane.svg,                   *
+*                 WF_linePointPlane.svg, WF_linePointPlane2.svg,          * 
+*                 WF_pointPlanePoint.svg, WF_planeLinePlane.svg,          *
+*                 WF_centerObjectsPlanes.svg, WF_plane.svg,               *
+*                 WF_boundingBoxes.svg, WF_boundingBox.svg, WF_box.svg    *
+*                                                                         *
+*   These files are a supplement to the FreeCAD CAx development system.   *
+*                                                                         *
+*   This program is free software; you can redistribute it and/or modify  *
+*   it under the terms of the GNU Lesser General Public License (LGPL)    *
+*   as published by the Free Software Foundation; either version 2 of     *
+*   the License, or (at your option) any later version.                   *
+*   for detail see the COPYING and COPYING.LESSER text files.             *
+*                                                                         *
+*   This software is distributed in the hope that it will be useful,      *
+*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+*   GNU Library General Public License for more details.                  *
+*                                                                         *
+*   You should have received a copy of the GNU Library General Public     *
+*   License along with this macro; if not, write to the Free Software     *
+*   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  *
+*   USA or see <http://www.gnu.org/licenses/>                             *
+***************************************************************************
