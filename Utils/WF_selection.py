@@ -204,14 +204,14 @@ class Selection():
     numberOfImages = property(__getNumberOfImages, __setNumberOfImages)
     
     def __str__(self):
-        message  = "Gui_Selection      : " + str(self.__selEx)
-        message += "\nNumberOfImages     : " + str(self.__numberOfImages)
-        message += "\nNumberOfObjects    : " + str(self.__numberOfObjects)
-        message += "\nNumberOfPlanes     : " + str(self.__numberOfFaces)
-        message += "\nNumberOfCurves     : " + str(self.__numberOfWires)
-        message += "\nNumberOfSegments   : " + str(self.__numberOfEdges)
-        message += "\nNumberOfPoints     : " + str(self.__numberOfVertexes)
-        message += "\nNumberOfEntities   : " + str(self.__numberOfEntities)
+        message  = "\nGui_Selection        : " + str(self.__selEx)
+        message += "\nNumber Of Images     : " + str(self.__numberOfImages)
+        message += "\nNumber Of Objects    : " + str(self.__numberOfObjects)
+        message += "\nNumber Of Planes     : " + str(self.__numberOfFaces)
+        message += "\nNumber Of Curves     : " + str(self.__numberOfWires)
+        message += "\nNumber Of Segments   : " + str(self.__numberOfEdges)
+        message += "\nNumber Of Points     : " + str(self.__numberOfVertexes)
+        message += "\nNumber Of Entities   : " + str(self.__numberOfEntities)
         return (message)
     
     
@@ -408,7 +408,6 @@ class Selection():
             return (0, None)
         
         if self.numberOfPoints >= 2 and "Points" in getfrom :
-            import Part
             for m_p1,m_p2 in zip(self.__selectedVertices, self.__selectedVertices[1:]):
                 m_diff = m_p2.Point.sub(m_p1.Point)
                 tolerance = 1e-10

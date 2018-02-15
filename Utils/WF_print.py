@@ -3,6 +3,8 @@ from PySide import QtCore, QtGui
 import os
 import FreeCAD as App
 
+error_msg_not_yet = "Not yet Developped !"
+
 def gui_infoDialog(msg, title=None):
     """ Create a simple QMessageBox dialog for info messages.
     """
@@ -51,3 +53,6 @@ def printError_msg(message, title=None):
     except:
         App.Console.PrintError("\nERROR : Not able to launch a QT dialog !" )
         raise(Exception(message))
+    
+def print_not_yet():
+    printError_msg(error_msg_not_yet)
