@@ -28,6 +28,7 @@
 *   USA or see <http://www.gnu.org/licenses/>                             *
 ***************************************************************************
 """
+
 __title__="Macro ExtremaLinePoint"
 __author__ = "Rentlau_64"
 __brief__ = '''
@@ -44,6 +45,7 @@ if App.GuiUp:
     import FreeCADGui as Gui
 import Part
 from PySide import QtGui,QtCore
+import WF
 
 # get the path of the current python script 
 path_WF = os.path.dirname(__file__)
@@ -58,10 +60,11 @@ if not sys.path.__contains__(str(path_WF_utils)):
     sys.path.append(str(path_WF_ui))
     
 try:
-    from WF_selection import *
+    from WF_selection import Selection
     from WF_print import printError_msg
     from WF_geometry import *
     #from WF_utils import *
+
 except:
     print "ERROR: cannot load WF modules !!"
     sys.exit(1)
@@ -242,13 +245,15 @@ def run():
     if m_sel == None :
         print_msg("Unable to create a Selection Object !") 
         return None
-
+    
+    m_debug = WF.verbose()
     if m_debug != 0:
         print_msg("m_actDoc=" + str(m_actDoc))
         print_msg("m_actDoc.Name=" + str(m_actDoc.Name))
         print_msg("m_selEx=" + str(m_selEx))         
         print_msg("m_sel=" + str(m_sel))
  
+       
     try:        
         Number_of_Edges, Edge_List = m_sel.get_segmentsNames(getfrom=["Segments","Curves","Planes","Objects"])
         if m_debug != 0:        
