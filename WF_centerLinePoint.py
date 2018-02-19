@@ -35,7 +35,7 @@ Macro CenterLinePoint.
 Creates a parametric CenterLinePoint from an Edge
 '''
 ###############
-m_debug = False
+
 ###############
 import sys
 import os.path
@@ -46,8 +46,6 @@ import Part
 from PySide import QtGui,QtCore
 import WF
 from WF_Objects_base import WF_Point
-# from Utils.WF_selection import Selection
-# from Utils.WF_geometry import *
 
 # get the path of the current python script 
 path_WF = os.path.dirname(__file__)
@@ -62,7 +60,7 @@ if not sys.path.__contains__(str(path_WF_utils)):
     sys.path.append(str(path_WF_ui))
      
 try:
-    from WF_selection import Selection
+    from WF_selection import Selection, getSel
     from WF_print import printError_msg, print_msg
     from WF_directory import createFolders, addObjectToGrp
     from WF_geometry import *
@@ -94,20 +92,18 @@ m_location       = "Single"
 m_locations      = ["Single", "All"]
 m_numberLinePart = 2
 m_indexPart      = 1
-
-def addObjectToGrp(obj,grp,info=0):
-    m_obj = obj
-    m_grp = grp
-    m_grp.addObject(m_obj) # adds object to the group
-    if info != 0:
-        print_msg("Object " + str(m_obj) + " added to Group : " + str(m_grp))    
-
 ###############
+
 class CenterLinePointPanel:  
     def __init__(self):
         self.form = Gui.PySideUic.loadUi(path_WF_ui + m_dialog)
         self.form.setWindowTitle(m_dialog_title)
-        
+        self.form.UI_CenterLinePoint_spin_numberLinePart.setValue(m_numberLinePart)
+        self.form.UI_CenterLinePoint_spin_indexPart.setValue(m_indexPart)
+        self.form.UI_CenterLinePoint_checkBox.setCheckState(QtCore.Qt.Unchecked)
+        if m_location == "All":
+            self.form.UI_CenterLinePoint_checkBox.setCheckState(QtCore.Qt.Checked)
+                        
     def accept(self):
         global m_location
         global m_numberLinePart
@@ -120,16 +116,20 @@ class CenterLinePointPanel:
             m_location = "Single" 
         m_numberLinePart = self.form.UI_CenterLinePoint_spin_numberLinePart.value()
         m_indexPart      = self.form.UI_CenterLinePoint_spin_indexPart.value()
+        
         Gui.Control.closeDialog()
+        m_actDoc = App.activeDocument()
+        if m_actDoc is not None:
+            if len(Gui.Selection.getSelectionEx(m_actDoc.Name)) != 0:
+                run()
         return True
     
     def reject(self):
         Gui.Control.closeDialog()
-        return True
+        return False
     
     def shouldShow(self):    
         return (len(Gui.Selection.getSelectionEx(App.activeDocument().Name)) == 0 )   
-
 
 
 def makeCenterLinePointFeature(group):
@@ -166,6 +166,7 @@ class CenterLinePoint(WF_Point):
                             "The number of parts of parent segment !").NumberLinePart=2
         selfobj.addProperty("App::PropertyInteger","IndexPart",self.name,
                             "The location of the point : 1/2 means middle of the segment !").IndexPart=1        
+        
         selfobj.setEditorMode("Edge", 1)
         selfobj.Proxy = self    
      
@@ -187,9 +188,7 @@ class CenterLinePoint(WF_Point):
         selfobj.X = float(Vector_point.x)
         selfobj.Y = float(Vector_point.y)
         selfobj.Z = float(Vector_point.z)
-                 
-
-       
+                
     def onChanged(self, selfobj, prop):
         """ Print the name of the property that has changed """
         # Debug mode
@@ -213,6 +212,7 @@ class CenterLinePoint(WF_Point):
             selfobj.Proxy.execute(selfobj)
 
         WF_Point.onChanged(self, selfobj, prop)   
+    
             
 class ViewProviderCenterLinePoint:
     global path_WF_icons
@@ -249,6 +249,7 @@ class ViewProviderCenterLinePoint:
            
     def setIcon(self, icon = '/WF_centerLinePoint.svg'):
         ViewProviderCenterLinePoint.icon = icon
+  
             
 class CommandCenterLinePoint:
     """ Command to create CenterLinePoint feature object. """
@@ -263,6 +264,7 @@ class CommandCenterLinePoint:
         if m_actDoc is not None:
             if len(Gui.Selection.getSelectionEx(m_actDoc.Name)) == 0:
                 Gui.Control.showDialog(CenterLinePointPanel())
+
         run()
         
     def IsActive(self):
@@ -276,44 +278,45 @@ if App.GuiUp:
 
 
 def run():
-    m_actDoc = App.activeDocument()
-    if m_actDoc == None:
-        message = "No Active document selected !"
-        return (None, message)
-    if not m_actDoc.Name:
-        message = "No Active document.name selected !"
-        return (None, message) 
-       
-    m_selEx  = Gui.Selection.getSelectionEx(m_actDoc.Name)                    
-    m_sel    = Selection(m_selEx)
- 
-    if m_sel == None :
-        print_msg("Unable to create a Selection Object !") 
-        return None
-    
-    #m_debug = WF.verbose()
-    if WF.verbose() != 0:
-        print_msg("m_actDoc      = " + str(m_actDoc))
-        print_msg("m_actDoc.Name = " + str(m_actDoc.Name))
-        print_msg("m_selEx       = " + str(m_selEx))         
-        print_msg("m_sel         = " + str(m_sel))
+#     m_actDoc = App.activeDocument()
+#     if m_actDoc == None:
+#         message = "No Active document selected !"
+#         return (None, message)
+#     if not m_actDoc.Name:
+#         message = "No Active document.name selected !"
+#         return (None, message) 
+#        
+#     m_selEx  = Gui.Selection.getSelectionEx(m_actDoc.Name)                    
+#     m_sel    = Selection(m_selEx)
+#  
+#     if m_sel == None :
+#         print_msg("Unable to create a Selection Object !") 
+#         return None
+#     
+#     if WF.verbose() != 0:
+#         print_msg("m_actDoc      = " + str(m_actDoc))
+#         print_msg("m_actDoc.Name = " + str(m_actDoc.Name))
+#         print_msg("m_selEx       = " + str(m_selEx))         
+#         print_msg("m_sel         = " + str(m_sel))
+    m_sel, m_actDoc = getSel(WF.verbose())
       
     try:        
-        Number_of_Edges, Edge_List = m_sel.get_segmentsNames(getfrom=["Segments","Curves","Planes","Objects"])
+        Number_of_Edges, Edge_List = m_sel.get_segmentsNames(getfrom=["Points","Segments","Curves","Planes","Objects"])
         if WF.verbose() != 0:        
             print_msg("Number_of_Edges = " + str(Number_of_Edges))
+            print_msg("Edge_List = " + str(Edge_List))
             
         if Number_of_Edges == 0:
             raise Exception(m_exception_msg)
         try:
-            m_main_dir  = "WorkPoints_P"   
+            m_main_dir = "WorkPoints_P"   
             m_group = createFolders(str(m_main_dir))
             if WF.verbose() != 0:
                 print_msg("Group = " + str(m_group.Label))
             m_sub_dir  = "Set"
             
             # Create a sub group if needed
-            if Number_of_Edges > 1:
+            if Number_of_Edges > 1 or m_location != "Single":
                 try:
                     m_ob = App.ActiveDocument.getObject(str(m_main_dir)).newObject("App::DocumentObjectGroup", str(m_sub_dir))
                     m_group = m_actDoc.getObject( str(m_ob.Label) )
@@ -340,10 +343,7 @@ def run():
                         selfobj.Edge = edge
                         selfobj.NumberLinePart = m_numberLinePart
                         selfobj.IndexPart      = m_iPart 
-                        selfobj.Proxy.execute(selfobj)
-                        
-#                if WF.verbose() != 0:    
-#                    print_point(Vector_Line_Center,str(Center_User_Name) + result_msg + " at :")
+                        selfobj.Proxy.execute(selfobj)                        
         finally:
             App.ActiveDocument.commitTransaction()
             

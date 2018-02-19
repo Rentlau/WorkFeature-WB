@@ -25,10 +25,37 @@
 *   USA or see <http://www.gnu.org/licenses/>                             *
 ***************************************************************************
 """
+import FreeCAD as App
+if App.GuiUp:
+    import FreeCADGui as Gui
 import Part
-
+from WF_print import print_msg
 import WF_geometry as geom
 
+def getSel(debug=0):
+
+    m_actDoc = App.activeDocument()
+    if m_actDoc == None:
+        message = "No Active document selected !"
+        return (None, message)
+    if not m_actDoc.Name:
+        message = "No Active document.name selected !"
+        return (None, message) 
+       
+    m_selEx  = Gui.Selection.getSelectionEx(m_actDoc.Name)                    
+    m_sel    = Selection(m_selEx)
+ 
+    if m_sel == None :
+        print_msg("Unable to create a Selection Object !") 
+        return None
+    
+    if debug != 0:
+        print_msg("m_actDoc      = " + str(m_actDoc))
+        print_msg("m_actDoc.Name = " + str(m_actDoc.Name))
+        print_msg("m_selEx       = " + str(m_selEx))         
+        print_msg("m_sel         ... " + str(m_sel))
+        
+    return m_sel, m_actDoc
 
 def parseSel(selectionObject):
     res = []
@@ -253,7 +280,7 @@ class Selection():
                             m_i_in_list = find(m_v,m_obj.Object.Shape)
                             Selected_Entities.append([m_obj.Object,"Vertex"+str(m_i_in_list)])
                             m_i += 1
-                        m_i = 0
+                        #m_i = 0
                                            
                     if issubclass(type(m_subobj),Part.Vertex):
                         Selected_Entities.append([m_obj.Object,m_obj.SubElementNames[m_i]])
@@ -360,6 +387,7 @@ class Selection():
 
         Selected_Entities = []
 
+        m_i = 0
         for m_obj in self.__selEx:
             m_shape = m_obj.Object.Shape
 
@@ -390,6 +418,16 @@ class Selection():
                         for m_e in m_shape.Edges:
                             Selected_Entities.append([m_obj.Object,"Edge"+str(m_i)])
                             m_i += 1
+                            
+        if self.numberOfPoints >= 2 and "Points" in getfrom :
+            for m_p1,m_p2 in zip(self.__selectedVertices, self.__selectedVertices[1:]):
+                m_diff = m_p2.Point.sub(m_p1.Point)
+                tolerance = 1e-10
+                if abs(m_diff.x) <= tolerance and abs(m_diff.y) <= tolerance and abs(m_diff.z) <= tolerance:
+                    continue 
+                Selected_Entities.append([Part.makeLine(m_p2.Point, m_p1.Point),"Edge"+str(m_i)])
+                m_i += 1        
+    
                  
         if len(Selected_Entities) != 0:                          
             return (len(Selected_Entities), Selected_Entities)

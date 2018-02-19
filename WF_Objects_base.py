@@ -59,6 +59,7 @@ class WF_Object():
         selfobj.parametric = [ v.encode('utf8') for v in ['No','Interactive','Dynamic'] ]
         selfobj.parametric = 'Dynamic'.encode('utf8')
         selfobj.parametric = WF.parametric()
+        selfobj.setEditorMode("parametric", 1) 
 
     # this method is mandatory   
     def execute(self,selfobj):
@@ -88,6 +89,37 @@ class WF_Point(WF_Object):
         selfobj.setEditorMode("Y", 1) 
         selfobj.setEditorMode("Z", 1)
     
+    # this method is mandatory   
+    def execute(self,selfobj):
+        pass
+        
+    def onChanged(self, selfobj, prop): 
+        WF_Object.onChanged(self, selfobj, prop) 
+        
+class WF_Line(WF_Object):
+    """ The Line WF object. """
+    # this method is mandatory
+    def __init__(self, selfobj, name):
+        WF_Object.__init__(self, selfobj)
+        
+        """ Add some custom properties to our Point WF object. """
+        selfobj.addProperty("App::PropertyFloat","X1",name,"X of the start point").X1=1.0
+        selfobj.addProperty("App::PropertyFloat","Y1",name,"Y of the start point").Y1=1.0
+        selfobj.addProperty("App::PropertyFloat","Z1",name,"Z of the start point").Z1=1.0
+        selfobj.addProperty("App::PropertyFloat","X2",name,"X of the end point").X2=1.0
+        selfobj.addProperty("App::PropertyFloat","Y2",name,"Y of the end point").Y2=1.0
+        selfobj.addProperty("App::PropertyFloat","Z2",name,"Z of the end point").Z2=1.0
+        
+        # 0 -- default mode, read and write
+        # 1 -- read-only
+        # 2 -- hidden 
+        selfobj.setEditorMode("X1", 1) 
+        selfobj.setEditorMode("Y1", 1) 
+        selfobj.setEditorMode("Z1", 1) 
+        selfobj.setEditorMode("X2", 1) 
+        selfobj.setEditorMode("Y2", 1) 
+        selfobj.setEditorMode("Z2", 1) 
+ 
     # this method is mandatory   
     def execute(self,selfobj):
         pass

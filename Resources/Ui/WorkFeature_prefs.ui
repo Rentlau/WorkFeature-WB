@@ -85,10 +85,13 @@
             <item>
              <widget class="Gui::PrefComboBox" name="combobox_4">
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Choose the parametric behavior of the Feature regarding parent changes.&lt;/p&gt;&lt;p&gt;No : for Static (no update)&lt;/p&gt;&lt;p&gt;Interactive : Update only when user asks for&lt;/p&gt;&lt;p&gt;Dynamic : Update each time parent changes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;NOT YET ACTIVE &lt;/p&gt;&lt;p&gt;Choose the parametric behavior of the Feature regarding parent changes.&lt;/p&gt;&lt;p&gt;No : for Static (no update)&lt;/p&gt;&lt;p&gt;Interactive : Update only when user asks for&lt;/p&gt;&lt;p&gt;Dynamic : Update each time parent changes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="editable">
+               <bool>true</bool>
               </property>
               <property name="currentIndex">
-               <number>0</number>
+               <number>2</number>
               </property>
               <property name="maxVisibleItems">
                <number>8</number>

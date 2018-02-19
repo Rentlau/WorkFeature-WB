@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from PySide import QtCore, QtGui
 import os
+import inspect
 import FreeCAD as App
 
 error_msg_not_yet = "Not yet Developped !"
@@ -37,22 +38,24 @@ def print_msg(message):
 def printInfo_msg(message, title=None):
     """ Print a message on console.
     """
-    App.Console.PrintMessage( message + "\n")
+    m_msg = message
+    App.Console.PrintMessage( m_msg + "\n")
     try :
-        gui_infoDialog(message, title)
+        gui_infoDialog(m_msg, title)
     except:
         App.Console.PrintError("\nERROR : Not able to launch a QT dialog !" )
-        raise(Exception(message)) 
+        raise(Exception(m_msg)) 
 
 def printError_msg(message, title=None):
     """ Print a ERROR message on console.
     """
-    App.Console.PrintError( message + "\n")
+    m_msg =  str(inspect.stack()[1][3]) + " : " + str(message)
+    App.Console.PrintError( m_msg + "\n")
     try :
-        gui_errorDialog(message, title)
+        gui_errorDialog(m_msg, title)
     except:
         App.Console.PrintError("\nERROR : Not able to launch a QT dialog !" )
-        raise(Exception(message))
+        raise(Exception(m_msg))
     
 def print_not_yet():
     printError_msg(error_msg_not_yet)

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>223</width>
+    <width>226</width>
     <height>53</height>
    </rect>
   </property>
@@ -24,7 +24,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="UI_CenterLinePoint_extension">
+      <widget class="QLineEdit" name="UI_Line_extension">
        <property name="maximumSize">
         <size>
          <width>60</width>
@@ -44,8 +44,6 @@ Negative values will start to shrink it (then reverse when middle reached). </st
     </layout>
    </item>
   </layout>
-  <zorder>UI_CenterLinePoint_extension</zorder>
-  <zorder>UI_ExtremaLinePoint_label</zorder>
  </widget>
  <resources/>
  <connections/>

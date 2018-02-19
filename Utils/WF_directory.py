@@ -15,7 +15,7 @@ def addObjectToGrp(obj,grp,info=0):
 def createFolders(folder=None):
     """ Create WorkFeatures Parametric folders if needed.
     """
-    m_main_dir = "WorkFeatures_P"
+    m_main_dir = "WorkFeatures"
     if not(App.ActiveDocument.getObject(m_main_dir)):   
         try:
             App.ActiveDocument.addObject("App::DocumentObjectGroup",m_main_dir)    
@@ -29,7 +29,8 @@ def createFolders(folder=None):
     m_group = None
     for m_dir in m_list_dirs:     
         if folder == m_dir:
-            if not(App.ActiveDocument.getObject(m_main_dir).getObject(str(m_dir))):
+            m_group = App.ActiveDocument.getObject(m_main_dir).getObject(str(m_dir))
+            if not(m_group):
                 try:
                     m_group = App.ActiveDocument.getObject(m_main_dir).newObject("App::DocumentObjectGroup", str(m_dir))
                 except:

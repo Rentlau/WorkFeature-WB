@@ -33,14 +33,14 @@ __title__  = "WorkFeature  workbench"
 __author__ = "Rentlau_64"
 __url__    = "https://github.com/Rentlau/WorkFeature-WB.git"
 ###############
-m_debug = True
+m_debug = False
 ###############
 
 import os, sys
 import WF
 
 global WF_Release
-WF_Release = "2018_02_13"
+WF_Release = "2018_02_19"
 
 # get the path of the Release python script 
 path_WF = os.path.dirname(WF.__file__)
@@ -80,6 +80,8 @@ class WorkFeatureWorkbench ( Workbench ):
         try:
             import WF_centerLinePoint
             import WF_extremaLinePoint
+            
+            import WF_twoPointsLine
         except ImportError:
             FreeCAD.Console.PrintWarning("Error: One of WF_ module not found, WorkFeature workbench will be disabled.\n")
         except:
@@ -93,14 +95,13 @@ class WorkFeatureWorkbench ( Workbench ):
         self.appendMenu(self.Point_menu, self.Point_commands_list)
         self.appendToolbar("WF Points" , self.Point_commands_list)
         
-#         import WF_twoPointsLine
-#         m_menu = ["Work Feature","Lines"]
-#         m_list = ["TwoPointsLine", 
-#                   ]
-#         self.appendCommandbar("Lines",m_list)
-#         self.appendMenu(m_menu,m_list)
-#          
-#         self.appendToolbar("WF Lines", m_list)
+        # Set menu and commands for Lines   
+        self.m_Line_menu = ["Work Feature","Lines"]
+        self.m_Line_commands_list = ["TwoPointsLine", 
+                                ]
+        self.appendCommandbar("Lines"   , self.m_Line_commands_list)
+        self.appendMenu(self.m_Line_menu, self.m_Line_commands_list)          
+        self.appendToolbar("WF Lines"   , self.m_Line_commands_list)
 
 #         m_submenu = ['WorkFeature.pdf']
 # 
