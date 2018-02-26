@@ -8,7 +8,8 @@
 Updated in February 2018
 
 Workbench utility to create:
-- Points (Mid points, Extremum points), 
+- Points (Mid points, Extremum points),
+- Lines (From 2 points,),
  
  
 github : https://github.com/Rentlau/WorkFeature-WB
@@ -27,9 +28,8 @@ github : https://github.com/Rentlau/WorkFeature-WB
 Download and install FreeCAD from [wiki Download page](http://www.freecadweb.org/wiki/Download) and install this workbench by (e.g, on Linux system): 
   - Cloning the repository from github (https://github.com/Rentlau/WorkFeature-WB) using:
 
-<code>mkdir /home/path_to_WorkFeature-WB/
-cd /home/path_to_WorkFeature-WB/
-
+<code>mkdir /home/path_to_WorkFeature-WB/<br>
+cd /home/path_to_WorkFeature-WB/<br>
 git clone https://github.com/Rentlau/WorkFeature-WB.git</code>
 
   - or download from github the zip file : <b>WorkFeature-WB-master.zip</b> and extract it into "/home/path_to_WorkFeature-WB/"
@@ -49,5 +49,11 @@ The development of the macro is done with Python2.7
 ### Abstract
 ----------
 
-To be continued
+Quite all objects created with functions from this workbench are parametric. That mean if the "parent" object change, all children objects will change accordingly !
   
+
+### Documentations
+----------
+
+Find some documentation in ./Doc directory :
+  - [How to create "Center Line Point(s)"](./Doc/HowTo_WFWB_Create_CenterLinePoint.pdf).<br>

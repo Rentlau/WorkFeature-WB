@@ -114,8 +114,8 @@ class TwoPointsLinePanel:
 
 
 def makeTwoPointsLineFeature(group):
-    """ Makes a TwoPointsLine" parametric feature object. 
-    
+    """ Makes a TwoPointsLine parametric feature object. 
+    into the given Group
     Returns the new object.
     """
     m_name = "TwoPointsLine_P"
