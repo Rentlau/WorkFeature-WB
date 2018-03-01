@@ -40,7 +40,7 @@ import os, sys
 import WF
 
 global WF_Release
-WF_Release = "2018_02_19"
+WF_Release = "2018_03_01"
 
 # get the path of the Release python script 
 path_WF = os.path.dirname(WF.__file__)

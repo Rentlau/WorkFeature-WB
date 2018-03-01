@@ -36,7 +36,7 @@
         <item>
          <widget class="Gui::PrefLineEdit" name="release_edit">
           <property name="toolTip">
-           <string>This is the default group name for construction geometry</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Must be the date of the last git push&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="text">
            <string/>
