@@ -28,11 +28,11 @@
 *   USA or see <http://www.gnu.org/licenses/>                             *
 ***************************************************************************
 """
-__title__="Macro ExtremaLinePoint"
+__title__="Macro LinePointPlane"
 __author__ = "Rentlau_64"
 __brief__ = '''
-Macro ExtremaLinePoint.
-Creates a parametric ExtremaLinePoint from an Edge
+Macro LinePointPlane.
+Creates a parametric LinePointPlane from a point and a line
 '''
 ###############
 
@@ -45,9 +45,7 @@ if App.GuiUp:
 import Part
 from PySide import QtGui,QtCore
 import WF
-from WF_Objects_base import WF_Point
-# from Utils.WF_selection import Selection
-# from Utils.WF_geometry import *
+from WF_Objects_base import WF_Plane
 
 # get the path of the current python script 
 path_WF = os.path.dirname(__file__)
@@ -72,40 +70,40 @@ except:
     sys.exit(1)
 
 ###############
-m_icon          = "/WF_extremaLinePoint.svg"
-m_icons         = ["/WF_startLinePoint.svg", "/WF_endtLinePoint.svg", "/WF_extremaLinePoint.svg"]
-m_dialog        = "/WF_UI_extremaLinePoint.ui"
-m_dialog_title  = "Define Start and End location for selected Line(s)."
-m_exception_msg = """Unable to create Extrema Line Point(s) :
-    Select one or several Line/Edge(s) and/or
-    Select one Plane/Face to process all (4) Edges and/or
-    Select one Object to process all Edges at once !
-   
+m_icon          = "/WF_linePointPlane.svg"
+m_dialog        = "/WF_UI_linePointPlane.ui"
+m_dialog_title  = "Define extension of the plane."
+
+m_exception_msg = """Unable to create Plane :
+    Select one Line and one Point only
+    with the Point NOT on the Line !
+
 Go to Parameter(s) Window in Task Panel!"""
-m_result_msg    = " : Extrema Line Point(s) created !"
-m_menu_text     = "Extrema of Line(s) "
+m_result_msg    = " : Plane created !"
+m_menu_text     = "Plane = (Point, Axis)"
 m_accel         = ""
-m_tool_tip      = """<b>Create Point(s)</b> at Start and End location of each selected Line(s).<br>
+m_tool_tip      = """<b>Create Plane</b> crossing one Point and one Line.<br>
 ...<br>
 <i>Click in view window without selection will popup<br>
  - a Warning Window and<br> 
  - a Parameter(s) Window in Task Panel!</i>
-"""
-m_location      = "Both ends"
-m_locations     = ["Begin", "End", "Both ends"]
+""" 
+m_extension      = 150.0
 ###############
- 
-class ExtremaLinePointPanel:  
+
+class LinePointPlanePanel:  
     def __init__(self):
         self.form = Gui.PySideUic.loadUi(path_WF_ui + m_dialog)
         self.form.setWindowTitle(m_dialog_title)
-        
-        self.form.UI_ExtremaLinePoint_comboBox.setCurrentIndex(self.form.UI_ExtremaLinePoint_comboBox.findText(m_location))
-        
+        self.form.UI_Plane_extension.setText(str(m_extension))
+                        
     def accept(self):
-        global m_location
-        m_location = self.form.UI_ExtremaLinePoint_comboBox.currentText()
-        
+        global m_extension
+        m_extension = float(self.form.UI_Plane_extension.text())        
+  
+        if WF.verbose() != 0:
+            print_msg("m_extension = " + str(m_extension))
+            
         Gui.Control.closeDialog()
         m_actDoc = App.activeDocument()
         if m_actDoc is not None:
@@ -121,20 +119,20 @@ class ExtremaLinePointPanel:
         return (len(Gui.Selection.getSelectionEx(App.activeDocument().Name)) == 0 )   
 
 
-def makeExtremaLinePointFeature(group):
-    """ Makes a ExtremaLinePoint" parametric feature object. 
+def makeLinePointPlaneFeature(group):
+    """ Makes a LinePointPlane parametric feature object. 
     into the given Group
     Returns the new object.
     """ 
-    m_name = "ExtremaLinePoint_P"
-    m_part = "Part::FeaturePython"
+    m_name = "LinePointPlane_P"
+    m_part = "Part::FeaturePython"     
     
     try:     
         m_obj = App.ActiveDocument.addObject(str(m_part),str(m_name))
         if group != None :
             addObjectToGrp(m_obj,group,info=1)
-        ExtremaLinePoint(m_obj)
-        ViewProviderExtremaLinePoint(m_obj.ViewObject)
+        LinePointPlane(m_obj)
+        ViewProviderLinePointPlane(m_obj.ViewObject)
     except:
         printError_msg( "Not able to add an object to Model!")
         return None
@@ -142,61 +140,110 @@ def makeExtremaLinePointFeature(group):
     return m_obj
 
 
-class ExtremaLinePoint(WF_Point):
-    """ The ExtremaLinePoint feature object. """
+class LinePointPlane(WF_Plane):
+    """ The LinePointPlane feature object. """
     # this method is mandatory
     def __init__(self,selfobj):
-        self.name = "ExtremaLinePoint"
-        WF_Point.__init__(self, selfobj, self.name) 
-        """ Add some custom properties to our ExtremaLinePoint feature object. """
+        self.name = "LinePointPlane"
+        WF_Plane.__init__(self, selfobj, self.name)
+        """ Add some custom properties to our LinePointPlane feature object. """
         selfobj.addProperty("App::PropertyLinkSub","Edge",self.name,
-                            "Input edge")  
-        selfobj.addProperty("App::PropertyEnumeration","At",self.name,
-                            "Location Definition").At=["Begin","End"]
-        
-        selfobj.setEditorMode("Edge", 1)      
-        selfobj.Proxy = self  
-    
-    # this method is mandatory    
+                            "Input edge")
+        selfobj.addProperty("App::PropertyLinkSub","Point",self.name,
+                            "Input point")
+        selfobj.addProperty("App::PropertyFloat","Extension",self.name,
+                            "Extension at extrema").Extension=150.0 
+        # 0 -- default mode, read and write
+        # 1 -- read-only
+        # 2 -- hidden 
+        selfobj.setEditorMode("Edge", 1)
+        selfobj.setEditorMode("Point", 1)
+        selfobj.Proxy = self    
+     
+    # this method is mandatory   
     def execute(self,selfobj): 
         """ Print a short message when doing a recomputation. """
         if WF.verbose() != 0:
-            App.Console.PrintMessage("Recompute Python ExtremaLinePoint feature\n")
+            App.Console.PrintMessage("Recompute Python LinePointPlane feature\n")
         
-        n = eval(selfobj.Edge[1][0].lstrip('Edge'))
-        if selfobj.At == "Begin":       
-            Vector_point = selfobj.Edge[0].Shape.Edges[n-1].Vertexes[0].Point
-        else:
-            Vector_point = selfobj.Edge[0].Shape.Edges[n-1].Vertexes[-1].Point
-                       
-        point = Part.Point( Vector_point )
-        selfobj.Shape = point.toShape()
-        propertiesPoint(selfobj.Label)
-        selfobj.X = float(Vector_point.x)
-        selfobj.Y = float(Vector_point.y)
-        selfobj.Z = float(Vector_point.z)
+        if selfobj.Edge != None and selfobj.Point != None :
+            points = []
+            
+            n1 = eval(selfobj.Point[1][0].lstrip('Vertex'))
+            point_C = selfobj.Point[0].Shape.Vertexes[n1-1].Point
+            points.append(point_C)
+            
+            n2 = eval(selfobj.Edge[1][0].lstrip('Edge'))
+            point_A = selfobj.Edge[0].Shape.Edges[n2-1].Vertexes[0].Point
+            point_B = selfobj.Edge[0].Shape.Edges[n2-1].Vertexes[-1].Point
+
+            points.append(point_A)
+            points.append(point_B)
+            
+            if isColinearVectors(point_A, point_B, point_C, tolerance=1e-12):
+                printError_msg(m_exception_msg, title="Macro LinePointPlane")
+                return
+            
+            Vector_Center = meanVectorsPoint(points)
+            xmax, xmin, ymax, ymin, zmax, zmin = minMaxVectorsLimits(points)
+
+            length = xmax - xmin
+            if (ymax - ymin) > length:
+                length = ymax - ymin
+            if (zmax - zmin) > length:
+                length = zmax - zmin
+            if length == 0:
+                length = 10.0
+                         
+            Edge_Vector = point_B - point_A
+            AC_Vector = point_C - point_A
+            
+            Edge_Length = length
+            if selfobj.Extension == 0.0 :
+                selfobj.Extension = 100.0
+            if selfobj.Extension < 0.0 :
+                selfobj.Extension *= -1
+                
+            if selfobj.Extension > 100.0 :
+                Edge_Length = length * (selfobj.Extension / 100.0)
+            elif m_extension < 100.0 :
+                Edge_Length = length / (selfobj.Extension / 100.0)
+            
+            Plane_Point  = Vector_Center
+            Plane_Normal = Edge_Vector.cross( AC_Vector )
+                        
+            Plane_face = Part.makePlane(Edge_Length, Edge_Length, 
+                                        Plane_Point, Plane_Normal )
+            Plane_Center = Plane_face.CenterOfMass
+            Plane_Translate =  Plane_Point - Plane_Center
+            Plane_face.translate( Plane_Translate )
+            selfobj.Shape = Plane_face
+            
+            properties_plane(selfobj.Label)
+
                 
     def onChanged(self, selfobj, prop):
         """ Print the name of the property that has changed """
+        # Debug mode
         if WF.verbose() != 0:
-            App.Console.PrintMessage("Change property: " + str(prop) + "\n")
+            App.Console.PrintMessage("Change property : " + str(prop) + "\n")
         
         if selfobj.parametric == 'No' :
-            selfobj.setEditorMode("At", 1)
+            selfobj.setEditorMode("Extension", 1)
         else :
-            selfobj.setEditorMode("At", 0)
-        
-        if prop == "At":
+            selfobj.setEditorMode("Extension", 0)
+            
+        if prop == "Extension":            
             selfobj.Proxy.execute(selfobj)
-        
-        WF_Point.onChanged(self, selfobj, prop)
+
+        WF_Plane.onChanged(self, selfobj, prop)   
     
             
-class ViewProviderExtremaLinePoint:
+class ViewProviderLinePointPlane:
     global path_WF_icons
-    icon = "/WF_extremaLinePoint.svg"
-    def __init__(self, vobj):
-        """ Set this object to the proxy object of the actual view provider """           
+    icon = '/WF_linePointPlane.svg'  
+    def __init__(self,vobj):
+        """ Set this object to the proxy object of the actual view provider """
         vobj.Proxy = self
     
     # this method is mandatory    
@@ -223,25 +270,26 @@ class ViewProviderExtremaLinePoint:
     # This method is optional and if not defined a default icon is shown.
     def getIcon(self):        
         """ Return the icon which will appear in the tree view. """
-        return (path_WF_icons + ViewProviderExtremaLinePoint.icon)
-    
-    def setIcon(self, icon = '/WF_extremaLinePoint.svg'):
-        ViewProviderExtremaLinePoint.icon = icon
-        
-                     
-class CommandExtremaLinePoint:       
-    """ Command to create ExtremaLinePoint feature object. """
+        return (path_WF_icons + ViewProviderLinePointPlane.icon)
+           
+    def setIcon(self, icon = '/WF_linePointPlane.svg'):
+        ViewProviderLinePointPlane.icon = icon
+  
+            
+class CommandLinePointPlane:
+    """ Command to create LinePointPlane feature object. """
     def GetResources(self):
         return {'Pixmap'  : path_WF_icons + m_icon,
                 'MenuText': m_menu_text,
                 'Accel'   : m_accel,
                 'ToolTip' : m_tool_tip}
-        
+
     def Activated(self):
         m_actDoc = App.activeDocument()
         if m_actDoc is not None:
             if len(Gui.Selection.getSelectionEx(m_actDoc.Name)) == 0:
-                Gui.Control.showDialog(ExtremaLinePointPanel())
+                Gui.Control.showDialog(LinePointPlanePanel())
+
         run()
         
     def IsActive(self):
@@ -251,58 +299,47 @@ class CommandExtremaLinePoint:
             return False
 
 if App.GuiUp:
-    Gui.addCommand("ExtremaLinePoint", CommandExtremaLinePoint())
+    Gui.addCommand("LinePointPlane", CommandLinePointPlane())
 
-   
+
 def run():
-    m_sel, m_actDoc = getSel(WF.verbose())
-       
+    m_sel, _ = getSel(WF.verbose())
+      
     try:        
-        Number_of_Edges, Edge_List = m_sel.get_segmentsNames(getfrom=["Segments","Curves","Planes","Objects"])
-        if WF.verbose() != 0:        
+        Number_of_Edges, Edge_List = m_sel.get_segmentsNames(getfrom=["Segments","Curves","Planes","Objects"])        
+        Number_of_Vertexes, Vertex_List = m_sel.get_pointsNames(getfrom=["Points","Curves","Objects"])
+        
+        if WF.verbose() != 0:
             print_msg("Number_of_Edges = " + str(Number_of_Edges))
-            print_msg("Edge_List = " + str(Edge_List))
-            
-        if Number_of_Edges == 0:
+            print_msg("Edge_List = " + str(Edge_List))        
+            print_msg("Number_of_Vertexes = " + str(Number_of_Vertexes))
+            print_msg("Vertex_List = " + str(Vertex_List))
+                
+        if Number_of_Edges < 1:
+            raise Exception(m_exception_msg)
+        if Number_of_Vertexes < 1:
             raise Exception(m_exception_msg)
         try:
-            m_main_dir = "WorkPoints_P"   
+            m_main_dir = "WorkPlanes_P"   
             m_group = createFolders(str(m_main_dir))
             if WF.verbose() != 0:
                 print_msg("Group = " + str(m_group.Label))
-            m_sub_dir  = "Set"
-            
-            # Create a sub group if needed
-            if Number_of_Edges > 1 or m_location == "Both ends":
-                try:
-                    m_ob = App.ActiveDocument.getObject(str(m_main_dir)).newObject("App::DocumentObjectGroup", str(m_sub_dir))
-                    m_group = m_actDoc.getObject( str(m_ob.Label) )
-                except:
-                    printError_msg("Could not Create '"+ str(m_sub_dir) +"' Objects Group!")           
-                             
-            for i in range( Number_of_Edges ):
-                edge = Edge_List[i]
-                
-                if WF.verbose() != 0:
-                    print_msg("Location = " + str(m_location))
-                                                  
-                if m_location in  ["Begin", "Both ends"] :
-                    App.ActiveDocument.openTransaction("Macro ExtremaLinePoint") 
-                    selfobj1 = makeExtremaLinePointFeature(m_group)    
-                    selfobj1.Edge = edge
-                    selfobj1.At = "Begin"              
-                    selfobj1.Proxy.execute(selfobj1)
-                if m_location in  ["End", "Both ends"] :
-                    App.ActiveDocument.openTransaction("Macro ExtremaLinePoint") 
-                    selfobj2 = makeExtremaLinePointFeature(m_group)    
-                    selfobj2.Edge = edge
-                    selfobj2.At = "End"
-                    selfobj2.Proxy.execute(selfobj2)
+                               
+            edge = Edge_List[0]
+            vertex =  Vertex_List [0] 
+               
+            App.ActiveDocument.openTransaction("Macro LinePointPlane")
+            selfobj = makeLinePointPlaneFeature(m_group)    
+            selfobj.Edge      = edge
+            selfobj.Point     = vertex
+            selfobj.Extension = m_extension
+            selfobj.Proxy.execute(selfobj)
+                       
         finally:
             App.ActiveDocument.commitTransaction()
             
     except Exception as err:
-        printError_msg(err.message, title="Macro ExtremaLinePoint")
+        printError_msg(err.message, title="Macro LinePointPlane")
 
                            
 if __name__ == '__main__':

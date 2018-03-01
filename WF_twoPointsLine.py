@@ -78,7 +78,7 @@ m_exception_msg = """Unable to create Line(s) from 2 Points :
     
 Go to Parameter(s) Window in Task Panel!"""
 m_result_msg    = " : Line(s) from 2 Points created !"
-m_menu_text     = "Line(s) from 2 Points"
+m_menu_text     = "Line(s) = (Point, Point)"
 m_accel         = ""
 m_tool_tip      = """<b>Create Line(s)</b> from at least two selected Points.<br>
 ...<br>
@@ -93,11 +93,15 @@ class TwoPointsLinePanel:
     def __init__(self):
         self.form = Gui.PySideUic.loadUi(path_WF_ui + m_dialog)
         self.form.setWindowTitle(m_dialog_title)
-        self.form.UI_Line_extension.setValue(m_extension)
+        self.form.UI_Line_extension.setText(str(m_extension))
         
     def accept(self):
         global m_extension
         m_extension = float(self.form.UI_Line_extension.text())
+        
+        if WF.verbose() != 0:
+            print_msg("m_extension = " + str(m_extension))
+            
         Gui.Control.closeDialog()
         m_actDoc = App.activeDocument()
         if m_actDoc is not None:
@@ -281,6 +285,7 @@ def run():
         Number_of_Vertexes, Vertex_List = m_sel.get_pointsNames(getfrom=["Points","Curves","Objects"])
         if WF.verbose() != 0:        
             print_msg("Number_of_Vertexes = " + str(Number_of_Vertexes))
+            print_msg("Vertex_List = " + str(Vertex_List))
             
         if Number_of_Vertexes < 2:
             raise Exception(m_exception_msg)

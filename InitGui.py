@@ -82,6 +82,9 @@ class WorkFeatureWorkbench ( Workbench ):
             import WF_extremaLinePoint
             
             import WF_twoPointsLine
+            
+            import WF_linePointPlane
+            import WF_perpendicularLinePointPlane
         except ImportError:
             FreeCAD.Console.PrintWarning("Error: One of WF_ module not found, WorkFeature workbench will be disabled.\n")
         except:
@@ -103,6 +106,14 @@ class WorkFeatureWorkbench ( Workbench ):
         self.appendMenu(self.m_Line_menu, self.m_Line_commands_list)          
         self.appendToolbar("WF Lines"   , self.m_Line_commands_list)
 
+        # Set menu and commands for Planes   
+        self.m_Line_menu = ["Work Feature","Planes"]
+        self.m_Line_commands_list = ["LinePointPlane",
+                                     "PerpendicularLinePointPlane", 
+                                ]
+        self.appendCommandbar("Planes"   , self.m_Line_commands_list)
+        self.appendMenu(self.m_Line_menu, self.m_Line_commands_list)          
+        self.appendToolbar("WF Planes"   , self.m_Line_commands_list)
 #         m_submenu = ['WorkFeature.pdf']
 # 
 #         self.appendMenu(["Work Feature", "Help"], m_submenu)

@@ -95,6 +95,7 @@ class WF_Point(WF_Object):
         
     def onChanged(self, selfobj, prop): 
         WF_Object.onChanged(self, selfobj, prop) 
+
         
 class WF_Line(WF_Object):
     """ The Line WF object. """
@@ -119,6 +120,32 @@ class WF_Line(WF_Object):
         selfobj.setEditorMode("X2", 1) 
         selfobj.setEditorMode("Y2", 1) 
         selfobj.setEditorMode("Z2", 1) 
+ 
+    # this method is mandatory   
+    def execute(self,selfobj):
+        pass
+        
+    def onChanged(self, selfobj, prop): 
+        WF_Object.onChanged(self, selfobj, prop) 
+     
+
+class WF_Plane(WF_Object):
+    """ The Plane WF object. """
+    # this method is mandatory
+    def __init__(self, selfobj, name):
+        WF_Object.__init__(self, selfobj)
+        
+        """ Add some custom properties to our Plane WF object. """
+#         selfobj.addProperty("App::PropertyFloat","X",name,"X of the point").X1=1.0
+#         selfobj.addProperty("App::PropertyFloat","Y",name,"Y of the point").Y1=1.0
+#         selfobj.addProperty("App::PropertyFloat","Z",name,"Z of the point").Z1=1.0
+#         
+#         # 0 -- default mode, read and write
+#         # 1 -- read-only
+#         # 2 -- hidden 
+#         selfobj.setEditorMode("X", 1) 
+#         selfobj.setEditorMode("Y", 1) 
+#         selfobj.setEditorMode("Z", 1) 
  
     # this method is mandatory   
     def execute(self,selfobj):

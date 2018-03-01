@@ -332,7 +332,7 @@ def run():
                 if m_location == "Single" :                  
                     App.ActiveDocument.openTransaction("Macro CenterLinePoint")
                     selfobj = makeCenterLinePointFeature(m_group)    
-                    selfobj.Edge = edge
+                    selfobj.Edge           = edge
                     selfobj.NumberLinePart = m_numberLinePart
                     selfobj.IndexPart      = m_indexPart 
                     selfobj.Proxy.execute(selfobj)
@@ -340,7 +340,7 @@ def run():
                     for m_iPart in range(m_numberLinePart+1):
                         App.ActiveDocument.openTransaction("Macro CenterLinePoint")
                         selfobj = makeCenterLinePointFeature(m_group)    
-                        selfobj.Edge = edge
+                        selfobj.Edge           = edge
                         selfobj.NumberLinePart = m_numberLinePart
                         selfobj.IndexPart      = m_iPart 
                         selfobj.Proxy.execute(selfobj)                        
