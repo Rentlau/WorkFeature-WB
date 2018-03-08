@@ -86,21 +86,22 @@ m_tool_tip      = """<b>Create Line(s)</b> from at least two selected Points.<br
  - a Warning Window and<br> 
  - a Parameter(s) Window in Task Panel!</i>
 """
-m_extension      = 0.0
+m_line_ext      = 0.0
 ###############
  
 class TwoPointsLinePanel:  
     def __init__(self):
         self.form = Gui.PySideUic.loadUi(path_WF_ui + m_dialog)
         self.form.setWindowTitle(m_dialog_title)
-        self.form.UI_Line_extension.setText(str(m_extension))
+        self.form.UI_Line_extension.setText(str(m_line_ext))
         
     def accept(self):
-        global m_extension
-        m_extension = float(self.form.UI_Line_extension.text())
+        global m_line_ext
+        
+        m_line_ext = float(self.form.UI_Line_extension.text())
         
         if WF.verbose() != 0:
-            print_msg("m_extension = " + str(m_extension))
+            print_msg("m_line_ext = " + str(m_line_ext))
             
         Gui.Control.closeDialog()
         m_actDoc = App.activeDocument()
@@ -116,6 +117,28 @@ class TwoPointsLinePanel:
     def shouldShow(self):    
         return (len(Gui.Selection.getSelectionEx(App.activeDocument().Name)) == 0 )   
 
+def makeTwoPointsLineFeatureFromList(selectionset,group):
+    """ Makes a TwoPointsLine parametric feature object from a selection set.
+    into the given Group
+    Returns the new object.
+    """
+    m_name = "TwoPointsLine_P"
+    m_part = "Part::FeaturePython"
+        
+    if not isinstance(selectionset,list):
+        selectionset = [selectionset]    
+    try: 
+        m_obj = App.ActiveDocument.addObject(str(m_part),str(m_name))
+        if group != None :
+            addObjectToGrp(m_obj,group,info=1)
+        TwoPointsLine(m_obj)
+        ViewProviderTwoPointsLine(m_obj.ViewObject)
+        m_obj.Proxy.addSubobjects(m_obj,selectionset)
+    except:
+        printError_msg( "Not able to add a complete object to Model!")
+        return None
+    
+    return m_obj
 
 def makeTwoPointsLineFeature(group):
     """ Makes a TwoPointsLine parametric feature object. 
@@ -132,7 +155,7 @@ def makeTwoPointsLineFeature(group):
         TwoPointsLine(m_obj)
         ViewProviderTwoPointsLine(m_obj.ViewObject)
     except:
-        printError_msg( "Not able to add an object to Model!")
+        printError_msg( "Not able to add a complete object to Model!")
         return None
     
     return m_obj
@@ -149,8 +172,14 @@ class TwoPointsLine(WF_Line):
                             "Start point")  
         selfobj.addProperty("App::PropertyLinkSub","Point2",self.name,
                             "End point")
+        
+#         selfobj.addProperty("App::PropertyLinkSubList","Points",self.name,
+#                         "Linked points")
+        
         selfobj.addProperty("App::PropertyFloat","Extension",self.name,
                             "Extension at extrema").Extension=0.0
+        selfobj.setEditorMode("Point1", 1)
+        selfobj.setEditorMode("Point2", 1)
         selfobj.Proxy = self    
     
     # this method is mandatory    
@@ -159,36 +188,79 @@ class TwoPointsLine(WF_Line):
         if WF.verbose() != 0:
             App.Console.PrintMessage("Recompute Python TwoPointsLine feature\n")
 
+#         if selfobj.Points != None:
+#             print selfobj.Points
+#             for i in selfobj.Points:
+#                 print i
+#                 print i[0]
+#             
+#             n1 = eval(selfobj.Points[0][1][0].lstrip('Vertex'))
+#             n2 = eval(selfobj.Points[1][1][0].lstrip('Vertex')) 
+#             
+#             print n1
+#             print n2
+#                         
+#             point1 = selfobj.Points[0][0].Shape.Vertexes[n1-1].Point
+#             point2 = selfobj.Points[1][0].Shape.Vertexes[n2-1].Point
+#             
+#             Axis_dir = point2 - point1
+#             Point_E1 = point2            
+#             Point_E2 = point1
+#             m_line_ext = selfobj.Extension
+#             if m_line_ext != 0.0:
+#                 Point_E1 = point2 +  Axis_dir.normalize().multiply(m_line_ext)   
+#                 if m_line_ext >= 0.0:            
+#                     Point_E2 = point1 -  Axis_dir.normalize().multiply(m_line_ext)
+#                 else:
+#                     Point_E2 = point1 +  Axis_dir.normalize().multiply(m_line_ext)
+#             if Point_E1 == Point_E2:
+#                 Point_E1 = Point_E1 + Axis_dir.multiply(0.1)
+#                 Point_E2 = Point_E2 - Axis_dir.multiply(0.9)            
+#              
+#             print Point_E1.x
+#             print Point_E2
+#             # must be Part.makeLine ((x,y,z),(x,y,z))               
+#             line = Part.makeLine( coordVectorPoint(Point_E2), coordVectorPoint(Point_E1) )
+#             selfobj.Shape = line
+#             propertiesLine(selfobj.Label) 
+                       
         if selfobj.Point1 != None and selfobj.Point2 != None :
             n1 = eval(selfobj.Point1[1][0].lstrip('Vertex'))
             n2 = eval(selfobj.Point2[1][0].lstrip('Vertex'))    
-            
+             
             point1 = selfobj.Point1[0].Shape.Vertexes[n1-1].Point
             point2 = selfobj.Point2[0].Shape.Vertexes[n2-1].Point
-    
+     
             Axis_dir = point2 - point1
-            Axis_E1 = point2            
-            Axis_E2 = point1
-            m_extension = selfobj.Extension
-            if m_extension != 0.0:
-                Axis_E1 = point2 +  Axis_dir.normalize().multiply(m_extension)
-                if m_extension >= 0.0:            
-                    Axis_E2 = point1 -  Axis_dir.normalize().multiply(m_extension)
+            Point_E1 = point2            
+            Point_E2 = point1
+            m_line_ext = selfobj.Extension
+            if m_line_ext != 0.0:
+                Point_E1 = point2 +  Axis_dir.normalize().multiply(m_line_ext)
+                if m_line_ext >= 0.0:            
+                    Point_E2 = point1 -  Axis_dir.normalize().multiply(m_line_ext)
                 else:
-                    Axis_E2 = point1 +  Axis_dir.normalize().multiply(m_extension)
-            if Axis_E1 == Axis_E2:
-                Axis_E1 = Axis_E1 + Axis_dir.multiply(0.1)
-                Axis_E2 = Axis_E2 - Axis_dir.multiply(0.9)            
-                            
-            line = Part.Line( Axis_E2, Axis_E1 )
-            selfobj.Shape = line.toShape()
-            propertiesLine(selfobj.Label)
-            selfobj.X1 = float(point1.x)
-            selfobj.Y1 = float(point1.y)
-            selfobj.Z1 = float(point1.z)
-            selfobj.X2 = float(point2.x)
-            selfobj.Y2 = float(point2.y)
-            selfobj.Z2 = float(point2.z)
+                    Point_E2 = point1 +  Axis_dir.normalize().multiply(m_line_ext)
+            
+            if isEqualVectors (Point_E1,Point_E2):
+                m_msg = """Unable to create Line(s) from 2 Points :
+                Given Points are equals !
+                """
+                printError_msg(m_msg , title="Macro TwoPointsLine")
+                
+            line = Part.makeLine( coordVectorPoint(Point_E2), coordVectorPoint(Point_E1) )
+            selfobj.Shape = line
+            propertiesLine(selfobj.Label)             
+#                             
+#             line = Part.Line( Point_E2, Point_E1 )
+#             selfobj.Shape = line.toShape()
+#             propertiesLine(selfobj.Label)
+#             selfobj.X1 = float(point1.x)
+#             selfobj.Y1 = float(point1.y)
+#             selfobj.Z1 = float(point1.z)
+#             selfobj.X2 = float(point2.x)
+#             selfobj.Y2 = float(point2.y)
+#             selfobj.Z2 = float(point2.z)
         
         #printPoint(Vector_point, msg=m_result_msg)        if Number_of_Points == 2:                  
         
@@ -199,13 +271,9 @@ class TwoPointsLine(WF_Line):
             App.Console.PrintMessage("Change property: " + str(prop) + "\n")
                 
         if selfobj.parametric == 'No' :
-            selfobj.setEditorMode("Extension", 1)
-            selfobj.setEditorMode("Point1", 1)
-            selfobj.setEditorMode("Point2", 1)  
+            selfobj.setEditorMode("Extension", 1)  
         else :
-            selfobj.setEditorMode("Extension", 0)
-            selfobj.setEditorMode("Point1", 0)
-            selfobj.setEditorMode("Point2", 0)      
+            selfobj.setEditorMode("Extension", 0)   
             
         if prop == "Extension":
             selfobj.Proxy.execute(selfobj)
@@ -215,6 +283,23 @@ class TwoPointsLine(WF_Line):
             selfobj.Proxy.execute(selfobj)
             
         WF_Line.onChanged(self, selfobj, prop)
+
+        
+    def addSubobjects(self,selfobj,pointlinks):
+        "adds pointlinks to this TwoPointsLine object"
+        objs = selfobj.Points
+        for o in pointlinks:
+            if isinstance(o,tuple) or isinstance(o,list):
+                if o[0].Name != selfobj.Name:
+                    objs.append(tuple(o))
+            else:
+                for el in o.SubElementNames:
+                    if "Point" in el:
+                        if o.Object.Name != selfobj.Name:
+                            objs.append((o.Object,el))
+        selfobj.Points = objs
+        selfobj.Proxy.execute(selfobj)
+        #self.execute(selfobj)
             
 class ViewProviderTwoPointsLine:
     global path_WF_icons  
@@ -319,10 +404,11 @@ def run():
                     selfobj = makeTwoPointsLineFeature(m_group)    
                     selfobj.Point1 = vertex1
                     selfobj.Point2 = vertex2
-                    selfobj.Extension = m_extension              
+#                     selfobj = makeTwoPointsLineFeatureFromList([vertex1,vertex2],m_group)
+                    selfobj.Extension = m_line_ext              
                     selfobj.Proxy.execute(selfobj) 
                 else :
-                    for i in range(0,Number_of_Vertexes-2,2):
+                    for i in range(0,Number_of_Vertexes-1,2):
                         vertex1 = Vertex_List[i]
                         vertex2 = Vertex_List[i+1]
                         
@@ -334,9 +420,12 @@ def run():
                         selfobj = makeTwoPointsLineFeature(m_group)    
                         selfobj.Point1 = vertex1
                         selfobj.Point2 = vertex2
-                        selfobj.Extension = m_extension              
+#                         selfobj = makeTwoPointsLineFeatureFromList([vertex1,vertex2],m_group)
+                        selfobj.Extension = m_line_ext              
                         selfobj.Proxy.execute(selfobj)   
-            else: #odd              
+            else: #odd
+                if WF.verbose() != 0:
+                    print_msg("Odd number of points")              
                 for i in range(Number_of_Vertexes-1):
                     vertex1 = Vertex_List[i]
                     vertex2 = Vertex_List[i+1]
@@ -345,7 +434,7 @@ def run():
                     selfobj = makeTwoPointsLineFeature(m_group)    
                     selfobj.Point1 = vertex1
                     selfobj.Point2 = vertex2
-                    selfobj.Extension = m_extension              
+                    selfobj.Extension = m_line_ext              
                     selfobj.Proxy.execute(selfobj)
 
         finally:

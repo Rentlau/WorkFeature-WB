@@ -116,7 +116,11 @@ class CenterLinePointPanel:
             m_location = "Single" 
         m_numberLinePart = self.form.UI_CenterLinePoint_spin_numberLinePart.value()
         m_indexPart      = self.form.UI_CenterLinePoint_spin_indexPart.value()
-        
+          
+        if WF.verbose() != 0:
+            print_msg("m_numberLinePart = " + str(m_numberLinePart))
+            print_msg("m_indexPart = " + str(m_indexPart))
+            
         Gui.Control.closeDialog()
         m_actDoc = App.activeDocument()
         if m_actDoc is not None:
@@ -133,7 +137,7 @@ class CenterLinePointPanel:
 
 
 def makeCenterLinePointFeature(group):
-    """ Makes a CenterLinePoint" parametric feature object. 
+    """ Makes a CenterLinePoint parametric feature object. 
     into the given Group
     Returns the new object.
     """ 
@@ -301,13 +305,19 @@ def run():
     m_sel, m_actDoc = getSel(WF.verbose())
       
     try:        
-        Number_of_Edges, Edge_List = m_sel.get_segmentsNames(getfrom=["Points","Segments","Curves","Planes","Objects"])
+        Number_of_Edges, Edge_List = m_sel.get_segmentsNames(getfrom=["Segments","Curves","Planes","Objects"])
         if WF.verbose() != 0:        
             print_msg("Number_of_Edges = " + str(Number_of_Edges))
             print_msg("Edge_List = " + str(Edge_List))
             
-        if Number_of_Edges == 0:
-            raise Exception(m_exception_msg)
+        Number_of_Vertexes, Vertex_List = m_sel.get_pointsNames(getfrom=["Points","Curves","Objects"])
+        if WF.verbose() != 0:        
+            print_msg("Number_of_Vertexes = " + str(Number_of_Vertexes))
+            print_msg("Vertex_List = " + str(Vertex_List))
+            
+        if Number_of_Edges == 0 :
+            if Number_of_Vertexes < 2 :
+                raise Exception(m_exception_msg)
         try:
             m_main_dir = "WorkPoints_P"   
             m_group = createFolders(str(m_main_dir))
@@ -315,6 +325,7 @@ def run():
                 print_msg("Group = " + str(m_group.Label))
             m_sub_dir  = "Set"
             
+            #### From Edges
             # Create a sub group if needed
             if Number_of_Edges > 1 or m_location != "Single":
                 try:
@@ -343,7 +354,42 @@ def run():
                         selfobj.Edge           = edge
                         selfobj.NumberLinePart = m_numberLinePart
                         selfobj.IndexPart      = m_iPart 
-                        selfobj.Proxy.execute(selfobj)                        
+                        selfobj.Proxy.execute(selfobj)
+            
+            #### From Vertexes
+            if Number_of_Vertexes > 2:
+                try:
+                    m_ob = App.ActiveDocument.getObject(str(m_main_dir)).newObject("App::DocumentObjectGroup", str(m_sub_dir))
+                    m_group = m_actDoc.getObject( str(m_ob.Label) )
+                except:
+                    printError_msg("Could not Create '"+ str(m_sub_dir) +"' Objects Group!")           
+             
+            if (Number_of_Vertexes % 2 == 0): #even
+                if WF.verbose() != 0:
+                    print_msg("Even number of points")
+                if Number_of_Vertexes == 2:
+                    vertex1 = Vertex_List[0]
+                    vertex2 = Vertex_List[1]
+                    
+                    if WF.verbose() != 0:
+                        print_msg("vertex1 = " + str(vertex1))
+                        print_msg("vertex2 = " + str(vertex2))
+                else :
+                    for i in range(0,Number_of_Vertexes-2,2):
+                        vertex1 = Vertex_List[i]
+                        vertex2 = Vertex_List[i+1]
+                        
+                        if WF.verbose() != 0:
+                            print_msg("vertex1 = " + str(vertex1))
+                            print_msg("vertex2 = " + str(vertex2))   
+            else: #odd
+                if WF.verbose() != 0:
+                    print_msg("Odd number of points")               
+                for i in range(Number_of_Vertexes-1):
+                    vertex1 = Vertex_List[i]
+                    vertex2 = Vertex_List[i+1]
+           
+                                   
         finally:
             App.ActiveDocument.commitTransaction()
             

@@ -246,6 +246,9 @@ class Selection():
         """
         return a list of [obj.Object,"Vertex"+str(i)]
         """
+        m_debug = False
+        if m_debug:
+            print ("self.numberOfEntities = " + str(self.numberOfEntities))
         if self.numberOfEntities == 0 :
             return (0, None)
         
@@ -255,8 +258,8 @@ class Selection():
                 for e in inObject.Vertexes:
                     # We return the index + 1  of the vertex in the vertexes list when point match 
                     if geom.isEqualVectors(e.Point, aVertex.Point, tolerance=1e-12):
-                            # Needs to add 1 as for Edge1 corresponds to first 0 index in the list
-                            return (m_i + 1)
+                        # Needs to add 1 as for Edge1 corresponds to first 0 index in the list
+                        return (m_i + 1)
                     m_i += 1 
             return None
 
@@ -264,13 +267,16 @@ class Selection():
         Selected_Entities1 = []
         Selected_Entities2 = []
 
+
         for m_obj in self.__selEx:
             m_shape = m_obj.Object.Shape
-            print "m_shape = " + str(m_shape)
-            print "type(m_shape) = " + str(type(m_shape))
+            if m_debug:
+                print ("m_shape = " + str(m_shape))
+                print ("type(m_shape) = " + str(type(m_shape)))
 
-            print "m_obj.HasSubObjects = " + str(m_obj.HasSubObjects)
-            if m_obj.HasSubObjects:                
+            if m_obj.HasSubObjects:
+                if m_debug:
+                    print ("m_obj.HasSubObjects")                
                 m_i = 0
                 for m_subobj in m_obj.SubObjects:
 
@@ -286,12 +292,16 @@ class Selection():
                         Selected_Entities.append([m_obj.Object,m_obj.SubElementNames[m_i]])
                         m_i += 1
             else:
+                if m_debug:
+                    print ("NOT m_obj.HasSubObjects")
                 m_i = 0
+                        
                 if issubclass(type(m_shape),Part.Vertex) and "Points" in getfrom :
                     if hasattr(m_shape, 'Vertexes'):
                         for m_v in m_shape.Vertexes:
                             Selected_Entities.append([m_obj.Object,"Vertex"+str(m_i)])
                             m_i += 1
+                            
                 if issubclass(type(m_shape),Part.Wire) and "Curves" in getfrom :
                     if hasattr(m_shape, 'Vertexes'):
                         if self.__numberOfObjects== 2 :
@@ -306,12 +316,14 @@ class Selection():
                         else:                        
                             for m_v in m_shape.Vertexes:
                                 Selected_Entities.append([m_obj.Object,"Vertex"+str(m_i)])
-                                m_i += 1 
+                                m_i += 1
+                                 
                 if issubclass(type(m_shape),Part.Solid) and "Objects" in getfrom :
                     if hasattr(m_shape, 'Vertexes'):
                         for m_v in m_shape.Vertexes:
                             Selected_Entities.append([m_obj.Object,"Vertex"+str(m_i)])
-                            m_i += 1    
+                            m_i += 1
+                                
                 if issubclass(type(m_shape),Part.Face) and "Planes" in getfrom : 
                     if hasattr(m_shape, 'Vertexes'):
                         for m_v in m_shape.Vertexes:
@@ -370,6 +382,9 @@ class Selection():
         """
         return a list of [obj.Object,"Edge"+str(i)]
         """
+        m_debug = True
+        if m_debug:
+            print ("self.numberOfEntities = " + str(self.numberOfEntities))
         if self.numberOfEntities == 0 :
             return (0, None)
         
@@ -387,14 +402,20 @@ class Selection():
 
         Selected_Entities = []
 
-        m_i = 0
         for m_obj in self.__selEx:
             m_shape = m_obj.Object.Shape
-
+            if m_debug:
+                print ("m_shape = " + str(m_shape))
+                print ("type(m_shape) = " + str(type(m_shape)))
+                
             if m_obj.HasSubObjects:
+                if m_debug:
+                    print ("m_obj.HasSubObjects")
                 m_i = 0
                 for m_subobj in m_obj.SubObjects:
-
+                    if m_debug:
+                        print ("m_subobj = " + str(m_subobj))
+                        
                     if issubclass(type(m_subobj),Part.Face) and "Planes" in getfrom :
                         m_i = 0
                         for m_e in m_subobj.Edges:
@@ -407,26 +428,40 @@ class Selection():
                         Selected_Entities.append([m_obj.Object,m_obj.SubElementNames[m_i]])
                         m_i += 1
             else:
+                if m_debug:
+                    print ("NOT m_obj.HasSubObjects")
                 m_i = 0
-                if issubclass(type(m_shape),Part.Solid) and "Objects" in getfrom :
-                    if hasattr(m_shape, 'Edges'):
-                        for m_e in m_shape.Edges:
-                            Selected_Entities.append([m_obj.Object,"Edge"+str(m_i)])
-                            m_i += 1    
-                if issubclass(type(m_shape),Part.Face) and "Planes" in getfrom : 
+                
+                if issubclass(type(m_shape),Part.Edge):
+                    Selected_Entities.append([m_obj.Object,"Edge"+str(m_i)])
+                    m_i += 1
+
+                if issubclass(type(m_shape),Part.Compound):
                     if hasattr(m_shape, 'Edges'):
                         for m_e in m_shape.Edges:
                             Selected_Entities.append([m_obj.Object,"Edge"+str(m_i)])
                             m_i += 1
+                    
+                if issubclass(type(m_shape),Part.Solid) and "Objects" in getfrom :
+                    if hasattr(m_shape, 'Edges'):
+                        for m_e in m_shape.Edges:
+                            Selected_Entities.append([m_obj.Object,"Edge"+str(m_i)])
+                            m_i += 1
+                                
+                if issubclass(type(m_shape),Part.Face) and "Planes" in getfrom : 
+                    if hasattr(m_shape, 'Edges'):
+                        for m_e in m_shape.Edges:
+                            Selected_Entities.append([m_obj.Object,"Edge"+str(m_i)])
+                            m_i += 1                        
                             
-        if self.numberOfPoints >= 2 and "Points" in getfrom :
-            for m_p1,m_p2 in zip(self.__selectedVertices, self.__selectedVertices[1:]):
-                m_diff = m_p2.Point.sub(m_p1.Point)
-                tolerance = 1e-10
-                if abs(m_diff.x) <= tolerance and abs(m_diff.y) <= tolerance and abs(m_diff.z) <= tolerance:
-                    continue 
-                Selected_Entities.append([Part.makeLine(m_p2.Point, m_p1.Point),"Edge"+str(m_i)])
-                m_i += 1        
+#         if self.numberOfPoints >= 2 and "Points" in getfrom :
+#             for m_p1,m_p2 in zip(self.__selectedVertices, self.__selectedVertices[1:]):
+#                 m_diff = m_p2.Point.sub(m_p1.Point)
+#                 tolerance = 1e-10
+#                 if abs(m_diff.x) <= tolerance and abs(m_diff.y) <= tolerance and abs(m_diff.z) <= tolerance:
+#                     continue 
+#                 Selected_Entities.append([Part.makeLine(m_p2.Point, m_p1.Point),"Edge"+str(m_i)])
+#                 m_i += 1        
     
                  
         if len(Selected_Entities) != 0:                          
@@ -477,7 +512,57 @@ class Selection():
         else:
             return (0, None)  
     
-    
+    def get_curvesNames(self, getfrom=["Points","Segments","Curves","Planes","Objects"]):
+        """
+        return a list of [obj.Object,"Curve"+str(i)]
+        """
+        m_debug = True
+        if m_debug:
+            print ("self.numberOfEntities = " + str(self.numberOfEntities))
+        if self.numberOfEntities == 0 :
+            return (0, None)
+                
+#         def find(aCurve,inObject):
+#             if hasattr(inObject, 'Curves'):
+#                 m_i = 0
+#                 for e in inObject.Curves:
+#                     # We return the index + 1  of the vertex in the vertexes list when point match 
+#                     if geom.isEqualVectors(e.Point, aVertex.Point, tolerance=1e-12):
+#                         # Needs to add 1 as for Edge1 corresponds to first 0 index in the list
+#                         return (m_i + 1)
+#                     m_i += 1 
+#             return None
+
+        Selected_Entities = []
+        
+        for m_obj in self.__selEx:
+            m_shape = m_obj.Object.Shape
+            if m_debug:
+                print ("m_shape = " + str(m_shape))
+                print ("type(m_shape) = " + str(type(m_shape)))
+                
+            if m_obj.HasSubObjects:
+                if m_debug:
+                    print ("m_obj.HasSubObjects")
+                m_i = 0
+                for m_subobj in m_obj.SubObjects:
+                    if m_debug:
+                        print ("m_subobj = " + str(m_subobj))
+                    if issubclass(type(m_subobj),Part.Edge) and "Segments" in getfrom :
+                        Selected_Entities.append([m_obj.Object,m_obj.SubElementNames[m_i]])
+                        m_i += 1
+            else:
+                if m_debug:
+                    print ("NOT m_obj.HasSubObjects")
+                m_i = 0
+                    
+                    
+        if len(Selected_Entities) != 0:                          
+            return (len(Selected_Entities), Selected_Entities)
+        else:
+            return (0, None)
+        
+                 
     def get_curves(self, getfrom=["Points","Segments","Curves","Planes","Objects"]):
         Selected_Entities = []
                        

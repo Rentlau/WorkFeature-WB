@@ -70,6 +70,19 @@ def alongLinePoint(edge, index, number):
     return Vector_A
 
 
+def coordVectorPoint(vertex):
+    """ Return the coordinates (x,y,z) of selcted Vector.
+    """
+    m_coord = (0.0,0.0,0.0)
+    m_vert = vertex
+
+    if vertex == None:
+        print_msg("ERROR : vertex == None, leaving coordVectorPoint()")
+        return m_coord
+    
+    return (m_vert.x,m_vert.y,m_vert.z)
+
+
 def meanVectorsPoint(vertexes):
     """ Return the mean point of all selected Vectors. 
     """

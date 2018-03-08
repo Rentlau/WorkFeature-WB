@@ -40,7 +40,7 @@ import os, sys
 import WF
 
 global WF_Release
-WF_Release = "2018_03_01"
+WF_Release = "2018_03_08"
 
 # get the path of the Release python script 
 path_WF = os.path.dirname(WF.__file__)
@@ -61,7 +61,6 @@ if m_debug:
     print "DEBUG : path_WF_resources is " +  str(path_WF_resources)
     print "DEBUG : path_WF_ui        is " +  str(path_WF_ui)     
 
-
 import FreeCAD
 import FreeCADGui
 
@@ -78,8 +77,9 @@ class WorkFeatureWorkbench ( Workbench ):
     def Initialize(self):
         import WF
         try:
-            import WF_centerLinePoint
+            import WF_centerLinePoint        
             import WF_extremaLinePoint
+            import WF_centerCirclePoint
             
             import WF_twoPointsLine
             
@@ -92,7 +92,9 @@ class WorkFeatureWorkbench ( Workbench ):
         
         # Set menu and commands for Points   
         self.Point_menu = ["Work Feature","Points"] 
-        self.Point_commands_list = ["CenterLinePoint", "ExtremaLinePoint"
+        self.Point_commands_list = ["CenterLinePoint", 
+                                    "ExtremaLinePoint",
+                                    "CenterCirclePoint", 
                                     ]
         self.appendCommandbar("Points" , self.Point_commands_list)
         self.appendMenu(self.Point_menu, self.Point_commands_list)
