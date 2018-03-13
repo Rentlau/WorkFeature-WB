@@ -72,7 +72,7 @@ except:
 ###############
 m_icon          = "/WF_twoPointsLine.svg"
 m_dialog        = "/WF_UI_twoPointsLine.ui"
-m_dialog_title  = "Define Start and End location to create Line(s)."
+m_dialog_title  = "Define extension."
 m_exception_msg = """Unable to create Line(s) from 2 Points :
     Select two or several Points !
     
@@ -185,72 +185,83 @@ class TwoPointsLine(WF_Line):
     # this method is mandatory    
     def execute(self,selfobj): 
         """ Print a short message when doing a recomputation. """
-        if WF.verbose() != 0:
-            App.Console.PrintMessage("Recompute Python TwoPointsLine feature\n")
+#         if WF.verbose() != 0:
+#             App.Console.PrintMessage("Recompute Python TwoPointsLine feature\n")
 
-#         if selfobj.Points != None:
-#             print selfobj.Points
-#             for i in selfobj.Points:
-#                 print i
-#                 print i[0]
-#             
-#             n1 = eval(selfobj.Points[0][1][0].lstrip('Vertex'))
-#             n2 = eval(selfobj.Points[1][1][0].lstrip('Vertex')) 
-#             
-#             print n1
-#             print n2
-#                         
-#             point1 = selfobj.Points[0][0].Shape.Vertexes[n1-1].Point
-#             point2 = selfobj.Points[1][0].Shape.Vertexes[n2-1].Point
-#             
-#             Axis_dir = point2 - point1
-#             Point_E1 = point2            
-#             Point_E2 = point1
-#             m_line_ext = selfobj.Extension
-#             if m_line_ext != 0.0:
-#                 Point_E1 = point2 +  Axis_dir.normalize().multiply(m_line_ext)   
-#                 if m_line_ext >= 0.0:            
-#                     Point_E2 = point1 -  Axis_dir.normalize().multiply(m_line_ext)
-#                 else:
-#                     Point_E2 = point1 +  Axis_dir.normalize().multiply(m_line_ext)
-#             if Point_E1 == Point_E2:
-#                 Point_E1 = Point_E1 + Axis_dir.multiply(0.1)
-#                 Point_E2 = Point_E2 - Axis_dir.multiply(0.9)            
-#              
-#             print Point_E1.x
-#             print Point_E2
-#             # must be Part.makeLine ((x,y,z),(x,y,z))               
-#             line = Part.makeLine( coordVectorPoint(Point_E2), coordVectorPoint(Point_E1) )
-#             selfobj.Shape = line
-#             propertiesLine(selfobj.Label) 
-                       
+# #         if selfobj.Points != None:
+# #             print selfobj.Points
+# #             for i in selfobj.Points:
+# #                 print i
+# #                 print i[0]
+# #             
+# #             n1 = eval(selfobj.Points[0][1][0].lstrip('Vertex'))
+# #             n2 = eval(selfobj.Points[1][1][0].lstrip('Vertex')) 
+# #             
+# #             print n1
+# #             print n2
+# #                         
+# #             point1 = selfobj.Points[0][0].Shape.Vertexes[n1-1].Point
+# #             point2 = selfobj.Points[1][0].Shape.Vertexes[n2-1].Point
+# #             
+# #             Axis_dir = point2 - point1
+# #             Point_E1 = point2            
+# #             Point_E2 = point1
+# #             m_line_ext = selfobj.Extension
+# #             if m_line_ext != 0.0:
+# #                 Point_E1 = point2 +  Axis_dir.normalize().multiply(m_line_ext)   
+# #                 if m_line_ext >= 0.0:            
+# #                     Point_E2 = point1 -  Axis_dir.normalize().multiply(m_line_ext)
+# #                 else:
+# #                     Point_E2 = point1 +  Axis_dir.normalize().multiply(m_line_ext)
+# #             if Point_E1 == Point_E2:
+# #                 Point_E1 = Point_E1 + Axis_dir.multiply(0.1)
+# #                 Point_E2 = Point_E2 - Axis_dir.multiply(0.9)            
+# #              
+# #             print Point_E1.x
+# #             print Point_E2
+# #             # must be Part.makeLine ((x,y,z),(x,y,z))               
+# #             line = Part.makeLine( coordVectorPoint(Point_E2), coordVectorPoint(Point_E1) )
+# #             selfobj.Shape = line
+# #             propertiesLine(selfobj.Label) 
+        if 'Point1' not in selfobj.PropertiesList:
+            return
+        if 'Point2' not in selfobj.PropertiesList:
+            return
+        if 'Extension' not in selfobj.PropertiesList:
+            return       
+                   
         if selfobj.Point1 != None and selfobj.Point2 != None :
             n1 = eval(selfobj.Point1[1][0].lstrip('Vertex'))
             n2 = eval(selfobj.Point2[1][0].lstrip('Vertex'))    
-             
-            point1 = selfobj.Point1[0].Shape.Vertexes[n1-1].Point
-            point2 = selfobj.Point2[0].Shape.Vertexes[n2-1].Point
-     
-            Axis_dir = point2 - point1
-            Point_E1 = point2            
-            Point_E2 = point1
-            m_line_ext = selfobj.Extension
-            if m_line_ext != 0.0:
-                Point_E1 = point2 +  Axis_dir.normalize().multiply(m_line_ext)
-                if m_line_ext >= 0.0:            
-                    Point_E2 = point1 -  Axis_dir.normalize().multiply(m_line_ext)
-                else:
-                    Point_E2 = point1 +  Axis_dir.normalize().multiply(m_line_ext)
-            
-            if isEqualVectors (Point_E1,Point_E2):
-                m_msg = """Unable to create Line(s) from 2 Points :
-                Given Points are equals !
-                """
-                printError_msg(m_msg , title="Macro TwoPointsLine")
+#             if WF.verbose() != 0:
+#                 print_msg("n1 = " + str(n1))
+#             if WF.verbose() != 0:
+#                 print_msg("n2 = " + str(n2))
+                 
+            try:    
+                point1 = selfobj.Point1[0].Shape.Vertexes[n1-1].Point
+                point2 = selfobj.Point2[0].Shape.Vertexes[n2-1].Point
+         
+                Axis_dir = point2 - point1
+                Point_E1 = point2            
+                Point_E2 = point1
+                m_line_ext = selfobj.Extension
+                if m_line_ext != 0.0:
+                    Point_E1 = point2 +  Axis_dir.normalize().multiply(m_line_ext)
+                    if m_line_ext >= 0.0:            
+                        Point_E2 = point1 -  Axis_dir.normalize().multiply(m_line_ext)
+                    else:
+                        Point_E2 = point1 +  Axis_dir.normalize().multiply(m_line_ext)
                 
-            line = Part.makeLine( coordVectorPoint(Point_E2), coordVectorPoint(Point_E1) )
-            selfobj.Shape = line
-            propertiesLine(selfobj.Label)             
+                if isEqualVectors (Point_E1,Point_E2):
+                    m_msg = """Unable to create Line(s) from 2 Points :
+                    Given Points are equals !
+                    """
+                    printError_msg(m_msg , title="Macro TwoPointsLine")
+                    
+                line = Part.makeLine( coordVectorPoint(Point_E2), coordVectorPoint(Point_E1) )
+                selfobj.Shape = line
+                propertiesLine(selfobj.Label)             
 #                             
 #             line = Part.Line( Point_E2, Point_E1 )
 #             selfobj.Shape = line.toShape()
@@ -261,19 +272,20 @@ class TwoPointsLine(WF_Line):
 #             selfobj.X2 = float(point2.x)
 #             selfobj.Y2 = float(point2.y)
 #             selfobj.Z2 = float(point2.z)
-        
-        #printPoint(Vector_point, msg=m_result_msg)        if Number_of_Points == 2:                  
+            except:
+                pass
         
     def onChanged(self, selfobj, prop):
         """ Print the name of the property that has changed """
         # Debug mode
         if WF.verbose() != 0:
-            App.Console.PrintMessage("Change property: " + str(prop) + "\n")
-                
-        if selfobj.parametric == 'No' :
-            selfobj.setEditorMode("Extension", 1)  
-        else :
-            selfobj.setEditorMode("Extension", 0)   
+            App.Console.PrintMessage("Change property : " + str(prop) + "\n")
+        
+        if 'parametric' in selfobj.PropertiesList:        
+            if selfobj.parametric == 'No' :
+                selfobj.setEditorMode("Extension", 1)  
+            else :
+                selfobj.setEditorMode("Extension", 0)   
             
         if prop == "Extension":
             selfobj.Proxy.execute(selfobj)

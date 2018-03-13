@@ -412,6 +412,7 @@ class Selection():
                 if m_debug:
                     print ("m_obj.HasSubObjects")
                 m_i = 0
+                
                 for m_subobj in m_obj.SubObjects:
                     if m_debug:
                         print ("m_subobj = " + str(m_subobj))
@@ -588,7 +589,63 @@ class Selection():
             return (len(Selected_Entities), Selected_Entities)
         else:
             return (0, None)   
+
     
+    def get_planesNames(self, getfrom=["Planes","Objects"]):
+        """
+        return a list of [obj.Object,"Face"+str(i)]
+        """
+        m_debug = True
+        if m_debug:
+            print ("self.numberOfEntities = " + str(self.numberOfEntities))
+        if self.numberOfEntities == 0 :
+            return (0, None)
+        
+        Selected_Entities = []
+                
+        for m_obj in self.__selEx:
+            m_shape = m_obj.Object.Shape
+            if m_debug:
+                print ("m_shape = " + str(m_shape))
+                print ("type(m_shape) = " + str(type(m_shape)))
+                        
+            if m_obj.HasSubObjects:
+                if m_debug:
+                    print ("m_obj.HasSubObjects")    
+                m_i = 0
+                                 
+                for m_subobj in m_obj.SubObjects:
+                    if m_debug:
+                        print ("m_subobj = " + str(m_subobj))
+
+                    if issubclass(type(m_subobj),Part.Face):
+                        Selected_Entities.append([m_obj.Object,m_obj.SubElementNames[m_i]])
+                        m_i += 1       
+            else:
+                if m_debug:
+                    print ("NOT m_obj.HasSubObjects")
+                m_i = 0
+                                
+                if issubclass(type(m_shape),Part.Face):
+                    Selected_Entities.append([m_obj.Object,"Face"+str(m_i)])
+                    m_i += 1
+                                 
+                if issubclass(type(m_shape),Part.Compound):
+                    if hasattr(m_shape, 'Faces'):
+                        for m_e in m_shape.Faces:
+                            Selected_Entities.append([m_obj.Object,"Face"+str(m_i)])
+                            m_i += 1 
+                                
+                if issubclass(type(m_shape),Part.Solid) and "Objects" in getfrom :
+                    if hasattr(m_shape, 'Faces'):
+                        for m_e in m_shape.Faces:
+                            Selected_Entities.append([m_obj.Object,"Face"+str(m_i)])
+                            m_i += 1
+                                           
+        if len(Selected_Entities) != 0:                          
+            return (len(Selected_Entities), Selected_Entities)
+        else:
+            return (0, None)    
     
     def get_planes(self, getfrom=["Points","Segments","Curves","Planes","Objects"]):
         Selected_Entities = []

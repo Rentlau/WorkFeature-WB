@@ -88,7 +88,7 @@ m_tool_tip      = """<b>Create Plane</b> crossing one Point and one Line.<br>
  - a Warning Window and<br> 
  - a Parameter(s) Window in Task Panel!</i>
 """ 
-m_extension      = 150.0
+m_extension      = 100.0
 ###############
 
 class LinePointPlanePanel:  
@@ -151,8 +151,11 @@ class LinePointPlane(WF_Plane):
                             "Input edge")
         selfobj.addProperty("App::PropertyLinkSub","Point",self.name,
                             "Input point")
+        m_tooltip = """Extensions of plane in percentage of the Line Length.
+Positive values upper than 100.0 will enlarge the Plane.
+Positive values lower than 100.0 will start to shrink it.""" 
         selfobj.addProperty("App::PropertyFloat","Extension",self.name,
-                            "Extension at extrema").Extension=150.0 
+                            m_tooltip).Extension=100.0  
         # 0 -- default mode, read and write
         # 1 -- read-only
         # 2 -- hidden 
@@ -163,64 +166,75 @@ class LinePointPlane(WF_Plane):
     # this method is mandatory   
     def execute(self,selfobj): 
         """ Print a short message when doing a recomputation. """
-        if WF.verbose() != 0:
-            App.Console.PrintMessage("Recompute Python LinePointPlane feature\n")
+#         if WF.verbose() != 0:
+#             App.Console.PrintMessage("Recompute Python LinePointPlane feature\n")
         
+        if 'Edge' not in selfobj.PropertiesList:
+            return         
+        if 'Point' not in selfobj.PropertiesList:
+            return 
+        if 'Extension' not in selfobj.PropertiesList:
+            return  
+              
         if selfobj.Edge != None and selfobj.Point != None :
             points = []
             
             n1 = eval(selfobj.Point[1][0].lstrip('Vertex'))
-            point_C = selfobj.Point[0].Shape.Vertexes[n1-1].Point
-            points.append(point_C)
-            
             n2 = eval(selfobj.Edge[1][0].lstrip('Edge'))
-            point_A = selfobj.Edge[0].Shape.Edges[n2-1].Vertexes[0].Point
-            point_B = selfobj.Edge[0].Shape.Edges[n2-1].Vertexes[-1].Point
-
-            points.append(point_A)
-            points.append(point_B)
-            
-            if isColinearVectors(point_A, point_B, point_C, tolerance=1e-12):
-                printError_msg(m_exception_msg, title="Macro LinePointPlane")
-                return
-            
-            Vector_Center = meanVectorsPoint(points)
-            xmax, xmin, ymax, ymin, zmax, zmin = minMaxVectorsLimits(points)
-
-            length = xmax - xmin
-            if (ymax - ymin) > length:
-                length = ymax - ymin
-            if (zmax - zmin) > length:
-                length = zmax - zmin
-            if length == 0:
-                length = 10.0
-                         
-            Edge_Vector = point_B - point_A
-            AC_Vector = point_C - point_A
-            
-            Edge_Length = length
-            if selfobj.Extension == 0.0 :
-                selfobj.Extension = 100.0
-            if selfobj.Extension < 0.0 :
-                selfobj.Extension *= -1
+#             if WF.verbose() != 0:
+#                 print_msg("n1 = " + str(n1))
+#                 print_msg("n2 = " + str(n2))
+                    
+            try:    
+                point_C = selfobj.Point[0].Shape.Vertexes[n1-1].Point
+                points.append(point_C)
+                  
+                point_A = selfobj.Edge[0].Shape.Edges[n2-1].Vertexes[0].Point
+                point_B = selfobj.Edge[0].Shape.Edges[n2-1].Vertexes[-1].Point
+    
+                points.append(point_A)
+                points.append(point_B)
                 
-            if selfobj.Extension > 100.0 :
-                Edge_Length = length * (selfobj.Extension / 100.0)
-            elif m_extension < 100.0 :
-                Edge_Length = length / (selfobj.Extension / 100.0)
-            
-            Plane_Point  = Vector_Center
-            Plane_Normal = Edge_Vector.cross( AC_Vector )
-                        
-            Plane_face = Part.makePlane(Edge_Length, Edge_Length, 
-                                        Plane_Point, Plane_Normal )
-            Plane_Center = Plane_face.CenterOfMass
-            Plane_Translate =  Plane_Point - Plane_Center
-            Plane_face.translate( Plane_Translate )
-            selfobj.Shape = Plane_face
-            
-            properties_plane(selfobj.Label)
-
+                if isColinearVectors(point_A, point_B, point_C, tolerance=1e-12):
+                    printError_msg(m_exception_msg, title="Macro LinePointPlane")
+                    return
+                
+                Vector_Center = meanVectorsPoint(points)
+                xmax, xmin, ymax, ymin, zmax, zmin = minMaxVectorsLimits(points)
+    
+                length = xmax - xmin
+                if (ymax - ymin) > length:
+                    length = ymax - ymin
+                if (zmax - zmin) > length:
+                    length = zmax - zmin
+                if length == 0:
+                    length = 10.0
+                             
+                Edge_Vector = point_B - point_A
+                AC_Vector = point_C - point_A
+                
+                Edge_Length = length
+                if selfobj.Extension == 0.0 :
+                    selfobj.Extension = 100.0
+                if selfobj.Extension < 0.0 :
+                    selfobj.Extension *= -1
+                
+                Edge_Length = length * (selfobj.Extension / 100.0)     
+                
+                Plane_Point  = Vector_Center
+                Plane_Normal = Edge_Vector.cross( AC_Vector )
+                            
+                Plane_face = Part.makePlane(Edge_Length, Edge_Length, 
+                                            Plane_Point, Plane_Normal )
+                Plane_Center = Plane_face.CenterOfMass
+                Plane_Translate =  Plane_Point - Plane_Center
+                Plane_face.translate( Plane_Translate )
+                selfobj.Shape = Plane_face
+                
+                propertiesPlane(selfobj.Label)
+            except:
+                pass
+                
                 
     def onChanged(self, selfobj, prop):
         """ Print the name of the property that has changed """
@@ -228,10 +242,11 @@ class LinePointPlane(WF_Plane):
         if WF.verbose() != 0:
             App.Console.PrintMessage("Change property : " + str(prop) + "\n")
         
-        if selfobj.parametric == 'No' :
-            selfobj.setEditorMode("Extension", 1)
-        else :
-            selfobj.setEditorMode("Extension", 0)
+        if 'parametric' in selfobj.PropertiesList:
+            if selfobj.parametric == 'No' :
+                selfobj.setEditorMode("Extension", 1)
+            else :
+                selfobj.setEditorMode("Extension", 0)
             
         if prop == "Extension":            
             selfobj.Proxy.execute(selfobj)

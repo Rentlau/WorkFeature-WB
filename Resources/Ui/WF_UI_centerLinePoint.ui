@@ -40,7 +40,7 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number indicates how many &lt;span style=&quot; font-weight:600;&quot;&gt;Parts&lt;/span&gt; each selected Lines(s) will be cut in (Max 100).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number indicates in how many &lt;span style=&quot; font-weight:600;&quot;&gt;Parts&lt;/span&gt; each selected parent Lines(s) will be cut in (Max 100).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="minimum">
           <number>2</number>
@@ -122,7 +122,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number indicates at which &lt;span style=&quot; font-weight:600;&quot;&gt;part's end&lt;/span&gt; the point will be located.&lt;/p&gt;&lt;p&gt;- If the Number of parts is&lt;span style=&quot; font-weight:600;&quot;&gt; 2&lt;/span&gt; and Point at part's end &lt;span style=&quot; font-weight:600;&quot;&gt;1&lt;/span&gt;,&lt;/p&gt;&lt;p&gt;this means that the point will be located in the &lt;span style=&quot; font-weight:600;&quot;&gt;middle&lt;/span&gt; of the Line.&lt;/p&gt;&lt;p&gt;- If the Number of parts is &lt;span style=&quot; font-weight:600;&quot;&gt;2&lt;/span&gt; and Point at part's end &lt;span style=&quot; font-weight:600;&quot;&gt;2&lt;/span&gt;, &lt;/p&gt;&lt;p&gt;this means that the point will be located in the &lt;span style=&quot; font-weight:600;&quot;&gt;end&lt;/span&gt; of the Line.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Negative value are allowed&lt;/p&gt;&lt;p&gt;Limits : [-1000:1000]&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The location of the point : 1/2 means middle of the segment !&lt;/p&gt;&lt;p&gt;The number indicates at which &lt;span style=&quot; font-weight:600;&quot;&gt;part's end&lt;/span&gt; the point will be located.&lt;/p&gt;&lt;p&gt;- If the Number of parts is&lt;span style=&quot; font-weight:600;&quot;&gt; 2&lt;/span&gt; and Point at part's end &lt;span style=&quot; font-weight:600;&quot;&gt;1&lt;/span&gt;,&lt;/p&gt;&lt;p&gt;this means that the point will be located in the &lt;span style=&quot; font-weight:600;&quot;&gt;middle&lt;/span&gt; of the Line.&lt;/p&gt;&lt;p&gt;- If the Number of parts is &lt;span style=&quot; font-weight:600;&quot;&gt;2&lt;/span&gt; and Point at part's end &lt;span style=&quot; font-weight:600;&quot;&gt;2&lt;/span&gt;, &lt;/p&gt;&lt;p&gt;this means that the point will be located in the &lt;span style=&quot; font-weight:600;&quot;&gt;end&lt;/span&gt; of the Line.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Negative value are allowed&lt;/p&gt;&lt;p&gt;Limits : [-1000:1000]&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="minimum">
             <number>-1000</number>

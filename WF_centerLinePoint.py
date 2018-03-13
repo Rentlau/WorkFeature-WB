@@ -165,11 +165,24 @@ class CenterLinePoint(WF_Point):
         WF_Point.__init__(self, selfobj, self.name)
         """ Add some custom properties to our CenterLinePoint feature object. """
         selfobj.addProperty("App::PropertyLinkSub","Edge",self.name,
-                            "Input edge")   
+                            "Input edge")
+        m_tooltip = """The number indicates in how many Parts 
+        each selected parent Lines(s) will be cut in (Max 100).
+        """   
         selfobj.addProperty("App::PropertyInteger","NumberLinePart",self.name,
-                            "The number of parts of parent segment !").NumberLinePart=2
+                            m_tooltip).NumberLinePart=2
+        m_tooltip = """The location of the point : 1/2 means middle of the segment !
+The number indicates at which part's end the point will be located.
+- If the Number of parts is 2 and Point at part's end 1,
+this means that the point will be located in the middle of the Line.
+- If the Number of parts is 2 and Point at part's end 2, 
+this means that the point will be located in the end of the Line.
+
+Negative value are allowed
+Limits : [-1000:1000]
+        """ 
         selfobj.addProperty("App::PropertyInteger","IndexPart",self.name,
-                            "The location of the point : 1/2 means middle of the segment !").IndexPart=1        
+                            m_tooltip).IndexPart=1        
         
         selfobj.setEditorMode("Edge", 1)
         selfobj.Proxy = self    
@@ -177,21 +190,32 @@ class CenterLinePoint(WF_Point):
     # this method is mandatory   
     def execute(self,selfobj): 
         """ Print a short message when doing a recomputation. """
-        if WF.verbose() != 0:
-            App.Console.PrintMessage("Recompute Python CenterLinePoint feature\n")
+#         if WF.verbose() != 0:
+#             App.Console.PrintMessage("Recompute Python CenterLinePoint feature\n")
+        
+        if 'Edge' not in selfobj.PropertiesList:
+            return
+        if 'IndexPart' not in selfobj.PropertiesList:
+            return
+        if 'NumberLinePart' not in selfobj.PropertiesList:
+            return
         
         n = eval(selfobj.Edge[1][0].lstrip('Edge'))
-#         if selfobj.NumberLinePart == 2:       
-#             Vector_point = centerLinePoint(selfobj.Edge[0].Shape.Edges[n-1])
-#         else:
-        Vector_point = alongLinePoint(selfobj.Edge[0].Shape.Edges[n-1], selfobj.IndexPart , selfobj.NumberLinePart)
-                             
-        point = Part.Point( Vector_point )
-        selfobj.Shape = point.toShape()
-        propertiesPoint(selfobj.Label)
-        selfobj.X = float(Vector_point.x)
-        selfobj.Y = float(Vector_point.y)
-        selfobj.Z = float(Vector_point.z)
+#         if WF.verbose() != 0:
+#             print_msg("n = " + str(n))
+        
+        try:   
+            Vector_point = alongLinePoint(selfobj.Edge[0].Shape.Edges[n-1], 
+                                          selfobj.IndexPart , selfobj.NumberLinePart)
+                                 
+            point = Part.Point( Vector_point )
+            selfobj.Shape = point.toShape()
+            propertiesPoint(selfobj.Label)
+            selfobj.X = float(Vector_point.x)
+            selfobj.Y = float(Vector_point.y)
+            selfobj.Z = float(Vector_point.z)
+        except:
+            pass
                 
     def onChanged(self, selfobj, prop):
         """ Print the name of the property that has changed """
@@ -199,12 +223,13 @@ class CenterLinePoint(WF_Point):
         if WF.verbose() != 0:
             App.Console.PrintMessage("Change property : " + str(prop) + "\n")
         
-        if selfobj.parametric == 'No' :
-            selfobj.setEditorMode("NumberLinePart", 1)
-            selfobj.setEditorMode("IndexPart", 1) 
-        else :
-            selfobj.setEditorMode("NumberLinePart", 0)
-            selfobj.setEditorMode("IndexPart", 0)
+        if 'parametric' in selfobj.PropertiesList:
+            if selfobj.parametric == 'No' :
+                selfobj.setEditorMode("NumberLinePart", 1)
+                selfobj.setEditorMode("IndexPart", 1) 
+            else :
+                selfobj.setEditorMode("NumberLinePart", 0)
+                selfobj.setEditorMode("IndexPart", 0)
             
         if prop == "IndexPart":
             selfobj.Proxy.execute(selfobj)
@@ -282,35 +307,17 @@ if App.GuiUp:
 
 
 def run():
-#     m_actDoc = App.activeDocument()
-#     if m_actDoc == None:
-#         message = "No Active document selected !"
-#         return (None, message)
-#     if not m_actDoc.Name:
-#         message = "No Active document.name selected !"
-#         return (None, message) 
-#        
-#     m_selEx  = Gui.Selection.getSelectionEx(m_actDoc.Name)                    
-#     m_sel    = Selection(m_selEx)
-#  
-#     if m_sel == None :
-#         print_msg("Unable to create a Selection Object !") 
-#         return None
-#     
-#     if WF.verbose() != 0:
-#         print_msg("m_actDoc      = " + str(m_actDoc))
-#         print_msg("m_actDoc.Name = " + str(m_actDoc.Name))
-#         print_msg("m_selEx       = " + str(m_selEx))         
-#         print_msg("m_sel         = " + str(m_sel))
     m_sel, m_actDoc = getSel(WF.verbose())
       
     try:        
-        Number_of_Edges, Edge_List = m_sel.get_segmentsNames(getfrom=["Segments","Curves","Planes","Objects"])
+        Number_of_Edges, Edge_List = m_sel.get_segmentsNames(
+            getfrom=["Segments","Curves","Planes","Objects"])
         if WF.verbose() != 0:        
             print_msg("Number_of_Edges = " + str(Number_of_Edges))
             print_msg("Edge_List = " + str(Edge_List))
             
-        Number_of_Vertexes, Vertex_List = m_sel.get_pointsNames(getfrom=["Points","Curves","Objects"])
+        Number_of_Vertexes, Vertex_List = m_sel.get_pointsNames(
+            getfrom=["Points","Curves","Objects"])
         if WF.verbose() != 0:        
             print_msg("Number_of_Vertexes = " + str(Number_of_Vertexes))
             print_msg("Vertex_List = " + str(Vertex_List))

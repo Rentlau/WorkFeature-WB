@@ -68,8 +68,8 @@ class WF_Object():
     def onChanged(self, selfobj, prop):
         if prop == "parametric":
             selfobj.Proxy.execute(selfobj)
-            if WF.verbose() != 0:
-                App.Console.PrintMessage("New parametric : " + str(selfobj.parametric) + "\n")    
+#             if WF.verbose() != 0:
+#                 App.Console.PrintMessage("New parametric : " + str(selfobj.parametric) + "\n")    
 
 
 class WF_Point(WF_Object):

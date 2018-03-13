@@ -261,7 +261,7 @@ def propertiesLine(Line_User_Name, color=(1.00,0.67,0.00)):
     return 
 
 
-def properties_plane(Plane_User_Name):
+def propertiesPlane(Plane_User_Name):
     """ Define the properties of a Work feature Plane.
     PointColor
     LineColor

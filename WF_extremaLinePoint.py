@@ -75,7 +75,7 @@ except:
 m_icon          = "/WF_extremaLinePoint.svg"
 m_icons         = ["/WF_startLinePoint.svg", "/WF_endtLinePoint.svg", "/WF_extremaLinePoint.svg"]
 m_dialog        = "/WF_UI_extremaLinePoint.ui"
-m_dialog_title  = "Define Start and End location for selected Line(s)."
+m_dialog_title  = "Define location(s)."
 m_exception_msg = """Unable to create Extrema Line Point(s) :
     Select one or several Line/Edge(s) and/or
     Select one Plane/Face to process all (4) Edges and/or
@@ -150,9 +150,12 @@ class ExtremaLinePoint(WF_Point):
         WF_Point.__init__(self, selfobj, self.name) 
         """ Add some custom properties to our ExtremaLinePoint feature object. """
         selfobj.addProperty("App::PropertyLinkSub","Edge",self.name,
-                            "Input edge")  
+                            "Input edge")
+        m_tooltip = """Indicates where is located the Point 
+relative to the parent Line.
+        """    
         selfobj.addProperty("App::PropertyEnumeration","At",self.name,
-                            "Location Definition").At=["Begin","End"]
+                            m_tooltip).At=["Begin","End"]
         
         selfobj.setEditorMode("Edge", 1)      
         selfobj.Proxy = self  
@@ -160,31 +163,42 @@ class ExtremaLinePoint(WF_Point):
     # this method is mandatory    
     def execute(self,selfobj): 
         """ Print a short message when doing a recomputation. """
-        if WF.verbose() != 0:
-            App.Console.PrintMessage("Recompute Python ExtremaLinePoint feature\n")
+#         if WF.verbose() != 0:
+#             App.Console.PrintMessage("Recompute Python ExtremaLinePoint feature\n")
+                
+        if 'Edge' not in selfobj.PropertiesList:
+            return
+        if 'At' not in selfobj.PropertiesList:
+            return
         
         n = eval(selfobj.Edge[1][0].lstrip('Edge'))
-        if selfobj.At == "Begin":       
-            Vector_point = selfobj.Edge[0].Shape.Edges[n-1].Vertexes[0].Point
-        else:
-            Vector_point = selfobj.Edge[0].Shape.Edges[n-1].Vertexes[-1].Point
-                       
-        point = Part.Point( Vector_point )
-        selfobj.Shape = point.toShape()
-        propertiesPoint(selfobj.Label)
-        selfobj.X = float(Vector_point.x)
-        selfobj.Y = float(Vector_point.y)
-        selfobj.Z = float(Vector_point.z)
+#         if WF.verbose() != 0:
+#             print_msg("n = " + str(n))
+        try: 
+            if selfobj.At == "Begin":       
+                Vector_point = selfobj.Edge[0].Shape.Edges[n-1].Vertexes[0].Point
+            else:
+                Vector_point = selfobj.Edge[0].Shape.Edges[n-1].Vertexes[-1].Point
+                           
+            point = Part.Point( Vector_point )
+            selfobj.Shape = point.toShape()
+            propertiesPoint(selfobj.Label)
+            selfobj.X = float(Vector_point.x)
+            selfobj.Y = float(Vector_point.y)
+            selfobj.Z = float(Vector_point.z) 
+        except:
+            pass
                 
     def onChanged(self, selfobj, prop):
         """ Print the name of the property that has changed """
         if WF.verbose() != 0:
             App.Console.PrintMessage("Change property: " + str(prop) + "\n")
         
-        if selfobj.parametric == 'No' :
-            selfobj.setEditorMode("At", 1)
-        else :
-            selfobj.setEditorMode("At", 0)
+        if 'parametric' in selfobj.PropertiesList:
+            if selfobj.parametric == 'No' :
+                selfobj.setEditorMode("At", 1)
+            else :
+                selfobj.setEditorMode("At", 0)
         
         if prop == "At":
             selfobj.Proxy.execute(selfobj)

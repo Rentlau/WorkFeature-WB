@@ -28,11 +28,11 @@
 *   USA or see <http://www.gnu.org/licenses/>                             *
 ***************************************************************************
 """
-__title__="Macro CenterCirclePoint"
+__title__="Macro CenterFacePoint"
 __author__ = "Rentlau_64"
 __brief__ = '''
-Macro CenterCirclePoint.
-Creates a parametric CenterCirclePoint from an Edge
+Macro CenterFacePoint.
+Creates a parametric CenterFacePoint from a  Plane
 '''
 ###############
 
@@ -70,25 +70,25 @@ except:
     sys.exit(1)
 
 ###############
-m_icon          = "/WF_centerCirclePoint.svg"
+m_icon          = "/WF_centerFacePoint.svg"
 m_dialog        = None
 m_dialog_title  = "Nothing"
-m_exception_msg = """Unable to create Center Line Point(s) :
-    Select at least one Edge of Circle !"""
+m_exception_msg = """Unable to create Center Face Point(s) :
+    Select at least one Face !
    
- #Go to Parameter(s) Window in Task Panel!"""
-m_result_msg    = " : Center Circle Point(s) created !"
-m_menu_text     = "Center of Circle(s)"
+Go to Parameter(s) Window in Task Panel!"""
+m_result_msg    = " : Center Face Point(s) created !"
+m_menu_text     = "Center of Face(s)"
 m_accel         = ""
 m_tool_tip      = """<b>Create Point(s)</b> at Center location 
-of each selected Circle(s).<br>
+of each selected Face(s).<br>
 ...<br>
 <i>Click in view window without selection will popup<br>
  - a Warning Window !</i>
 """
 ###############
 
-class CenterCirclePointPanel:  
+class CenterFacePointPanel:  
     def __init__(self):
         self.form = Gui.PySideUic.loadUi(path_WF_ui + m_dialog)
         self.form.setWindowTitle(m_dialog_title)
@@ -109,20 +109,20 @@ class CenterCirclePointPanel:
         return (len(Gui.Selection.getSelectionEx(App.activeDocument().Name)) == 0 )   
 
 
-def makeCenterCirclePointFeature(group):
-    """ Makes a CenterCirclePoint parametric feature object. 
+def makeCenterFacePointFeature(group):
+    """ Makes a CenterFacePoint parametric feature object. 
     into the given Group
     Returns the new object.
     """ 
-    m_name = "CenterCirclePoint_P"
+    m_name = "CenterFacePoint_P"
     m_part = "Part::FeaturePython"     
     
     try:     
         m_obj = App.ActiveDocument.addObject(str(m_part),str(m_name))
         if group != None :
             addObjectToGrp(m_obj,group,info=1)
-        CenterCirclePoint(m_obj)
-        ViewProviderCenterCirclePoint(m_obj.ViewObject)
+        CenterFacePoint(m_obj)
+        ViewProviderCenterFacePoint(m_obj.ViewObject)
     except:
         printError_msg( "Not able to add an object to Model!")
         return None
@@ -130,50 +130,39 @@ def makeCenterCirclePointFeature(group):
     return m_obj
 
 
-class CenterCirclePoint(WF_Point):
-    """ The CenterCirclePoint feature object. """
+class CenterFacePoint(WF_Point):
+    """ The CenterFacePoint feature object. """
     # this method is mandatory
     def __init__(self,selfobj):
-        self.name = "CenterCirclePoint"
+        self.name = "CenterFacePoint"
         WF_Point.__init__(self, selfobj, self.name)
-        """ Add some custom properties to our CenterCirclePoint feature object. """
-        selfobj.addProperty("App::PropertyLinkSub","Edge",self.name,
-                            "Input edge")   
+        """ Add some custom properties to our CenterFacePoint feature object. """
+        selfobj.addProperty("App::PropertyLinkSub","Face",self.name,
+                            "Input face")   
 
-        selfobj.setEditorMode("Edge", 1)
+        selfobj.setEditorMode("Face", 1)
         selfobj.Proxy = self    
      
     # this method is mandatory   
     def execute(self,selfobj): 
         """ Print a short message when doing a recomputation. """
 #         if WF.verbose() != 0:
-#             App.Console.PrintMessage("Recompute Python CenterCirclePoint feature\n")
-
-        if 'Edge' not in selfobj.PropertiesList:
+#             App.Console.PrintMessage("Recompute Python CenterFacePoint feature\n")
+                
+        if 'Face' not in selfobj.PropertiesList:
             return
-              
-        n = eval(selfobj.Edge[1][0].lstrip('Edge'))
+        
+        n = eval(selfobj.Face[1][0].lstrip('Face'))
 #         if WF.verbose() != 0:
 #             print_msg("n = " + str(n))    
         
         try: 
-            m_edge = selfobj.Edge[0].Shape.Edges[n-1]
+            m_face = selfobj.Face[0].Shape.Faces[n-1]
             if WF.verbose() != 0:
-                print_msg("m_edge = " + str(m_edge))
-                
-            
-            Vector_point = m_edge.Curve.Center  
-    #         try :
-    #             point = m_edge.Curve.Radius
-    #         except:
-    #             try:
-    #                 point = m_edge.Center
-    #             except:
-    #                 try:
-    #                     point = m_edge.Curve.Center
-    #                 except AttributeError:
-    #                     continue
-    #       
+                print_msg("m_face = " + str(m_face))            
+        
+            Vector_point = m_face.CenterOfMass  
+          
             point = Part.Point( Vector_point )         
             selfobj.Shape = point.toShape()
             propertiesPoint(selfobj.Label)
@@ -182,7 +171,6 @@ class CenterCirclePoint(WF_Point):
             selfobj.Z = float(Vector_point.z)
         except:
             pass
-                
                  
     def onChanged(self, selfobj, prop):
         """ Print the name of the property that has changed """
@@ -193,9 +181,9 @@ class CenterCirclePoint(WF_Point):
         WF_Point.onChanged(self, selfobj, prop)   
     
             
-class ViewProviderCenterCirclePoint:
+class ViewProviderCenterFacePoint:
     global path_WF_icons
-    icon = '/WF_centerCirclePoint.svg'  
+    icon = '/WF_centerFacePoint.svg'  
     def __init__(self,vobj):
         """ Set this object to the proxy object of the actual view provider """
         vobj.Proxy = self
@@ -224,14 +212,14 @@ class ViewProviderCenterCirclePoint:
     # This method is optional and if not defined a default icon is shown.
     def getIcon(self):        
         """ Return the icon which will appear in the tree view. """
-        return (path_WF_icons + ViewProviderCenterCirclePoint.icon)
+        return (path_WF_icons + ViewProviderCenterFacePoint.icon)
            
-    def setIcon(self, icon = '/WF_centerCirclePoint.svg'):
-        ViewProviderCenterCirclePoint.icon = icon
+    def setIcon(self, icon = '/WF_centerFacePoint.svg'):
+        ViewProviderCenterFacePoint.icon = icon
   
             
-class CommandCenterCirclePoint:
-    """ Command to create CenterCirclePoint feature object. """
+class CommandCenterFacePoint:
+    """ Command to create CenterFacePoint feature object. """
     def GetResources(self):
         return {'Pixmap'  : path_WF_icons + m_icon,
                 'MenuText': m_menu_text,
@@ -243,7 +231,7 @@ class CommandCenterCirclePoint:
         if m_actDoc is not None:
             if len(Gui.Selection.getSelectionEx(m_actDoc.Name)) == 0:
                 pass
-                #Gui.Control.showDialog(CenterCirclePointPanel())
+                #Gui.Control.showDialog(CenterFacePointPanel())
 
         run()
         
@@ -254,20 +242,19 @@ class CommandCenterCirclePoint:
             return False
 
 if App.GuiUp:
-    Gui.addCommand("CenterCirclePoint", CommandCenterCirclePoint())
+    Gui.addCommand("CenterFacePoint", CommandCenterFacePoint())
 
 
 def run():
     m_sel, m_actDoc = getSel(WF.verbose())
       
     try: 
-        Number_of_Curves, Curve_List = m_sel.get_curvesNames(
-            getfrom=["Points","Segments","Curves","Planes","Objects"])
+        Number_of_Planes, Plane_List = m_sel.get_planesNames(getfrom=["Planes","Objects"])
         if WF.verbose() != 0:        
-            print_msg("Number_of_Curves = " + str(Number_of_Curves))
-            print_msg("Curve_List = " + str(Curve_List))
+            print_msg("Number_of_Planes = " + str(Number_of_Planes))
+            print_msg("Plane_List = " + str(Plane_List))
             
-        if Number_of_Curves == 0:
+        if Number_of_Planes == 0:
             raise Exception(m_exception_msg)
         try:
             m_main_dir = "WorkPoints_P"   
@@ -277,25 +264,28 @@ def run():
             m_sub_dir  = "Set"
             
             # Create a sub group if needed
-            if Number_of_Curves > 1 :
+            if Number_of_Planes > 1 :
                 try:
                     m_ob = App.ActiveDocument.getObject(str(m_main_dir)).newObject("App::DocumentObjectGroup", str(m_sub_dir))
                     m_group = m_actDoc.getObject( str(m_ob.Label) )
                 except:
                     printError_msg("Could not Create '"+ str(m_sub_dir) +"' Objects Group!")           
 
-            for i in range( Number_of_Curves ):
-                edge = Curve_List[i]            
-                App.ActiveDocument.openTransaction("Macro CenterCirclePoint")
-                selfobj = makeCenterCirclePointFeature(m_group)    
-                selfobj.Edge           = edge
+            for i in range( Number_of_Planes ):
+                plane = Plane_List[i]            
+                App.ActiveDocument.openTransaction("Macro CenterFacePoint")
+                selfobj = makeCenterFacePointFeature(m_group)    
+                selfobj.Face           = plane
                 selfobj.Proxy.execute(selfobj)                   
                                                    
         finally:
             App.ActiveDocument.commitTransaction()
-   
+            
+        
+
+            
     except Exception as err:
-        printError_msg(err.message, title="Macro CenterCirclePoint")
+        printError_msg(err.message, title="Macro CenterFacePoint")
 
                            
 if __name__ == '__main__':

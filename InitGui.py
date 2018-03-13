@@ -40,7 +40,7 @@ import os, sys
 import WF
 
 global WF_Release
-WF_Release = "2018_03_08"
+WF_Release = "2018_03_13"
 
 # get the path of the Release python script 
 path_WF = os.path.dirname(WF.__file__)
@@ -80,6 +80,7 @@ class WorkFeatureWorkbench ( Workbench ):
             import WF_centerLinePoint        
             import WF_extremaLinePoint
             import WF_centerCirclePoint
+            import WF_centerFacePoint
             
             import WF_twoPointsLine
             
@@ -94,7 +95,8 @@ class WorkFeatureWorkbench ( Workbench ):
         self.Point_menu = ["Work Feature","Points"] 
         self.Point_commands_list = ["CenterLinePoint", 
                                     "ExtremaLinePoint",
-                                    "CenterCirclePoint", 
+                                    "CenterCirclePoint",
+                                    "CenterFacePoint", 
                                     ]
         self.appendCommandbar("Points" , self.Point_commands_list)
         self.appendMenu(self.Point_menu, self.Point_commands_list)
