@@ -83,7 +83,15 @@ m_result_msg    = " : Mid Line Point(s) created !"
 m_menu_text     = "Center of Line(s)"
 m_accel         = ""
 m_tool_tip      = """<b>Create Point(s)</b> at Center location of each selected Line(s).<br>
-...<br>
+Cut each selected Line(s) in 2 (n) parts and<br>
+create a (n-1) Point(s) along selected edge(s) except at extrema.<br>
+The number (n) indicates how many parts to consider.<br>
+<br>
+- Select one or several Line/Edge(s) and/or<br>
+- Select one Plane/Face to process all (4) Edges and/or<br>
+- Select one Object to process all Edges at once<br>
+- Then Click on the button<br>
+<br> 
 <i>Click in view window without selection will popup<br>
  - a Warning Window and<br> 
  - a Parameter(s) Window in Task Panel!</i>

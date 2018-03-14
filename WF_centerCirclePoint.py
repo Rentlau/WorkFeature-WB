@@ -82,7 +82,10 @@ m_menu_text     = "Center of Circle(s)"
 m_accel         = ""
 m_tool_tip      = """<b>Create Point(s)</b> at Center location 
 of each selected Circle(s).<br>
-...<br>
+<br>
+- Select one or several Circle(s), Arc(s) or Ellipse(s)<br>
+- Then Click on the button<br>
+<br>
 <i>Click in view window without selection will popup<br>
  - a Warning Window !</i>
 """

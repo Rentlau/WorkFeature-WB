@@ -82,7 +82,11 @@ m_menu_text     = "Center of Face(s)"
 m_accel         = ""
 m_tool_tip      = """<b>Create Point(s)</b> at Center location 
 of each selected Face(s).<br>
-...<br>
+<br>
+- Select one or several Plane/Face(s) to process and/or<br>
+- Select one or several Object(s) to process all Faces at once<br>
+- Then Click on the button.<br> 
+<br>
 <i>Click in view window without selection will popup<br>
  - a Warning Window !</i>
 """

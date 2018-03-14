@@ -86,7 +86,12 @@ m_result_msg    = " : Extrema Line Point(s) created !"
 m_menu_text     = "Extrema of Line(s) "
 m_accel         = ""
 m_tool_tip      = """<b>Create Point(s)</b> at Start and End location of each selected Line(s).<br>
-...<br>
+<br>
+- Select one or several Line/Edge(s) and/or<br>
+- Select one Plane/Face to process all (4) Edges and/or<br>
+- Select one Object to process all Edges at once<br>
+- Then Click on the button<br>
+<br> 
 <i>Click in view window without selection will popup<br>
  - a Warning Window and<br> 
  - a Parameter(s) Window in Task Panel!</i>
