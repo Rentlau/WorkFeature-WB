@@ -387,12 +387,10 @@ def run():
         if Number_of_Vertexes < 2:
             raise Exception(m_exception_msg)
         try:
-            m_main_dir = "WorkAxis_P"   
+            m_main_dir = "WorkAxis_P"
+            m_sub_dir  = "Set"   
             m_group = createFolders(str(m_main_dir))
-            if WF.verbose() != 0:
-                print_msg("Group = " + str(m_group.Label))
-            m_sub_dir  = "Set"
-            
+
             # Create a sub group if needed
             if Number_of_Vertexes > 2:
                 try:
@@ -400,7 +398,10 @@ def run():
                     m_group = m_actDoc.getObject( str(m_ob.Label) )
                 except:
                     printError_msg("Could not Create '"+ str(m_sub_dir) +"' Objects Group!")           
-                                 
+                         
+            if WF.verbose() != 0:
+                print_msg("Group = " + str(m_group.Label))
+                                  
             if (Number_of_Vertexes % 2 == 0): #even
                 if WF.verbose() != 0:
                     print_msg("Even number of points")

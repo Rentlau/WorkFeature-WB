@@ -78,7 +78,7 @@ m_exception_msg = """Unable to create Center Line Point(s) :
    
  #Go to Parameter(s) Window in Task Panel!"""
 m_result_msg    = " : Center Circle Point(s) created !"
-m_menu_text     = "Center of Circle(s)"
+m_menu_text     = "Point(s) = center(Arc)"
 m_accel         = ""
 m_tool_tip      = """<b>Create Point(s)</b> at Center location 
 of each selected Circle(s).<br>
@@ -273,12 +273,10 @@ def run():
         if Number_of_Curves == 0:
             raise Exception(m_exception_msg)
         try:
-            m_main_dir = "WorkPoints_P"   
+            m_main_dir = "WorkPoints_P"
+            m_sub_dir  = "Set"   
             m_group = createFolders(str(m_main_dir))
-            if WF.verbose() != 0:
-                print_msg("Group = " + str(m_group.Label))
-            m_sub_dir  = "Set"
-            
+
             # Create a sub group if needed
             if Number_of_Curves > 1 :
                 try:
@@ -286,7 +284,10 @@ def run():
                     m_group = m_actDoc.getObject( str(m_ob.Label) )
                 except:
                     printError_msg("Could not Create '"+ str(m_sub_dir) +"' Objects Group!")           
-
+            
+            if WF.verbose() != 0:
+                print_msg("Group = " + str(m_group.Label))
+                          
             for i in range( Number_of_Curves ):
                 edge = Curve_List[i]            
                 App.ActiveDocument.openTransaction("Macro CenterCirclePoint")

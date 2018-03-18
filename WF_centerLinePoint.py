@@ -80,7 +80,7 @@ m_exception_msg = """Unable to create Center Line Point(s) :
    
 Go to Parameter(s) Window in Task Panel!"""
 m_result_msg    = " : Mid Line Point(s) created !"
-m_menu_text     = "Center of Line(s)"
+m_menu_text     = "Point(s) = divide(Line)"
 m_accel         = ""
 m_tool_tip      = """<b>Create Point(s)</b> at Center location of each selected Line(s).<br>
 Cut each selected Line(s) in 2 (n) parts and<br>
@@ -331,14 +331,12 @@ def run():
             print_msg("Vertex_List = " + str(Vertex_List))
             
         if Number_of_Edges == 0 :
-            if Number_of_Vertexes < 2 :
-                raise Exception(m_exception_msg)
+            #if Number_of_Vertexes < 2 :
+            raise Exception(m_exception_msg)
         try:
             m_main_dir = "WorkPoints_P"   
-            m_group = createFolders(str(m_main_dir))
-            if WF.verbose() != 0:
-                print_msg("Group = " + str(m_group.Label))
             m_sub_dir  = "Set"
+            m_group = createFolders(str(m_main_dir))
             
             #### From Edges
             # Create a sub group if needed
@@ -348,7 +346,10 @@ def run():
                     m_group = m_actDoc.getObject( str(m_ob.Label) )
                 except:
                     printError_msg("Could not Create '"+ str(m_sub_dir) +"' Objects Group!")           
-                             
+            
+            if WF.verbose() != 0:
+                print_msg("Group = " + str(m_group.Label))                 
+            
             for i in range( Number_of_Edges ):
                 edge = Edge_List[i]
                 

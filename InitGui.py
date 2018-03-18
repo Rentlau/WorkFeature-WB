@@ -77,10 +77,12 @@ class WorkFeatureWorkbench ( Workbench ):
     def Initialize(self):
         import WF
         try:
-            import WF_centerLinePoint        
+            import WF_centerLinePoint
+            import WF_alongLinePoint        
             import WF_extremaLinePoint
             import WF_centerCirclePoint
             import WF_centerFacePoint
+            import WF_lineFacePoint
             
             import WF_twoPointsLine
             
@@ -93,10 +95,12 @@ class WorkFeatureWorkbench ( Workbench ):
         
         # Set menu and commands for Points   
         self.Point_menu = ["Work Feature","Points"] 
-        self.Point_commands_list = ["CenterLinePoint", 
+        self.Point_commands_list = ["CenterLinePoint",
+                                    "AlongLinePoint", 
                                     "ExtremaLinePoint",
                                     "CenterCirclePoint",
-                                    "CenterFacePoint", 
+                                    "CenterFacePoint",
+                                    "LineFacePoint", 
                                     ]
         self.appendCommandbar("Points" , self.Point_commands_list)
         self.appendMenu(self.Point_menu, self.Point_commands_list)

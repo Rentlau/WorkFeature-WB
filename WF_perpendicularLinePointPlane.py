@@ -80,7 +80,7 @@ m_exception_msg = """Unable to create Plane :
 
 Go to Parameter(s) Window in Task Panel!"""
 m_result_msg    = " : Plane created !"
-m_menu_text     = "Plane = (Point, _|Axis)"
+m_menu_text     = "Plane = (Point, _|Line)"
 m_accel         = ""
 m_tool_tip      = """<b>Create Plane</b> given one Point and one perpendicular Line.<br>
 ...<br>
@@ -332,8 +332,13 @@ def run():
         if Number_of_Vertexes < 1:
             raise Exception(m_exception_msg)
         try:
-            m_main_dir = "WorkPlanes_P"   
+            m_main_dir = "WorkPlanes_P"
+            m_sub_dir  = "Set"    
             m_group = createFolders(str(m_main_dir))
+                        
+            # Create a sub group if needed
+            # To develop
+            
             if WF.verbose() != 0:
                 print_msg("Group = " + str(m_group.Label))
                                

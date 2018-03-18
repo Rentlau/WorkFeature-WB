@@ -32,18 +32,30 @@ Download and install FreeCAD from [wiki Download page](http://www.freecadweb.org
   - Cloning the repository from github (https://github.com/Rentlau/WorkFeature-WB) using:
 
 ```
-mkdir /home/path_to_WorkFeature-WB
-cd /home/path_to_WorkFeature-WB/
+mkdir /home/your_name/path_to_WorkFeature-WB
+cd /home/your_name/path_to_WorkFeature-WB/
 git clone https://github.com/Rentlau/WorkFeature-WB.git
 ```
 
-  - or download from github the zip file : <b>WorkFeature-WB-master.zip</b> and extract it into "/home/path_to_WorkFeature-WB/"
+  - or download from github the zip file : <b>WorkFeature-WB-master.zip</b> and extract it into "/home/your_name/path_to_WorkFeature-WB"
 
-  - Then by making a symbolic link or copy the folder into "freecad installation folder"/Mod (most of the time <b>/home/.FreeCAD/Mod/</b>) :
+  - Then by making a symbolic link into "freecad installation folder"/Mod (most of the time <b>/home/your_name/.FreeCAD/Mod/</b>)<br>
+  Into your home directory you must have a similar directory /home/your_name/.FreeCAD/Mod/<br>
+  This is the place all your extra workbench add-ons are installed ! :<br>
 
 ```
-ln -s (path_to_WorkFeature-WB) (path_to_freecad)/Mod
+ln -s /home/your_name/path_to_WorkFeature-WB /home/your_name/.FreeCAD/Mod/
 ```
+
+  - Or copy the "/home/your_name/path_to_WorkFeature-WB" directory into into "freecad installation folder"/Mod add-ons directory :<br>
+
+```
+cp /home/your_name/path_to_WorkFeature-WB /home/your_name/.FreeCAD/Mod/
+```
+
+On Windows most of the time the place all your extra workbench add-ons are installed is <b>C:\Program Files\FreeCAD 0.16\Mod\WorkeFeature-WB-master</b>.
+
+See repository at https://github.com/FreeCAD/FreeCAD-addons for more details on add-ons for FreeCAD.
 
 ### Requirements
 ----------
@@ -65,6 +77,7 @@ Quite all objects created with functions from this workbench are parametric. Tha
 | Icon                           | Function  |
 |:------|:------|
 |![alt](./Resources/Icons/WF_centerLinePoint.svg)  | Create Point(s) at Center location of each selected Line(s). <br>Can also create several Points along selected Line(s)|
+|![alt](./Resources/Icons/WF_alongLinePoint.svg)  | Create Point(s) along Line(s) <br>at a defined distance of intersection from selected Point(s)/Line(s).|
 |![alt](./Resources/Icons/WF_extremaLinePoint.svg)  | Create Point(s) at edges of selected Line(s). |
 |![alt](./Resources/Icons/WF_centerCirclePoint.svg)  | Create Point(s) at center location of selected Circle(s). |
 |![alt](./Resources/Icons/WF_centerFacePoint.svg)  | Create Point(s) at center location of selected Plane(s). |

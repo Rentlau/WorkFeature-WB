@@ -141,6 +141,83 @@ def minMaxVectorsLimits(vertexes):
     
     return xmax, xmin, ymax, ymin, zmax, zmin
 
+def intersecLinePlane(A, B, Plane_Normal, Plane_Point):
+    """ Return the intersection between the Line L defined by A and B
+    and the Plane defined by Plane_Normal and Plane_Point.
+    """
+    # Plane Equation is eq(0) P(x, y, z): 
+    # a * x + b * y + c * z + d = 0     
+    # where Normal to P is  N(a, b, c)
+    N = Plane_Normal
+
+    #if N == App.Vector(0.0, 0.0, 0.0):
+    #    return None   
+    a, b, c = N.x, N.y, N.z
+    #print("a = " + str(a) + " b = " + str(b) + " c = " + str(c))
+     
+    # p1(px,py,pz) belongs to the plane P, so
+    # a * px + b * py + c * pz + d = 0 and
+    # d = -(a * px + b * py + c * pz)
+    p1 = Plane_Point
+    d = -((a * p1.x) + (b * p1.y) + (c * p1.z))
+    #print("d = "+ str(d))
+    
+    # L is the line defined by 2 points A(ax, ay, az) and B(bx, by, bz), and
+    # may be also defined as the line crossing A(ax, ay, az) and along 
+    # the direction AB = U(bx-ax, by-ay, bz-az)
+    # If U(ux, uy, uz) = U(bx-ax, by-ay, bz-az) the Line L is the set of 
+    # points M as defined by eq(1):
+    # Vector(MA) = k * Vector(U)
+    # with k Real
+    if isEqualVectors(A, B) == True :
+        print_msg("ERROR : The 2 given points are equals !")
+        return None
+    ax, ay, az = A.x, A.y, A.z
+    bx, by, bz = B.x, B.y, B.z
+    ux, uy, uz = bx - ax, by - ay, bz - az
+    U = App.Vector(ux, uy, uz)
+
+    # We consider Dot product between U and N 
+    # 1> U.N = 0
+    #print("U.dot(N) =" + str(U.dot(N)))
+    
+    if U.dot(N) == 0.0:
+        # if A belongs to P : the full Line L is included in the Plane
+        if (a * ax) + (b * ay) + (c * az) + d == 0.0:
+            print_msg("WARNING : The full Line is included in the Plane, returning first Point !")
+            return A
+        # if not the Plane and line are paralell without intersection
+        else:
+            print_msg("ERROR : The Plane and the line are paralell without intersection !")
+            return None
+    # 2> U.N != 0
+    else:
+        # We look for T(tx, ty, tz) on the Line L
+        # eq(1) in parametric form; k exists and follows eq(2):
+        # tx = ax + k * ux 
+        # ty = ay + k * uy
+        # tz = az + k * uz
+        # and T(tx, ty, tz) on the plane too so eq(1) is
+        # a * tx + b * ty + c * tz + d = 0
+        # by pasting the tx, ty and tz expressions into eq(1) we have a first 
+        # deg equation with one unknow 'k':
+        # a * (ax + k * ux) + b * (ay + k * uy) + c * (az + k * uz) + d = 0
+        # so 
+        # a * ax + a * k * ux + b * ay + b * k * uy + c * az + c * k * uz + d = 0
+        # k * ( a * ux + b * uy  c *uz ) + a * ax + b * ay + c * az  + d = 0
+        # k = -1 * (a * ax + b * ay + c * az  + d) / ( a * ux + b * uy + c *uz )
+        if ( a * ux + b * uy + c *uz ) == 0.0:
+            print_msg("ERROR : a * ux + b * uy + c *uz == 0.0 !")
+            return None
+        
+        k = -1 * (a * ax + b * ay + c * az  + d) / ( a * ux + b * uy + c *uz )
+        tx = ax + k * ux 
+        ty = ay + k * uy
+        tz = az + k * uz
+        #print("tx =" + str(tx) + " ty=" + str(ty) + " tz=" + str(tz))
+        T = App.Vector(tx, ty, tz)
+
+        return T
 
 def intersectPerpendicularLine(A, B, C,):
     """ Return the intersection between the Line L defined by A and B
