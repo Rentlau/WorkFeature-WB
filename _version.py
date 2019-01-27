@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+"""
 ***************************************************************************
-*   These Icons files are part of Work Feature workbench                  *
+*   This file is part of Work Feature workbench                           *
 *                                                                         *
 *   Copyright (c) 2017-2019 <rentlau_64>                                  *
 *   https://github.com/Rentlau/WorkFeature-WB                             *
@@ -26,3 +28,7 @@
 *   License along with this workbench;                                    *
 *   If not, see <https://www.gnu.org/licenses/>                           *
 ***************************************************************************
+"""
+
+version_info = ('2019', '01', '27', 'dev')
+__version__ = '.'.join(map(str, version_info))

@@ -1,149 +1,181 @@
 # -*- coding: utf-8 -*-
-# FreeCAD init script of the Work Features module
 """
 ***************************************************************************
-*   FreeCAD Work Feature workbench                                        *
+*   This file is part of Work Feature workbench                           *
 *                                                                         *
-*   Copyright (c) 2017 <rentlau_64>                                       *
+*   Copyright (c) 2017-2019 <rentlau_64>                                  *
+*   https://github.com/Rentlau/WorkFeature-WB                             *
+*                                                                         *
 *   Code rewrite by <rentlau_64> from Work Features macro:                *
 *   https://github.com/Rentlau/WorkFeature                                *
 *                                                                         *
-*   This file is a supplement to the FreeCAD CAx development system.      *  
+*   This workbench is a supplement to the FreeCAD CAx development system. *
 *   http://www.freecadweb.org                                             *
 *                                                                         *
-*   This program is free software; you can redistribute it and/or modify  *
-*   it under the terms of the GNU Lesser General Public License (LGPL)    *
-*   as published by the Free Software Foundation; either version 2 of     *
-*   the License, or (at your option) any later version.                   *
-*   for detail see the COPYING and COPYING.LESSER text files.             *
-*   http://en.wikipedia.org/wiki/LGPL                                     *
+*   This workbench is free software; you can redistribute it and/or modify*
+*   it under the terms of the GNU General Public License as published by  *
+*   the Free Software Foundation, either version 3 of the License, or     *
+*   (at your option) any later version.                                   *
+*   for detail see the LICENSE text file or:                              *
+*   https://www.gnu.org/licenses/gpl-3.0.html                             *
 *                                                                         *
-*   This software is distributed in the hope that it will be useful,      *
+*   This workbench is distributed in the hope that it will be useful,     *
 *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the          *
 *   GNU Library General Public License for more details.                  *
 *                                                                         *
 *   You should have received a copy of the GNU Library General Public     *
-*   License along with this macro; if not, write to the Free Software     *
-*   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  *
-*   USA or see <http://www.gnu.org/licenses/>                             *
+*   License along with this workbench;                                    *
+*   If not, see <https://www.gnu.org/licenses/>                           *
 ***************************************************************************
 """
-__title__  = "WorkFeature  workbench"
+
+# FreeCAD init script of the Work Features module
+import os
+import sys
+import WF
+import FreeCAD
+import FreeCADGui
+from _version import __version__
+
+__title__ = "WorkFeature  workbench"
 __author__ = "Rentlau_64"
-__url__    = "https://github.com/Rentlau/WorkFeature-WB.git"
+__url__ = "https://github.com/Rentlau/WorkFeature-WB.git"
 ###############
 m_debug = False
 ###############
-
-import os, sys
-import WF
-
 global WF_Release
-WF_Release = "2018_03_13"
+WF_Release = __version__
 
-# get the path of the Release python script 
+# get the path of the py python script
 path_WF = os.path.dirname(WF.__file__)
 
-path_WF_icons     = os.path.join(path_WF, 'Resources', 'Icons')
-path_WF_utils     = os.path.join(path_WF, 'Utils')
+path_WF_icons = os.path.join(path_WF, 'Resources', 'Icons')
+path_WF_utils = os.path.join(path_WF, 'Utils')
 path_WF_resources = os.path.join(path_WF, 'Resources')
-path_WF_ui        = os.path.join(path_WF, 'Resources', 'Ui')
+path_WF_ui = os.path.join(path_WF, 'Resources', 'Ui')
 
 if not sys.path.__contains__(str(path_WF_utils)):
     sys.path.append(str(path_WF_utils))
     sys.path.append(str(path_WF_ui))
-    
+
 if m_debug:
-    print "DEBUG : path_WF           is " +  str(path_WF)
-    print "DEBUG : path_WF_icons     is " +  str(path_WF_icons)
-    print "DEBUG : path_WF_utils     is " +  str(path_WF_utils)
-    print "DEBUG : path_WF_resources is " +  str(path_WF_resources)
-    print "DEBUG : path_WF_ui        is " +  str(path_WF_ui)     
+    print("DEBUG : path_WF           is " + str(path_WF))
+    print("DEBUG : path_WF_icons     is " + str(path_WF_icons))
+    print("DEBUG : path_WF_utils     is " + str(path_WF_utils))
+    print("DEBUG : path_WF_resources is " + str(path_WF_resources))
+    print("DEBUG : path_WF_ui        is " + str(path_WF_ui))
 
-import FreeCAD
-import FreeCADGui
 
-class WorkFeatureWorkbench ( Workbench ):
+class WorkFeatureWorkbenchDev(Workbench):
     "WorkFeature workbench object"
     global path_WF_icons
     global path_WF_ui
-    
+    global m_debug
+
     def __init__(self):
         self.__class__.Icon = path_WF_icons + "/WF_wf16x16.svg"
-        self.__class__.MenuText = "WorkFeature"
-        self.__class__.ToolTip  = "WorkFeature workbench (allowing parametric objects)"
-     
+        self.__class__.MenuText = "WorkFeatureDev"
+        m_tooltip = "WorkFeature workbench (allowing parametric objects)"
+        self.__class__.ToolTip = m_tooltip
+
     def Initialize(self):
         import WF
         try:
+            import WF_general
             import WF_centerLinePoint
-            import WF_alongLinePoint        
-            import WF_extremaLinePoint
-            import WF_centerCirclePoint
-            import WF_centerFacePoint
-            import WF_lineFacePoint
-            
-            import WF_twoPointsLine
-            
-            import WF_linePointPlane
-            import WF_perpendicularLinePointPlane
-        except ImportError:
-            FreeCAD.Console.PrintWarning("Error: One of WF_ module not found, WorkFeature workbench will be disabled.\n")
-        except:
-            FreeCAD.Console.PrintWarning("Error: Unknown error while trying to load one of WF_ module !\n")
-        
-        # Set menu and commands for Points   
-        self.Point_menu = ["Work Feature","Points"] 
-        self.Point_commands_list = ["CenterLinePoint",
-                                    "AlongLinePoint", 
-                                    "ExtremaLinePoint",
-                                    "CenterCirclePoint",
-                                    "CenterFacePoint",
-                                    "LineFacePoint", 
-                                    ]
-        self.appendCommandbar("Points" , self.Point_commands_list)
-        self.appendMenu(self.Point_menu, self.Point_commands_list)
-        self.appendToolbar("WF Points" , self.Point_commands_list)
-        
-        # Set menu and commands for Lines   
-        self.m_Line_menu = ["Work Feature","Lines"]
-        self.m_Line_commands_list = ["TwoPointsLine", 
-                                ]
-        self.appendCommandbar("Lines"   , self.m_Line_commands_list)
-        self.appendMenu(self.m_Line_menu, self.m_Line_commands_list)          
-        self.appendToolbar("WF Lines"   , self.m_Line_commands_list)
+            import WF_alongLinePoint
+            # import WF_extremaLinePoint
+            # import WF_centerCirclePoint
+            # import WF_centerFacePoint
+            # import WF_pointFacePoint
+            # import WF_lineFacePoint
 
-        # Set menu and commands for Planes   
-        self.m_Line_menu = ["Work Feature","Planes"]
+            # import WF_twoPointsLine
+
+            # import WF_linePointPlane
+            # import WF_perpendicularLinePointPlane
+        except ImportError:
+            m_error = "Error: One of WF_ module not found,"
+            m_error += "WorkFeature workbench will be disabled.\n"
+            FreeCAD.Console.PrintWarning(m_error)
+            m_error = "Error: Unknown error while trying"
+            m_error += "to load one of WF_ module !\n"
+            FreeCAD.Console.PrintWarning(m_error)
+
+        # Set menu and commands for Points
+        self.General_menu = ["Work Feature",
+                             "General"]
+        self.General_commands_list = ["ShowHideDynamic",
+                                      "ShowHideInteractive",
+                                      "ShowHideNo",
+                                      "Refresh",
+                                      ]
+        self.appendCommandbar("General", self.General_commands_list)
+        self.appendMenu(self.General_menu, self.General_commands_list)
+        self.appendToolbar("WF General", self.General_commands_list)
+
+        # Set menu and commands for Points
+        self.Point_menu = ["Work Feature",
+                           "Points"]
+        self.Point_commands_list = ["CenterLinePoint",
+                                    "AlongLinePoint",
+                                    # "ExtremaLinePoint",
+                                    # "CenterCirclePoint",
+                                    # "CenterFacePoint",
+                                    # "PointFacePoint",
+                                    # "LineFacePoint",
+                                    ]
+        self.appendCommandbar("Points", self.Point_commands_list)
+        self.appendMenu(self.Point_menu, self.Point_commands_list)
+        self.appendToolbar("WF Points", self.Point_commands_list)
+
+        # Set menu and commands for Lines
+        self.m_Line_menu = ["Work Feature",
+                            "Lines"]
+        self.m_Line_commands_list = ["TwoPointsLine",
+                                     ]
+        # self.appendCommandbar("Lines", self.m_Line_commands_list)
+        # self.appendMenu(self.m_Line_menu, self.m_Line_commands_list)
+        # self.appendToolbar("WF Lines", self.m_Line_commands_list)
+
+        # Set menu and commands for Planes
+        self.m_Line_menu = ["Work Feature",
+                            "Planes"]
         self.m_Line_commands_list = ["LinePointPlane",
-                                     "PerpendicularLinePointPlane", 
-                                ]
-        self.appendCommandbar("Planes"   , self.m_Line_commands_list)
-        self.appendMenu(self.m_Line_menu, self.m_Line_commands_list)          
-        self.appendToolbar("WF Planes"   , self.m_Line_commands_list)
-#         m_submenu = ['WorkFeature.pdf']
-# 
-#         self.appendMenu(["Work Feature", "Help"], m_submenu)
-        
+                                     "PerpendicularLinePointPlane",
+                                     ]
+        # self.appendCommandbar("Planes", self.m_Line_commands_list)
+        # self.appendMenu(self.m_Line_menu, self.m_Line_commands_list)
+        # self.appendToolbar("WF Planes", self.m_Line_commands_list)
+        # m_submenu = ['WorkFeature.pdf']
+        # self.appendMenu(["Work Feature", "Help"], m_submenu)
+
         FreeCADGui.addIconPath(path_WF_icons)
         FreeCADGui.addResourcePath(path_WF_icons)
-        FreeCADGui.addPreferencePage(path_WF_ui + "/WorkFeature_prefs.ui","Work Feature" )
-        
+        FreeCADGui.addPreferencePage(path_WF_ui + "/WorkFeature_prefs.ui",
+                                     "Work Feature")
+
         WF.set_release(WF_Release)
-        Log ('Loading WorkFeature workbench...done\n')
+        Log('Loading WorkFeature workbench...done\n')
+        if m_debug:
+            print("DEBUG : WF_Release is " + str(WF_Release))
 
     def Activated(self):
         # do something here if needed...
-        Msg ("WorkFeature workbench loaded\n")
+        m_msg = "WorkFeature workbench loaded !"
+        FreeCAD.Console.PrintMessage(m_msg + "\n")
+        m_msg = "WorkFeature Release is : {0:s}".format(str(WF_Release))
+        FreeCAD.Console.PrintMessage(m_msg + "\n")
 
     def Deactivated(self):
         # do something here if needed...
-        Msg ("WorkFeature workbench Deactivated\n")
-     
+        m_msg = "WorkFeature workbench Deactivated !"
+        FreeCAD.Console.PrintMessage(m_msg + "\n")
+
     def ContextMenu(self, recipient):
         if (recipient == "View"):
-            self.appendContextMenu("Points",self.Point_list)
+            self.appendContextMenu("Points", self.Point_list)
 #             if (FreeCAD.activeDraftCommand == None):
 #                 if (FreeCADGui.Selection.getSelection()):
 #                     self.appendContextMenu("Draft",self.cmdList+self.modList)
@@ -155,12 +187,13 @@ class WorkFeatureWorkbench ( Workbench ):
 #                     self.appendContextMenu("",self.lineList)
 #         else:
 #             if (FreeCADGui.Selection.getSelection()):
-#                 self.appendContextMenu("Utilities",self.treecmdList)   
-         
+#                 self.appendContextMenu("Utilities",self.treecmdList)
+
     def GetClassName(self):
         return "Gui::PythonWorkbench"
- 
-FreeCADGui.addWorkbench(WorkFeatureWorkbench)
+
+
+FreeCADGui.addWorkbench(WorkFeatureWorkbenchDev)
 
 if __name__ == '__main__':
     pass
