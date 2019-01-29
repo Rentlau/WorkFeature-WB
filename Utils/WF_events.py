@@ -54,38 +54,38 @@ class DefineAndConnectEvents():
         self.connections_for_return_pressed = {}
 
     def connectEvents(self):
-        for m_key, m_val in self.connections_for_slider_changed.items():
-            #print_msg( "Connecting : " + str(getattr(self.ui, str(m_key))) + " and " + str(getattr(self.obj, str(m_val))) )
+        for m_key, m_val in list(self.connections_for_slider_changed.items()):
+            # print_msg( "Connecting : " + str(getattr(self.ui, str(m_key))) + " and " + str(getattr(self.obj, str(m_val))) )
             QtCore.QObject.connect(getattr(self.ui, str(m_key)),
                                    QtCore.SIGNAL("valueChanged(int)"),getattr(self.obj, str(m_val)))
                                    
-        for m_key, m_val in self.connections_for_button_pressed.items():
-            #print_msg( "Connecting : " + str(getattr(self.ui, str(m_key))) + " and " + str(getattr(self.obj, str(m_val))) )
+        for m_key, m_val in list(self.connections_for_button_pressed.items()):
+            # print_msg( "Connecting : " + str(getattr(self.ui, str(m_key))) + " and " + str(getattr(self.obj, str(m_val))) )
             QtCore.QObject.connect(getattr(self.ui, str(m_key)),
                                    QtCore.SIGNAL("pressed()"),getattr(self.obj, str(m_val)))
                     
-        for m_key, m_val in self.connections_for_combobox_changed.items():
-            #print_msg( "Connecting : " + str(getattr(self.ui, str(m_key))) + " and " + str(getattr(self.obj, str(m_val))) )                            
+        for m_key, m_val in list(self.connections_for_combobox_changed.items()):
+            # print_msg( "Connecting : " + str(getattr(self.ui, str(m_key))) + " and " + str(getattr(self.obj, str(m_val))) )                            
             QtCore.QObject.connect(getattr(self.ui, str(m_key)),
                                    QtCore.SIGNAL(_fromUtf8("currentIndexChanged(QString)")),getattr(self.obj, str(m_val)))     
 
-        for m_key, m_val in self.connections_for_checkbox_toggled.items():
-            #print_msg( "Connecting : " + str(getattr(self.ui, str(m_key))) + " and " + str(getattr(self.obj, str(m_val))) ) 
+        for m_key, m_val in list(self.connections_for_checkbox_toggled.items()):
+            # print_msg( "Connecting : " + str(getattr(self.ui, str(m_key))) + " and " + str(getattr(self.obj, str(m_val))) ) 
             QtCore.QObject.connect(getattr(self.ui, str(m_key)),
                                    QtCore.SIGNAL(_fromUtf8("toggled(bool)")),getattr(self.obj, str(m_val)))  
               
-        for m_key, m_val in self.connections_for_spin_changed.items():
-            #print_msg( "Connecting : " + str(getattr(self.ui, str(m_key))) + " and " + str(getattr(self.obj, str(m_val))) ) 
+        for m_key, m_val in list(self.connections_for_spin_changed.items()):
+            # print_msg( "Connecting : " + str(getattr(self.ui, str(m_key))) + " and " + str(getattr(self.obj, str(m_val))) ) 
             QtCore.QObject.connect(getattr(self.ui, str(m_key)),
                                    QtCore.SIGNAL("valueChanged(int)"),getattr(self.obj, str(m_val))) 
 
-        for m_key, m_val in self.connections_for_return_pressed.items():
-            #print_msg( "Connecting : " + str(getattr(self.ui, str(m_key))) + " and " + str(getattr(self.obj, str(m_val))) )
+        for m_key, m_val in list(self.connections_for_return_pressed.items()):
+            # print_msg( "Connecting : " + str(getattr(self.ui, str(m_key))) + " and " + str(getattr(self.obj, str(m_val))) )
             QtCore.QObject.connect(getattr(self.ui, str(m_key)),
                                    QtCore.SIGNAL("returnPressed()"),getattr(self.obj, str(m_val)))
             
-        for m_key, m_val in self.connections_for_return_pressed.items():
-            #print_msg( "Connecting : " + str(getattr(self.ui, str(m_key))) + " and " + str(getattr(self.obj, str(m_val))) )
+        for m_key, m_val in list(self.connections_for_return_pressed.items()):
+            # print_msg( "Connecting : " + str(getattr(self.ui, str(m_key))) + " and " + str(getattr(self.obj, str(m_val))) )
             QtCore.QObject.connect(getattr(self.ui, str(m_key)),
                                    QtCore.SIGNAL("editingFinished()"),getattr(self.obj, str(m_val)))
 

@@ -88,13 +88,13 @@
                <bool>true</bool>
               </property>
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Choose the parametric behavior of the Feature regarding parent changes.&lt;/p&gt;&lt;p&gt;No : For static behavior (No update)&lt;/p&gt;&lt;p&gt;Interactive : Update only when user asks for (click on Update Button).&lt;/p&gt;&lt;p&gt;Dynamic : Update each time one of the parent change.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Choose the parametric behavior of the Feature regarding parent changes.&lt;/p&gt;&lt;p&gt;Not : For static behavior (No update)&lt;/p&gt;&lt;p&gt;Interactive : Update only when user asks for (click on Update Button).&lt;/p&gt;&lt;p&gt;Dynamic : Update each time one of the parent change.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="editable">
                <bool>true</bool>
               </property>
               <property name="currentIndex">
-               <number>2</number>
+               <number>0</number>
               </property>
               <property name="maxVisibleItems">
                <number>8</number>
@@ -107,7 +107,7 @@
               </property>
               <item>
                <property name="text">
-                <string>No</string>
+                <string>Not</string>
                </property>
               </item>
               <item>
@@ -161,11 +161,7 @@
              </sizepolicy>
             </property>
             <property name="toolTip">
-             <string>Change the tolerance for the following functions:
-  - in &quot;Check&quot; TAB:
-	are Parallel?
-	are Perpendicular?
-	are Coplanar?</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Change the tolerance for the some functions.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
              <string>Tolerance</string>
@@ -222,6 +218,72 @@
       <attribute name="title">
        <string>Point</string>
       </attribute>
+      <layout class="QGridLayout" name="gridLayout_8">
+       <item row="0" column="0">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QLabel" name="point_label">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Change the size of next generated point(s).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string>Point Size</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="Gui::PrefLineEdit" name="point_edit">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Change the size of future point(s).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string>5</string>
+           </property>
+           <property name="prefEntry" stdset="0">
+            <cstring>pointSize</cstring>
+           </property>
+           <property name="prefPath" stdset="0">
+            <cstring>Mod/WF</cstring>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="0">
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>266</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
      </widget>
      <widget class="QWidget" name="tab_help">
       <attribute name="title">

@@ -79,6 +79,9 @@ def getParamType(param):
         return "string"
     elif param in ["parametric", ]:
         return "int"
+    elif param in ["pointSize", "tolerance", ]:
+        # return "float"
+        return "string"
     else:
         return None
 
@@ -99,7 +102,7 @@ def getParam(param, default=None):
         return p.GetString(param, default)
     elif t == "float":
         if default is None:
-            default = 0
+            default = 0.0
         return p.GetFloat(param, default)
     elif t == "bool":
         if default is None:
@@ -151,7 +154,7 @@ def set_release(value):
 def parametric():
     """ Returns the parametric index from WF user settings
 
-    m_parametric = ['No','Interactive','Dynamic']
+    m_parametric = ['Not','Interactive','Dynamic']
     """
     return getParam("parametric", None)
 
@@ -160,3 +163,25 @@ def set_parametric(value):
     """ Sets the parametric index to WF user settings
     """
     setParam("parametric", value)
+    
+def pointSize():
+    """ Returns the point size from WF user settings
+    """
+    return float(getParam("pointSize", "5.0"))
+
+
+def set_pointSize(value):
+    """ Sets the point size to WF user settings
+    """
+    setParam("pointSize", value)
+    
+def tolerance():
+    """ Returns the tolerance from WF user settings
+    """
+    return float(getParam("tolerance", "1e-12"))
+
+
+def set_tolerance(value):
+    """ Sets the tolerance to WF user settings
+    """
+    setParam("tolerance", value)

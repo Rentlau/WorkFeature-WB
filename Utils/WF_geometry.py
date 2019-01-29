@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import FreeCAD as App
+import WF
 from WF_print import printError_msg, print_msg
 if App.GuiUp:
     import FreeCADGui as Gui
+
 
 tolerance = 1e-12
 
@@ -319,7 +321,8 @@ def propertiesPoint(Point_User_Name, color=(1.00, 0.67, 0.00)):
         print_msg("Not able to set PointColor !")
         print_msg("Color : " + str(color) + " !")
     try:
-        Gui.ActiveDocument.getObject(Point_User_Name).PointSize = 5.00
+        Gui.ActiveDocument.getObject(Point_User_Name).PointSize = WF.pointSize()
+
     except Exception as err:
         printError_msg(err.message, title="propertiesPoint")
         print_msg("Not able to set PointSize !")

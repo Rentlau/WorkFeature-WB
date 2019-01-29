@@ -70,7 +70,7 @@ try:
     from WF_geometry import *
     # from WF_utils import *
 except ImportError:
-    print("ERROR: Cannot load WF modules !!")
+    print("ERROR: Cannot load WF modules !")
     sys.exit(1)
 
 ###############
@@ -91,7 +91,7 @@ m_menu_text = "Point(s) = center(Line)"
 m_accel = ""
 m_tool_tip = """<b>Create Point(s)</b> at Center location of each selected Line(s).<br>
 Cut each selected Line(s) in 2 (n) parts and<br>
-create a (n-1) Point(s) along selected edge(s) except at extrema.<br>
+create a (n-1) Point(s) along selected edge(s).<br>
 The number (n) indicates how many parts to consider.<br>
 <br>
 - Select one or several Line/Edge(s)<br>
@@ -171,7 +171,7 @@ def makeCenterLinePointFeature(group):
         ViewProviderCenterLinePoint(m_obj.ViewObject)
     except Exception as err:
         printError_msg("Not able to add an object to Model!")
-        printError_msg(err.message, title=m_macro)
+        printError_msg(err.args[0], title=m_macro)
         return None
 
     return m_obj
@@ -261,7 +261,7 @@ Limits : [-1000:1000]
             selfobj.Y = float(Vector_point.y)
             selfobj.Z = float(Vector_point.z)
         except Exception as err:
-            printError_msg(err.message, title=m_macro)
+            printError_msg(err.args[0], title=m_macro)
 
     # this method is mandatory
     def execute(self, selfobj):
@@ -274,7 +274,7 @@ Limits : [-1000:1000]
         if 'Parametric' in selfobj.PropertiesList:
             # Create the object the first time regardless
             # the parametric behavior
-            if selfobj.Parametric == 'No' and self.created:
+            if selfobj.Parametric == 'Not' and self.created:
                 return
             if selfobj.Parametric == 'Interactive' and self.created:
                 return
@@ -337,7 +337,7 @@ Limits : [-1000:1000]
                 if 'Parametric' in selfobj.PropertiesList:
                     self.created = True
         except Exception as err:
-            printError_msg(err.message, title=m_macro)
+            printError_msg(err.args[0], title=m_macro)
 
     def onChanged(self, selfobj, prop):
         if m_debug:
@@ -350,7 +350,7 @@ Limits : [-1000:1000]
 
         if prop == "Parametric":
             if 'Parametric' in selfobj.PropertiesList:
-                if selfobj.Parametric == 'No':
+                if selfobj.Parametric == 'Not':
                     selfobj.setEditorMode("NumberLinePart", 1)
                     selfobj.setEditorMode("IndexPart", 1)
                 else:
@@ -466,7 +466,7 @@ def run():
                     m_ob = App.ActiveDocument.getObject(str(m_main_dir)).newObject("App::DocumentObjectGroup", str(m_sub_dir))
                     m_group = m_actDoc.getObject(str(m_ob.Label))
                 except Exception as err:
-                    printError_msg(err.message, title=m_macro)
+                    printError_msg(err.args[0], title=m_macro)
                     printError_msg(m_error_msg)
 
             if WF.verbose():
@@ -504,7 +504,7 @@ def run():
                     m_ob = App.ActiveDocument.getObject(str(m_main_dir)).newObject("App::DocumentObjectGroup", str(m_sub_dir))
                     m_group = m_actDoc.getObject(str(m_ob.Label))
                 except Exception as err:
-                    printError_msg(err.message, title=m_macro)
+                    printError_msg(err.args[0], title=m_macro)
                     printError_msg(m_error_msg)
 
             # Even number of vertexes
@@ -603,7 +603,7 @@ def run():
             App.ActiveDocument.commitTransaction()
 
     except Exception as err:
-        printError_msg(err.message, title=m_macro)
+        printError_msg(err.args[0], title=m_macro)
 
 
 if __name__ == '__main__':

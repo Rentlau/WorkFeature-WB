@@ -52,7 +52,7 @@ def printInfo_msg(message, title=None):
     except Exception as err:
         App.Console.PrintError("\nERROR : Not able to launch a QT dialog !")
         App.Console.PrintError(err.message)
-        raise(Exception(m_msg))
+        raise Exception
 
 
 def printError_msg(message, title=None):
@@ -65,7 +65,7 @@ def printError_msg(message, title=None):
     except Exception as err:
         App.Console.PrintError("\nERROR : Not able to launch a QT dialog !")
         App.Console.PrintError(err.message)
-        raise(Exception(m_msg))
+        raise Exception
 
 
 def print_not_yet():

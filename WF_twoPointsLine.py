@@ -66,7 +66,7 @@ try:
     from WF_geometry import *
     #from WF_utils import *
 except:
-    print "ERROR: cannot load WF modules !!"
+    print"ERROR: cannot load WF modules !!"
     sys.exit(1)
 
 ###############
@@ -282,7 +282,7 @@ class TwoPointsLine(WF_Line):
             App.Console.PrintMessage("Change property : " + str(prop) + "\n")
         
         if 'parametric' in selfobj.PropertiesList:        
-            if selfobj.parametric == 'No' :
+            if selfobj.parametric == 'Not' :
                 selfobj.setEditorMode("Extension", 1)  
             else :
                 selfobj.setEditorMode("Extension", 0)   

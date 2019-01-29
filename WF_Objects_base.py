@@ -44,7 +44,7 @@ __brief__ = '''
 m_debug = True
 ###############
 
-WF_ParametricList = ['No', 'Interactive', 'Dynamic']
+WF_ParametricList = ['Not', 'Interactive', 'Dynamic']
 WF_PLIST = WF_ParametricList
 WF_ColorList = [(0.45, 0.30, 0.00), (0.70, 0.47, 0.00), (1.00, 0.67, 0.00)]
 WF_CLIST = WF_ColorList
@@ -69,7 +69,7 @@ class WF_Object():
         self.created = False
         m_tooltip = """Choose the parametric behavior of the Feature
 regarding parent changes.
-  No : For Static behavior (no update when original parent(s) change)
+  Not : For Static behavior (no update when original parent(s) change)
   Interactive : Update only when user asks for
   Dynamic : Update each time parent changes
 """

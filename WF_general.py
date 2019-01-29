@@ -32,7 +32,7 @@ try:
     from WF_selection import Selection
     from WF_print import printError_msg, print_msg
 except ImportError:
-    print "ERROR: cannot load WF modules !!"
+    print("ERROR: cannot load WF modules !")
     sys.exit(1)
 
 ###############
@@ -279,7 +279,7 @@ class CommandShowHideInteractive:
 
 
 ###############
-m_icon_showhideno = "/WF_showHideNo.svg"
+m_icon_showhideno = "/WF_showHideNot.svg"
 m_dialog_showhideno = ""
 m_dialog_title_showhideno = ""
 m_exception_msg_showhideno = """
@@ -372,8 +372,8 @@ def run_refresh():
         # print obj.PropertiesList
         if "Parametric" in obj.PropertiesList:
             if WF.verbose():
-                print str(obj.Name)
-                print str(obj.Parametric)
+                print(str(obj.Name))
+                print(str(obj.Parametric))
             if str(obj.Parametric) == 'Interactive':
                 obj.Parametric = 'Dynamic'
                 obj.touch()
@@ -389,8 +389,8 @@ def run_showhide(parametric='Dynamic'):
         # print obj.PropertiesList
         if "Parametric" in obj.PropertiesList:
             if WF.verbose():
-                print str(obj.Name)
-                print str(obj.Parametric)
+                print(str(obj.Name))
+                print(str(obj.Parametric))
             if str(obj.Parametric) == parametric:
                 obj.ViewObject.Visibility = not obj.ViewObject.Visibility
 

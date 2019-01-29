@@ -70,7 +70,7 @@ try:
     from WF_geometry import *
     # from WF_utils import *
 except ImportError:
-    print "ERROR: cannot load WF modules !!"
+    print("ERROR: cannot load WF modules !")
     sys.exit(1)
 
 ###############
@@ -225,7 +225,7 @@ onto the first selected Line."""
         if 'Parametric' in selfobj.PropertiesList:
             # Create the object the first time regardless
             # the parametric behavior
-            if selfobj.Parametric == 'No' and self.created:
+            if selfobj.Parametric == 'Not' and self.created:
                 return
             if selfobj.Parametric == 'Interactive' and self.created:
                 return
@@ -261,7 +261,7 @@ onto the first selected Line."""
             if selfobj.Point != selfobj.AlongEdge:
                 n3 = eval(selfobj.Point[1][0].lstrip('Vertex'))
             else:
-                print selfobj.Point[1][0].name()
+                print(selfobj.Point[1][0].name())
                 n3 = eval(selfobj.Point[1][0].lstrip('Edge'))
 
         print("running AlongLinePoint.execute !")

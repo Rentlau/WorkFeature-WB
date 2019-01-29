@@ -243,7 +243,7 @@ Positive values lower than 100.0 will start to shrink it."""
             App.Console.PrintMessage("Change property : " + str(prop) + "\n")
         
         if 'parametric' in selfobj.PropertiesList:
-            if selfobj.parametric == 'No' :
+            if selfobj.parametric == 'Not' :
                 selfobj.setEditorMode("Extension", 1)
             else :
                 selfobj.setEditorMode("Extension", 0)

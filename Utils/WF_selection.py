@@ -328,7 +328,7 @@ class Selection():
         if len(Selected_Entities) != 0:
             return (len(Selected_Entities), Selected_Entities)
         if len(Selected_Entities1) != 0:
-            e = zip(Selected_Entities1, Selected_Entities2)
+            e = list(zip(Selected_Entities1, Selected_Entities2))
             Selected_Entities = [i[0] for i in e]
             return (len(Selected_Entities), Selected_Entities)
         else:

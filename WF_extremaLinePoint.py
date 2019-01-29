@@ -200,7 +200,7 @@ relative to the parent Line.
             App.Console.PrintMessage("Change property: " + str(prop) + "\n")
         
         if 'parametric' in selfobj.PropertiesList:
-            if selfobj.parametric == 'No' :
+            if selfobj.parametric == 'Not' :
                 selfobj.setEditorMode("At", 1)
             else :
                 selfobj.setEditorMode("At", 0)
