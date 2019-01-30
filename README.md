@@ -1,7 +1,7 @@
 
 # <center>WorkFeature-WB :<br> <img src="./Resources/Icons/WF_wf.svg"></center>
 ### <center>Work Feature workbench with parametric objects For FreeCAD </center>
-----------
+
 
 <center>by Rentlau_64</center>
 
@@ -24,7 +24,7 @@ Updated in January 2019
 
 
 ##  Introduction
-----------
+
 Workbench utility to create:
 - Points (Mid points, Extremum points, Center of circle, Center of Plane,),
 - Lines (From 2 points,),
@@ -42,7 +42,7 @@ Post on FreeCAD Forum : https://forum.freecadweb.org/viewtopic.php?f=9&t=27195
 [[back to top](#Sections)]
 
 ##  Installing
-----------
+
 
 **WorkFeature-WB** is part of the [FreeCAD external workbenches,](https://www.freecadweb.org/wiki/External_workbenches)
  and can be automatically installed using the [FreeCAD Add-on Manager](https://github.com/FreeCAD/FreeCAD-addons) which comes bundled with FreeCAD 0.17, under the *Tools* menu. 
@@ -81,7 +81,7 @@ On Windows most of the time the place all your extra workbench add-ons are insta
 [[back to top](#Sections)]
 
 ## Requirements
-----------
+
 
 - <b>Freecad</b> >= v0.15
 - <b>Numpy</b> is a required dependency (numpy >= v1.14.3).
@@ -93,7 +93,7 @@ Please "[Open an issue](https://github.com/Rentlau/WorkFeature-WB/issues)", if y
 [[back to top](#Sections)]
 
 ## General purpose
-----------
+
 
 **WorkFeature-WB** Tool utility to create **Points** (mid points, center of circle...), **Axes** (from 2 points...), **Planes** (from one axis and a point...) to facilitate the creation of your project. 
 
@@ -114,7 +114,7 @@ Quite all **objects** created with **WorkFeature-WB** functions are parametric.
 That means; if the **"parent"** object change, all **children WorkFeature-WB** objects will change accordingly !
 
 The **"Parametric"** property of objects can have any of the following behavior regarding parent changes:
-- **No** : For static behavior (No update even if one parents change).
+- **Not** : For static behavior (No update even if one parents change).
 - **Interactive** : Update only when user asks for (click on **`Update`** Button).
 - **Dynamic** : Update each time one of parents change.
 
@@ -133,7 +133,7 @@ In this panel you can choose by example to set the **Parametric behavior**:
 [[back to top](#Sections)]
 
 ## List of available functions
-----------
+
 
 Functions are organised by sub menus:
 
@@ -148,7 +148,7 @@ Functions are organised by sub menus:
 |:------|:------|
 |![alt](./Resources/Icons/WF_showHideDynamic.svg)  | Hide/Show all **Dynamic** parametric Objects. |
 |![alt](./Resources/Icons/WF_showHideInteractive.svg)  | Hide/Show all **Interactive** parametric Objects.|
-|![alt](./Resources/Icons/WF_showHideNo.svg)  | Hide/Show all **No** parametric (static) Objects. |
+|![alt](./Resources/Icons/WF_showHideNot.svg)  | Hide/Show all **Not** parametric (static) Objects. |
 |![alt](./Resources/Icons/WF_refresh.svg)  | Force  update of all **Interactive** parametric Objects. |
 
  - WF_Points sub menu :
@@ -178,36 +178,36 @@ Functions are organised by sub menus:
 [[back to top](#Sections)]
 
 ## Extra Documentations
-----------
+
 
 Find some more detailed documentations in ./Doc directory :
-  - [How to create "Center Line Point(s)"<img src="./Resources/Icons/WF_centerLinePoint.svg">](./Doc/HowTo_WFWB_Create_CenterLinePoint.pdf) <br>
+  - [How to create "Center Line Point(s)"<img src="./Resources/Icons/WF_centerLinePoint.svg">](./Doc/CenterLinePoint/HowTo_WFWB_Create_CenterLinePoint.md) <br>
 
 [[back to top](#Sections)]
 
 ## License
-----------
+
 
 <img src="./Doc/Images/gplv3-with-text-136x68.png">
 [GNU GENERAL PUBLIC LICENSE](https://www.gnu.org/licenses/gpl-3.0.html)
 
-----------
+
 [[back to top](#Sections)]
 
 ## Releases
-----------
+
 
 [Mars 2018](https://github.com/Rentlau/WorkFeature-WB/tree/V18.03)
-First release with only parametric objects
+First release with only dynamic parametric objects
 
 [January 2019](https://github.com/Rentlau/WorkFeature-WB/tree/release2019_01)
-Second release with **No**, **Interactive** and **Dynamic** parametric objects. Not all Functions available but in active developpement.
+Second release with **Not**, **Interactive** and **Dynamic** parametric objects. Not all Functions available but in active developpement.
 
-----------
+
 [[back to top](#Sections)]
 
 ### Associated project
-----------
+
 [Work features addon-on (macro) for FreeCAD](https://github.com/Rentlau/WorkFeature)
 
 Tool utility that creates:
@@ -220,22 +220,17 @@ Tool utility that creates:
 
 
 
-----------
 [[back to top](#Sections)]
 
 ### Tested on Linux Ubuntu
 
-A - FreeCAD 0.16.6712         | B - FreeCAD 0.17.13142
-:-------------------------:|:-------------------------:
-![alt](./Doc/Images/Version16.png?1) | ![alt](./Doc/Images/Version17.png?1)
+    A - FreeCAD 0.16.6712 
+    B - FreeCAD 0.17.13142
+
+
 
 ### Tested on Windows
 
-A - FreeCAD 0.16.6706       | 
-:-------------------------:|
-![alt](./Doc/Images/FreecadWindows.png?1) |
+    A - FreeCAD 0.16.6706
 
 
-```python
-
-```
