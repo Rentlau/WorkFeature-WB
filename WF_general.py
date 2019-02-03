@@ -337,7 +337,7 @@ class ViewProviderShowHideNo:
         ViewProviderRefresh.icon = icon
 
 
-class CommandShowHideNo:
+class CommandShowHideNot:
     def GetResources(self):
         return {'Pixmap': path_WF_icons + m_icon_showhideno,
                 'MenuText': m_menu_text_showhideno,
@@ -350,7 +350,7 @@ class CommandShowHideNo:
             m_selEx = Gui.Selection.getSelectionEx(m_actDoc.Name)
             if len(m_selEx) != 0 and WF.verbose():
                 print_msg(str(m_selEx))
-            run_showhide('No')
+            run_showhide('Not')
 
     def IsActive(self):
         if App.ActiveDocument:
@@ -362,7 +362,7 @@ class CommandShowHideNo:
 if App.GuiUp:
     Gui.addCommand("ShowHideDynamic", CommandShowHideDynamic())
     Gui.addCommand("ShowHideInteractive", CommandShowHideInteractive())
-    Gui.addCommand("ShowHideNo", CommandShowHideNo())
+    Gui.addCommand("ShowHideNo", CommandShowHideNot())
     Gui.addCommand("Refresh", CommandRefresh())
 
 

@@ -85,7 +85,7 @@ class WorkFeatureWorkbenchDev(Workbench):
             import WF_general
             import WF_centerLinePoint
             import WF_alongLinePoint
-            # import WF_extremaLinePoint
+            import WF_extremaLinePoint
             # import WF_centerCirclePoint
             # import WF_centerFacePoint
             # import WF_pointFacePoint
@@ -120,7 +120,7 @@ class WorkFeatureWorkbenchDev(Workbench):
                            "Points"]
         self.Point_commands_list = ["CenterLinePoint",
                                     "AlongLinePoint",
-                                    # "ExtremaLinePoint",
+                                    "ExtremaLinePoint",
                                     # "CenterCirclePoint",
                                     # "CenterFacePoint",
                                     # "PointFacePoint",

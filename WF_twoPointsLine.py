@@ -86,7 +86,7 @@ m_accel = ""
 m_tool_tip = """<b>Create Line(s)</b> from at least two selected Points.<br>
 <br>
 - Select two or more Points<br>
-- Then Click on the icon<br>
+- Then Click on the button<br>
 <i>Click in view window without selection will popup<br>
  - a Warning Window and<br> 
  - a Parameter(s) Window in Task Panel!</i>

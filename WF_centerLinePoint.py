@@ -68,7 +68,6 @@ try:
     from WF_print import printError_msg, print_msg
     from WF_directory import createFolders, addObjectToGrp
     from WF_geometry import *
-    # from WF_utils import *
 except ImportError:
     print("ERROR: Cannot load WF modules !")
     sys.exit(1)
@@ -98,7 +97,7 @@ The number (n) indicates how many parts to consider.<br>
  (you can also select 2 points in place of one Line/Edge) and/or<br>
 - Select one Plane/Face to process all (4) Edges and/or<br>
 - Select one Object to process all Edges at once<br>
-- Then Click on the icon<br>
+- Then Click on the button<br>
 <br>
 <i>Click in view window without selection will popup<br>
  - a Warning Window and<br>
@@ -495,7 +494,15 @@ def run():
                         selfobj.NumberLinePart = m_numberLinePart
                         selfobj.IndexPart = m_iPart
                         selfobj.Proxy.execute(selfobj)
-
+                        if str(selfobj.Parametric) == 'Interactive':
+                            selfobj.Parametric = 'Dynamic'
+                            selfobj.touch()
+                            selfobj.Parametric = 'Interactive'
+                        if str(selfobj.Parametric) == 'Not':
+                            selfobj.Parametric = 'Dynamic'
+                            selfobj.touch()
+                            selfobj.Parametric = 'Not'
+                            
             # From Vertexes
             if Number_of_Vertexes > 2:
                 try:
