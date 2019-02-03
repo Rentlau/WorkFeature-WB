@@ -91,7 +91,7 @@ class WorkFeatureWorkbenchDev(Workbench):
             # import WF_pointFacePoint
             # import WF_lineFacePoint
 
-            # import WF_twoPointsLine
+            import WF_twoPointsLine
 
             # import WF_linePointPlane
             # import WF_perpendicularLinePointPlane
@@ -135,9 +135,9 @@ class WorkFeatureWorkbenchDev(Workbench):
                             "Lines"]
         self.m_Line_commands_list = ["TwoPointsLine",
                                      ]
-        # self.appendCommandbar("Lines", self.m_Line_commands_list)
-        # self.appendMenu(self.m_Line_menu, self.m_Line_commands_list)
-        # self.appendToolbar("WF Lines", self.m_Line_commands_list)
+        self.appendCommandbar("Lines", self.m_Line_commands_list)
+        self.appendMenu(self.m_Line_menu, self.m_Line_commands_list)
+        self.appendToolbar("WF Lines", self.m_Line_commands_list)
 
         # Set menu and commands for Planes
         self.m_Line_menu = ["Work Feature",

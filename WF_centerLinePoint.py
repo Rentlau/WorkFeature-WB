@@ -48,7 +48,7 @@ Macro CenterLinePoint.
 Creates a parametric CenterLinePoint from an Edge
 '''
 ###############
-m_debug = True
+m_debug = False
 ###############
 
 # get the path of the current python script
@@ -187,8 +187,6 @@ class CenterLinePoint(WF_Point):
         self.name = "CenterLinePoint"
         WF_Point.__init__(self, selfobj, self.name)
         # Add some custom properties to our CenterLinePoint feature object.
-#         selfobj.addProperty("App::PropertyLinkSub","Edge",self.name,
-#                             "Input edge")
         selfobj.addProperty("App::PropertyLinkSubGlobal",
                             "Edge",
                             self.name,

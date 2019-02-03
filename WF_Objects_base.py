@@ -41,7 +41,7 @@ __brief__ = '''
 
 '''
 ###############
-m_debug = True
+m_debug = False
 ###############
 
 WF_ParametricList = ['Not', 'Interactive', 'Dynamic']
@@ -157,31 +157,54 @@ class WF_Line(WF_Object):
     """ The Line WF object. """
     # this method is mandatory
     def __init__(self, selfobj, name):
+        if m_debug:
+            print("running WF_Line.__init__ !")
         WF_Object.__init__(self, selfobj)
         # Add some custom properties to our Line WF object.
+        selfobj.addProperty("App::PropertyFloat",
+                            "Point1_X",
+                            name,
+                            "X of the start point").Point1_X = 1.0
+        selfobj.addProperty("App::PropertyFloat",
+                            "Point1_Y",
+                            name,
+                            "Y of the start point").Point1_Y = 1.0
+        selfobj.addProperty("App::PropertyFloat",
+                            "Point1_Z",
+                            name,
+                            "Z of the start point").Point1_Z = 1.0
+        selfobj.addProperty("App::PropertyFloat",
+                            "Point2_X",
+                            name,
+                            "X of the end point").Point2_X = 1.0
+        selfobj.addProperty("App::PropertyFloat",
+                            "Point2_Y",
+                            name,
+                            "Y of the end point").Point2_Y = 1.0
+        selfobj.addProperty("App::PropertyFloat",
+                            "Point2_Z",
+                            name,
+                            "Z of the end point").Point2_Z = 1.0
 
-#         selfobj.addProperty("App::PropertyFloat","X1",name,"X of the start point").X1=1.0
-#         selfobj.addProperty("App::PropertyFloat","Y1",name,"Y of the start point").Y1=1.0
-#         selfobj.addProperty("App::PropertyFloat","Z1",name,"Z of the start point").Z1=1.0
-#         selfobj.addProperty("App::PropertyFloat","X2",name,"X of the end point").X2=1.0
-#         selfobj.addProperty("App::PropertyFloat","Y2",name,"Y of the end point").Y2=1.0
-#         selfobj.addProperty("App::PropertyFloat","Z2",name,"Z of the end point").Z2=1.0
-#
         # 0 -- default mode, read and write
         # 1 -- read-only
         # 2 -- hidden
-#         selfobj.setEditorMode("X1", 0)
-#         selfobj.setEditorMode("Y1", 0)
-#         selfobj.setEditorMode("Z1", 0)
-#         selfobj.setEditorMode("X2", 0)
-#         selfobj.setEditorMode("Y2", 0)
-#         selfobj.setEditorMode("Z2", 0)
+        selfobj.setEditorMode("Point1_X", 1)
+        selfobj.setEditorMode("Point1_Y", 1)
+        selfobj.setEditorMode("Point1_Z", 1)
+        selfobj.setEditorMode("Point2_X", 1)
+        selfobj.setEditorMode("Point2_Y", 1)
+        selfobj.setEditorMode("Point2_Z", 1)
 
     # this method is mandatory
     def execute(self, selfobj):
+        if m_debug:
+            print("running WF_Line.execute !")
         pass
 
     def onChanged(self, selfobj, prop):
+        if m_debug:
+            print("running WF_Line.onChanged !")
         WF_Object.onChanged(self, selfobj, prop)
 
 

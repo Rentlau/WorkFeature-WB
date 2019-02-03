@@ -73,13 +73,17 @@ def typecheck(args_and_types, name="?"):
 
 
 def getParamType(param):
-    if param in ["verbose", ]:
+    if param in ["verbose",
+                 "closePolyline", ]:
         return "bool"
     elif param in ["release", ]:
         return "string"
     elif param in ["parametric", ]:
         return "int"
-    elif param in ["pointSize", "tolerance", ]:
+    elif param in ["pointSize",
+                   "lineThickness",
+                   "linePointSize",
+                   "tolerance", ]:
         # return "float"
         return "string"
     else:
@@ -174,7 +178,38 @@ def set_pointSize(value):
     """ Sets the point size to WF user settings
     """
     setParam("pointSize", value)
+
     
+def lineThickness():
+    """ Returns the line thickness from WF user settings
+    """
+    return float(getParam("lineThickness", "5.0"))
+
+
+def set_lineThickness(value):
+    """ Sets the line thickness to WF user settings
+    """
+    setParam("lineThickness", value)
+
+
+def linePointSize():
+    """ Returns the line point size from WF user settings
+    """
+    return float(getParam("linePointSize", "5.0"))
+
+
+def set_linelinePointSize(value):
+    """ Sets the line point size to WF user settings
+    """
+    setParam("linePointSize", value)
+    
+    
+def closePolyline():
+    """ Returns the close polyline value from WF user settings
+    """
+    return getParam("closePolyline", False)
+
+       
 def tolerance():
     """ Returns the tolerance from WF user settings
     """

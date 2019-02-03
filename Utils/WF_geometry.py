@@ -307,7 +307,8 @@ def printPoint(point, msg=""):
     return
 
 
-def propertiesPoint(Point_User_Name, color=(1.00, 0.67, 0.00)):
+def propertiesPoint(Point_User_Name,
+                    color=(1.00, 0.67, 0.00)):
     """ Define the properties of a Work feature Point.
     PointColor
     PointSize
@@ -335,7 +336,8 @@ def propertiesPoint(Point_User_Name, color=(1.00, 0.67, 0.00)):
     return
 
 
-def propertiesLine(Line_User_Name, color=(1.00, 0.67, 0.00)):
+def propertiesLine(Line_User_Name,
+                   color=(1.00, 0.67, 0.00)):
     """ Define the properties of a Work feature Line.
     PointColor
     LineColor
@@ -358,12 +360,12 @@ def propertiesLine(Line_User_Name, color=(1.00, 0.67, 0.00)):
         print_msg("Not able to set LineColor !")
         print_msg("Color : " + str(color) + " !")
     try:
-        Gui.ActiveDocument.getObject(Line_User_Name).LineWidth = 2.00
+        Gui.ActiveDocument.getObject(Line_User_Name).LineWidth = WF.lineThickness()
     except Exception as err:
         printError_msg(err.message, title="propertiesLine")
         print_msg("Not able to set LineWidth !")
     try:
-        Gui.ActiveDocument.getObject(Line_User_Name).PointSize = 2.00
+        Gui.ActiveDocument.getObject(Line_User_Name).PointSize = WF.linePointSize()
     except Exception as err:
         printError_msg(err.message, title="propertiesLine")
         print_msg("Not able to set PointSize !")
