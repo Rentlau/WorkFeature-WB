@@ -140,7 +140,7 @@ Functions are organised by sub menus:
 | Name                           | Icons  |
 |:------|:------|
 | **WF General** | ![alt](./Doc/Images/WF_General.png) |
-| **WF Points** | ![alt](./Doc/Images/WF_Points.png) |
+| **WF Points** | ![alt](./Doc/Images/WF_Points.png?1) |
 | **WF Lines** | ![alt](./Doc/Images/WF_Lines.png) |
 
  - WF_General:
@@ -158,7 +158,7 @@ Functions are organised by sub menus:
 |:------|:------|
 |![alt](./Resources/Icons/WF_centerLinePoint.svg)  | Create Point(s) at Center location of each selected Line(s). <br>Can also create several Points along selected Line(s)|
 |![alt](./Resources/Icons/WF_alongLinePoint.svg)  | Create Point(s) along Line(s) <br>at a defined distance of intersection from selected Point(s)/Line(s).|
-|![alt](./Resources/Icons/WF_extremaLinePoint.svg)  | Create Point(s) at edges of selected Line(s).  **<span style="color:red">NOT YET DEV in 2019 release!</span>**.|
+|![alt](./Resources/Icons/WF_extremaLinePoint.svg)  | Create Point(s) at edges of selected Line(s).|
 |![alt](./Resources/Icons/WF_centerCirclePoint.svg)  | Create Point(s) at center location of selected Circle(s). **<span style="color:red">NOT YET DEV in 2019 release!</span>** |
 |![alt](./Resources/Icons/WF_centerFacePoint.svg)  | Create Point(s) at center location of selected Plane(s). **<span style="color:red">NOT YET DEV in 2019 release!</span>**|
 
