@@ -254,7 +254,7 @@ relative to the parent Line.
                     selfobj.setEditorMode("At", 1) 
                 else :
                     selfobj.setEditorMode("At", 0)   
-            propertiesLine(selfobj.Label, self.color)
+            propertiesPoint(selfobj.Label, self.color)
 
         if prop == "At":
             selfobj.Proxy.execute(selfobj)

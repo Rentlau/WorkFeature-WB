@@ -179,12 +179,6 @@ class AlongLinePoint(WF_Point):
         self.name = "AlongLinePoint"
         WF_Point.__init__(self, selfobj, self.name)
         # Add some custom properties to our AlongLinePoint feature object.
-#         selfobj.addProperty("App::PropertyLinkSub","AlongEdge",self.name,
-#                             "Along edge")
-#         selfobj.addProperty("App::PropertyLinkSub","Point",self.name,
-#                             "point")
-#         selfobj.addProperty("App::PropertyLinkSub","Edge",self.name,
-#                             "edge")
         selfobj.addProperty("App::PropertyLinkSubGlobal",
                             "AlongEdge",
                             self.name,
@@ -234,7 +228,8 @@ onto the first selected Line."""
             m_msg = "Recompute Python AlongLinePoint feature\n"
             App.Console.PrintMessage(m_msg)
 
-        m_PropertiesList = ['AlongEdge',
+        m_PropertiesList = ["Distance",
+                            'AlongEdge',
                             'Edge',
                             'Point'
                             ]
@@ -343,6 +338,17 @@ onto the first selected Line."""
             App.Console.PrintMessage("Change property : " + str(prop) + "\n")
 
         WF_Point.onChanged(self, selfobj, prop)
+    
+        if prop == "Parametric":
+            if 'Parametric' in selfobj.PropertiesList:
+                if selfobj.Parametric == 'Not':
+                    selfobj.setEditorMode("Distance", 1)
+                else:
+                    selfobj.setEditorMode("Distance", 0)
+            propertiesPoint(selfobj.Label, self.color)
+        
+        if prop == "Distance":
+            selfobj.Proxy.execute(selfobj)
 
 
 class ViewProviderAlongLinePoint:
