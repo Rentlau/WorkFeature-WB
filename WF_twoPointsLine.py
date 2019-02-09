@@ -93,7 +93,8 @@ m_tool_tip = """<b>Create Line(s)</b> from at least two selected Points.<br>
 """
 ###############
 m_macro = "Macro TwoPointsLine"
-m_line_ext      = 0.0
+m_line_ext = 0.0
+m_byPair = False
 ###############
  
  
@@ -102,14 +103,21 @@ class TwoPointsLinePanel:
         self.form = Gui.PySideUic.loadUi(path_WF_ui + m_dialog)
         self.form.setWindowTitle(m_dialog_title)
         self.form.UI_Line_extension.setText(str(m_line_ext))
+        self.form.UI_Point_by_Pair_checkBox.setCheckState(QtCore.Qt.Unchecked)
+        if m_byPair:
+            self.form.UI_Point_by_Pair_checkBox.setCheckState(QtCore.Qt.Checked)
+        
         
     def accept(self):
         global m_line_ext
+        global m_byPair
         
         m_line_ext = float(self.form.UI_Line_extension.text())
+        m_byPair = self.form.UI_Point_by_Pair_checkBox.isChecked()
         
         if WF.verbose() != 0:
             print_msg("m_line_ext = " + str(m_line_ext))
+            print_msg("m_byPair = " + str(m_byPair))
             
         Gui.Control.closeDialog()
         m_actDoc = App.activeDocument()
@@ -198,7 +206,7 @@ Negative number allowed.
         selfobj.addProperty("App::PropertyFloat",
                             "Extension"
                             ,self.name,
-                            m_tooltip).Extension=0.0
+                            m_tooltip).Extension=m_line_ext
 
         selfobj.setEditorMode("Point1", 1)
         selfobj.setEditorMode("Point2", 1)
@@ -416,28 +424,79 @@ def run():
 
             if WF.verbose():
                 print_msg("Group = " + str(m_group.Label))
-                                  
-            if (Number_of_Vertexes % 2 == 0): #even
+            
+            # Case of only 2 points
+            if Number_of_Vertexes == 2:
                 if WF.verbose():
-                    print_msg("Even number of points")
-                if Number_of_Vertexes == 2:
-                    vertex1 = Vertex_List[0]
-                    vertex2 = Vertex_List[1]
-                    
+                    print_msg("Process only 2 points") 
+                vertex1 = Vertex_List[0]
+                vertex2 = Vertex_List[1]
+                
+                if WF.verbose():
+                    print_msg("vertex1 = " + str(vertex1))
+                    print_msg("vertex2 = " + str(vertex2)) 
+                             
+                App.ActiveDocument.openTransaction(m_macro)
+                selfobj = makeTwoPointsLineFeature(m_group)    
+                selfobj.Point1 = vertex1
+                selfobj.Point2 = vertex2
+                selfobj.Extension = m_line_ext              
+                selfobj.Proxy.execute(selfobj)
+            # Case of more than 2 points
+            else: 
+                if m_byPair:                    
                     if WF.verbose():
-                        print_msg("vertex1 = " + str(vertex1))
-                        print_msg("vertex2 = " + str(vertex2)) 
-                                 
-                    App.ActiveDocument.openTransaction(m_macro)
-                    selfobj = makeTwoPointsLineFeature(m_group)    
-                    selfobj.Point1 = vertex1
-                    selfobj.Point2 = vertex2
-                    selfobj.Extension = m_line_ext              
-                    selfobj.Proxy.execute(selfobj) 
+                        print_msg("Process points by pair")
+                    if (Number_of_Vertexes % 2 == 0): #even
+                        if WF.verbose():
+                            print_msg("Even number of points")   
+                        for i in range(0,Number_of_Vertexes-1,2):
+                            vertex1 = Vertex_List[i]
+                            vertex2 = Vertex_List[i+1]
+                            
+                            if WF.verbose():
+                                print_msg("vertex1 = " + str(vertex1))
+                                print_msg("vertex2 = " + str(vertex2)) 
+                                         
+                            App.ActiveDocument.openTransaction(m_macro)
+                            selfobj = makeTwoPointsLineFeature(m_group)    
+                            selfobj.Point1 = vertex1
+                            selfobj.Point2 = vertex2
+                            selfobj.Extension = m_line_ext              
+                            selfobj.Proxy.execute(selfobj)
+                    else: #odd
+                        if WF.verbose():
+                            print_msg("Odd number of points")
+                        for i in range(0,Number_of_Vertexes-2,2):
+                            vertex1 = Vertex_List[i]
+                            vertex2 = Vertex_List[i+1]
+                            
+                            if WF.verbose():
+                                print_msg("vertex1 = " + str(vertex1))
+                                print_msg("vertex2 = " + str(vertex2)) 
+                                         
+                            App.ActiveDocument.openTransaction(m_macro)
+                            selfobj = makeTwoPointsLineFeature(m_group)    
+                            selfobj.Point1 = vertex1
+                            selfobj.Point2 = vertex2
+                            selfobj.Extension = m_line_ext              
+                            selfobj.Proxy.execute(selfobj)
+                        if WF.closePolyline():
+                            vertex1 = Vertex_List[-1]
+                            vertex2 = Vertex_List[0]
+                                         
+                            App.ActiveDocument.openTransaction(m_macro)
+                            selfobj = makeTwoPointsLineFeature(m_group)    
+                            selfobj.Point1 = vertex1
+                            selfobj.Point2 = vertex2
+                            selfobj.Extension = m_line_ext              
+                            selfobj.Proxy.execute(selfobj)
                 else:
-                    for i in range(0,Number_of_Vertexes-1,2):
+                    if WF.verbose():
+                        print_msg("Process points as list")              
+                    for i in range(Number_of_Vertexes-1):
                         vertex1 = Vertex_List[i]
-                        vertex2 = Vertex_List[i+1]
+                        vertex2 = Vertex_List[i+1] 
                         
                         if WF.verbose():
                             print_msg("vertex1 = " + str(vertex1))
@@ -448,31 +507,23 @@ def run():
                         selfobj.Point1 = vertex1
                         selfobj.Point2 = vertex2
                         selfobj.Extension = m_line_ext              
-                        selfobj.Proxy.execute(selfobj)   
-            else: #odd
-                if WF.verbose():
-                    print_msg("Odd number of points")              
-                for i in range(Number_of_Vertexes-1):
-                    vertex1 = Vertex_List[i]
-                    vertex2 = Vertex_List[i+1]
-                                 
-                    App.ActiveDocument.openTransaction(m_macro)
-                    selfobj = makeTwoPointsLineFeature(m_group)    
-                    selfobj.Point1 = vertex1
-                    selfobj.Point2 = vertex2
-                    selfobj.Extension = m_line_ext              
-                    selfobj.Proxy.execute(selfobj)
-                if WF.closePolyline():
-                    vertex1 = Vertex_List[-1]
-                    vertex2 = Vertex_List[0]
-                                 
-                    App.ActiveDocument.openTransaction(m_macro)
-                    selfobj = makeTwoPointsLineFeature(m_group)    
-                    selfobj.Point1 = vertex1
-                    selfobj.Point2 = vertex2
-                    selfobj.Extension = m_line_ext              
-                    selfobj.Proxy.execute(selfobj)
-                      
+                        selfobj.Proxy.execute(selfobj)
+
+                    if WF.closePolyline():
+                        vertex1 = Vertex_List[-1]
+                        vertex2 = Vertex_List[0]
+                                            
+                        if WF.verbose():
+                            print_msg("vertex1 = " + str(vertex1))
+                            print_msg("vertex2 = " + str(vertex2)) 
+                                     
+                        App.ActiveDocument.openTransaction(m_macro)
+                        selfobj = makeTwoPointsLineFeature(m_group)    
+                        selfobj.Point1 = vertex1
+                        selfobj.Point2 = vertex2
+                        selfobj.Extension = m_line_ext              
+                        selfobj.Proxy.execute(selfobj)
+                                          
         finally:
             App.ActiveDocument.commitTransaction()
             

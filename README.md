@@ -223,15 +223,30 @@ Tool utility that creates:
 
 [[back to top](#Sections)]
 
+### Developed on Linux Ubuntu
+
+    OS: Ubuntu 18.04.1 LTS
+    Word size of OS: 64-bit
+    Word size of FreeCAD: 64-bit
+    Version: 0.18.15697 (Git)
+    Build type: Release
+    Branch: master
+    Hash: dedaa807629ab25cf32977d30bf7610f1346aff7
+    Python version: 2.7.15rc1
+    Qt version: 5.9.5
+    Coin version: 4.0.0a
+    OCC version: 7.3.0
+    Locale: French/France (fr_FR)
+
 ### Tested on Linux Ubuntu
 
-    A - FreeCAD 0.16.6712 
-    B - FreeCAD 0.17.13142
-
-
+    A - FreeCAD 0.16.6712  : Not Yet
+    B - FreeCAD 0.17.13142 : Not yet
 
 ### Tested on Windows
+    A - FreeCAD 0.16.6706 : Not Yet
 
-    A - FreeCAD 0.16.6706
 
+```python
 
+```

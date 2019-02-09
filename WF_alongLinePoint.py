@@ -50,7 +50,6 @@ Creates a parametric AlongLinePoint from a Line and a Point
 m_debug = True
 ###############
 
-
 # get the path of the current python script
 path_WF = os.path.dirname(__file__)
 
@@ -79,38 +78,37 @@ m_dialog = "/WF_UI_alongLinePoint.ui"
 m_dialog_title = "Define distance"
 m_exception_msg = """
 Unable to create Point along a Line :
-- Select first one Line/Edge where to attach the new point and
-- Define one or several Reference Point(s) by either
-    - Select one or several Line/Edge(s) and/or
-    - Select one or several Point(s).
+The First selected Line/Edge(s) is  where to attach new Points.
+and Second define one or several Reference Point(s).
 
-The reference Point is the projection of the selected Point(s)
-onto the first selected Line.
-Or the reference Point is the projection of Line(s)
-onto the first selected Line.
+3 cases:
+Selection of : One Edge and One or several Point(s).
+Selection of : One Edge and One or several Edge(s).
+Selection of : Several Edges and Points with same number of Edges and Points
 
 and go to Parameter(s) Window in Task Panel!"""
 m_result_msg = " : Point along a Line created !"
 m_menu_text = "Point(s) = along(Line, Point)"
 m_accel = ""
 m_tool_tip = """<b>Create Point(s)</b> along Line(s) at a defined<br>
- distance of intersection from selected Point(s)/Line(s).<br>
-<br>
-First<br>
-- Select one Line/Edge where to attach the new point<br>
-and Second define one or several Reference Point(s) by either<br>
-- Select one or several Line/Edge(s) and/or<br>
-- Select one or several Point(s)<br>
-- Then Click on the button<br>
-<br>
+ distance of Reference Point(s)/Line(s) intersection.<br>
 The reference Point is the projection of the selected Point(s)<br>
-onto the first selected Line.<br>
-Or the reference Point is the projection of Line(s)<br>
-onto the first selected Line.<br>
+ onto the first selected Line.<br>
+Or the reference Point is the projection of Line(s) closest end<br>
+ onto the first selected Line.<br>
 <br>
-Be aware that if second Points or Lines selected are not on the first<br>
-Line, an intersection Point is calculated as reference by projection.<br>
+Define the Distance along the line from the <br>
+Reference Point(s)/Line(s) intersection.<br>
+Negative values will revert the direction.<br> 
 <br>
+The First selected Line/Edge(s) is  where to attach new Points.<br> 
+and Second define one or several Reference Point(s).<br> 
+<br>
+3 cases:<br>
+Selection of : One Edge and One or several Point(s).<br>
+Selection of : One Edge and One or several Edge(s).<br>
+Selection of : Several Edges and Points with same number of Edges and Points<br>
+- Then Click on the button<br><br>
 <i>Click in view window without selection will popup<br>
  - a Warning Window and<br>
  - a Parameter(s) Window in Task Panel!</i>
@@ -176,6 +174,9 @@ class AlongLinePoint(WF_Point):
     """ The AlongLinePoint feature object. """
     # this method is mandatory
     def __init__(self, selfobj):
+        if m_debug:
+            print("running AlongLinePoint.__init__ !")
+            
         self.name = "AlongLinePoint"
         WF_Point.__init__(self, selfobj, self.name)
         # Add some custom properties to our AlongLinePoint feature object.
@@ -195,12 +196,12 @@ class AlongLinePoint(WF_Point):
         m_tooltip = """Distance from the reference Point.
 The reference Point is the projection of the selected Point(s)
 onto the first selected Line.
-Or the reference Point is the projection of Line(s)
+Or the reference Point is the projection of Line(s) closest end
 onto the first selected Line."""
         selfobj.addProperty("App::PropertyFloat",
                             "Distance",
                             self.name,
-                            m_tooltip).Distance = 10.0
+                            m_tooltip).Distance = m_distanceLinePoint
 
         selfobj.setEditorMode("AlongEdge", 1)
         selfobj.setEditorMode("Point", 1)
@@ -248,37 +249,37 @@ onto the first selected Line."""
             print("selfobj.Edge = " + str(selfobj.Edge))
             print("selfobj.Point = " + str(selfobj.Point))
 
-        n1 = eval(selfobj.AlongEdge[1][0].lstrip('Edge'))
-        print("running AlongLinePoint.execute !")
-        if selfobj.Edge is not None:
-            n2 = eval(selfobj.Edge[1][0].lstrip('Edge'))
-        else:
-            if selfobj.Point != selfobj.AlongEdge:
-                n3 = eval(selfobj.Point[1][0].lstrip('Vertex'))
-            else:
-                print(selfobj.Point[1][0].name())
-                n3 = eval(selfobj.Point[1][0].lstrip('Edge'))
-
-        print("running AlongLinePoint.execute !")
-        m_distanceLinePoint = selfobj.Distance
-        print("running AlongLinePoint.execute !")
-        if WF.verbose():
-            print_msg("n1 = " + str(n1))
-            if selfobj.Edge is not None:
-                print_msg("n2 = " + str(n2))
-            else:
-                print_msg("n3 = " + str(n3))
-            print_msg("m_distanceLinePoint = " + str(m_distanceLinePoint))
-
-        try:
+        try:           
             Vector_point = None
+            
+            n1 = eval(selfobj.AlongEdge[1][0].lstrip('Edge'))
+            
+            if selfobj.Edge is not None:
+                n2 = eval(selfobj.Edge[1][0].lstrip('Edge'))
+            else:
+                if selfobj.Point != selfobj.AlongEdge:
+                    n3 = eval(selfobj.Point[1][0].lstrip('Vertex'))
+                else:
+                    print(selfobj.Point[1][0].name())
+                    n3 = eval(selfobj.Point[1][0].lstrip('Edge'))
+            
+            m_distanceLinePoint = selfobj.Distance
+            
+            if m_debug:
+                print_msg("n1 = " + str(n1))
+                if selfobj.Edge is not None:
+                    print_msg("n2 = " + str(n2))
+                else:
+                    print_msg("n3 = " + str(n3))
+                print_msg("m_distanceLinePoint = " + str(m_distanceLinePoint))
+                        
             m_alongedge = selfobj.AlongEdge[0].Shape.Edges[n1-1]
             if selfobj.Edge is not None:
                 m_edge = selfobj.Edge[0].Shape.Edges[n2-1]
             else:
                 m_point = selfobj.Point[0].Shape.Vertexes[n3-1].Point
 
-            if WF.verbose():
+            if m_debug:
                 print_msg("m_alongedge = " + str(m_alongedge))
                 if selfobj.Edge is not None:
                     print_msg("m_edge = " + str(m_edge))
@@ -287,7 +288,7 @@ onto the first selected Line."""
 
             Vector_A = m_alongedge.valueAt(0.0)
             Vector_B = m_alongedge.valueAt(m_alongedge.Length)
-            if WF.verbose():
+            if m_debug:
                 print_msg("Vector_A = " + str(Vector_A))
                 print_msg("Vector_B = " + str(Vector_B))
 
@@ -300,14 +301,14 @@ onto the first selected Line."""
             else:
                 Vector_C = m_point
 
-            if WF.verbose():
+            if m_debug:
                 print_msg("Vector_C = " + str(Vector_C))
 
             # Calculate intersection Point
             Vector_T, _, _ = intersectPerpendicularLine(Vector_A,
                                                         Vector_B,
                                                         Vector_C,)
-            if WF.verbose():
+            if m_debug:
                 print_msg("Vector_T = " + str(Vector_T))
 
             Vector_Translate = (Vector_B - Vector_A)
@@ -315,18 +316,19 @@ onto the first selected Line."""
                 Vector_Translate = Vector_Translate.normalize() * m_distanceLinePoint
                 Vector_point = Vector_T + Vector_Translate
             else:
-                Vector_point = Vector_T
-
+                Vector_point = Vector_T 
+                           
             if Vector_point is not None:
                 point = Part.Point(Vector_point)
                 selfobj.Shape = point.toShape()
-                propertiesPoint(selfobj.Label)
+                propertiesPoint(selfobj.Label, self.color)
                 selfobj.X = float(Vector_point.x)
                 selfobj.Y = float(Vector_point.y)
                 selfobj.Z = float(Vector_point.z)
                 # To be compatible with previous version 2018
                 if 'Parametric' in selfobj.PropertiesList:
                     self.created = True
+            
         except Exception as err:
             printError_msg(err.message, title=m_macro)
 
@@ -493,7 +495,7 @@ def run():
                 App.ActiveDocument.commitTransaction()
 
         # Selection of : One Edge and One or several Edge(s)
-        if Number_of_Edges > 1 and Number_of_Vertexes == 0:
+        elif Number_of_Edges > 1 and Number_of_Vertexes == 0:
             try:
                 # Create a sub group if needed
                 if Number_of_Edges > 2:
@@ -523,8 +525,9 @@ def run():
             finally:
                 App.ActiveDocument.commitTransaction()
 
-        # Selection of : same number of Edges and Points
-        if Number_of_Edges > 1 and Number_of_Vertexes == Number_of_Edges:
+        # Selection of : several Edges and Points with 
+        # same number of Edges and Points
+        elif Number_of_Edges > 1 and Number_of_Vertexes == Number_of_Edges:
             try:
                 # Create a sub group if needed
                 m_group = createSubGroup(m_main_dir,
@@ -549,6 +552,8 @@ def run():
 
             finally:
                 App.ActiveDocument.commitTransaction()
+        else:
+            printError_msg(err.message, title=m_macro)
     except Exception as err:
         printError_msg(err.message, title=m_macro)
 
