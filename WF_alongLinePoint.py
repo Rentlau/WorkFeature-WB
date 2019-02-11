@@ -99,16 +99,17 @@ Or the reference Point is the projection of Line(s) closest end<br>
 <br>
 Define the Distance along the line from the <br>
 Reference Point(s)/Line(s) intersection.<br>
-Negative values will revert the direction.<br> 
+Negative values will revert the direction.<br>
 <br>
-The First selected Line/Edge(s) is  where to attach new Points.<br> 
-and Second define one or several Reference Point(s).<br> 
+The First selected Line/Edge(s) is  where to attach new Points.<br>
+and Second define one or several Reference Point(s).<br>
 <br>
 3 cases:<br>
 Selection of : One Edge and One or several Point(s).<br>
 Selection of : One Edge and One or several Edge(s).<br>
 Selection of : Several Edges and Points with same number of Edges and Points<br>
-- Then Click on the button<br><br>
+- Then Click on the Button/Icon<br>
+<br>
 <i>Click in view window without selection will popup<br>
  - a Warning Window and<br>
  - a Parameter(s) Window in Task Panel!</i>
@@ -145,7 +146,7 @@ class AlongLinePointPanel:
         return False
 
     def shouldShow(self):
-        return (len(Gui.Selection.getSelectionEx(App.activeDocument().Name)) == 0 )
+        return (len(Gui.Selection.getSelectionEx(App.activeDocument().Name)) == 0)
 
 
 def makeAlongLinePointFeature(group):
@@ -176,7 +177,7 @@ class AlongLinePoint(WF_Point):
     def __init__(self, selfobj):
         if m_debug:
             print("running AlongLinePoint.__init__ !")
-            
+
         self.name = "AlongLinePoint"
         WF_Point.__init__(self, selfobj, self.name)
         # Add some custom properties to our AlongLinePoint feature object.
@@ -249,11 +250,11 @@ onto the first selected Line."""
             print("selfobj.Edge = " + str(selfobj.Edge))
             print("selfobj.Point = " + str(selfobj.Point))
 
-        try:           
+        try:
             Vector_point = None
-            
+
             n1 = eval(selfobj.AlongEdge[1][0].lstrip('Edge'))
-            
+
             if selfobj.Edge is not None:
                 n2 = eval(selfobj.Edge[1][0].lstrip('Edge'))
             else:
@@ -262,9 +263,9 @@ onto the first selected Line."""
                 else:
                     print(selfobj.Point[1][0].name())
                     n3 = eval(selfobj.Point[1][0].lstrip('Edge'))
-            
+
             m_distanceLinePoint = selfobj.Distance
-            
+
             if m_debug:
                 print_msg("n1 = " + str(n1))
                 if selfobj.Edge is not None:
@@ -272,12 +273,12 @@ onto the first selected Line."""
                 else:
                     print_msg("n3 = " + str(n3))
                 print_msg("m_distanceLinePoint = " + str(m_distanceLinePoint))
-                        
-            m_alongedge = selfobj.AlongEdge[0].Shape.Edges[n1-1]
+
+            m_alongedge = selfobj.AlongEdge[0].Shape.Edges[n1 - 1]
             if selfobj.Edge is not None:
-                m_edge = selfobj.Edge[0].Shape.Edges[n2-1]
+                m_edge = selfobj.Edge[0].Shape.Edges[n2 - 1]
             else:
-                m_point = selfobj.Point[0].Shape.Vertexes[n3-1].Point
+                m_point = selfobj.Point[0].Shape.Vertexes[n3 - 1].Point
 
             if m_debug:
                 print_msg("m_alongedge = " + str(m_alongedge))
@@ -316,8 +317,8 @@ onto the first selected Line."""
                 Vector_Translate = Vector_Translate.normalize() * m_distanceLinePoint
                 Vector_point = Vector_T + Vector_Translate
             else:
-                Vector_point = Vector_T 
-                           
+                Vector_point = Vector_T
+
             if Vector_point is not None:
                 point = Part.Point(Vector_point)
                 selfobj.Shape = point.toShape()
@@ -328,19 +329,19 @@ onto the first selected Line."""
                 # To be compatible with previous version 2018
                 if 'Parametric' in selfobj.PropertiesList:
                     self.created = True
-            
+
         except Exception as err:
             printError_msg(err.message, title=m_macro)
 
     def onChanged(self, selfobj, prop):
-        if m_debug:
-            print("running AlongLinePoint.onChanged !")
-
         if WF.verbose():
             App.Console.PrintMessage("Change property : " + str(prop) + "\n")
 
+        if m_debug:
+            print("running AlongLinePoint.onChanged !")
+
         WF_Point.onChanged(self, selfobj, prop)
-    
+
         if prop == "Parametric":
             if 'Parametric' in selfobj.PropertiesList:
                 if selfobj.Parametric == 'Not':
@@ -348,7 +349,7 @@ onto the first selected Line."""
                 else:
                     selfobj.setEditorMode("Distance", 0)
             propertiesPoint(selfobj.Label, self.color)
-        
+
         if prop == "Distance":
             selfobj.Proxy.execute(selfobj)
 
@@ -491,8 +492,10 @@ def run():
                     selfobj.Distance = m_distanceLinePoint
                     selfobj.Proxy.execute(selfobj)
 
-            finally:
-                App.ActiveDocument.commitTransaction()
+            except Exception as err:
+                printError_msg(err.message, title=m_macro)
+
+            App.ActiveDocument.commitTransaction()
 
         # Selection of : One Edge and One or several Edge(s)
         elif Number_of_Edges > 1 and Number_of_Vertexes == 0:
@@ -522,10 +525,12 @@ def run():
                     selfobj.Distance = m_distanceLinePoint
                     selfobj.Proxy.execute(selfobj)
 
-            finally:
-                App.ActiveDocument.commitTransaction()
+            except Exception as err:
+                printError_msg(err.message, title=m_macro)
 
-        # Selection of : several Edges and Points with 
+            App.ActiveDocument.commitTransaction()
+
+        # Selection of : several Edges and Points with
         # same number of Edges and Points
         elif Number_of_Edges > 1 and Number_of_Vertexes == Number_of_Edges:
             try:
@@ -550,10 +555,12 @@ def run():
                     selfobj.Distance = m_distanceLinePoint
                     selfobj.Proxy.execute(selfobj)
 
-            finally:
-                App.ActiveDocument.commitTransaction()
+            except Exception as err:
+                printError_msg(err.message, title=m_macro)
+
+            App.ActiveDocument.commitTransaction()
         else:
-            printError_msg(err.message, title=m_macro)
+            printError_msg("Bad selection !", title=m_macro)
     except Exception as err:
         printError_msg(err.message, title=m_macro)
 

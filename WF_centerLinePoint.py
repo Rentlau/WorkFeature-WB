@@ -97,7 +97,7 @@ The number (n) indicates how many parts to consider.<br>
  (you can also select 2 points in place of one Line/Edge) and/or<br>
 - Select one Plane/Face to process all (4) Edges and/or<br>
 - Select one Object to process all Edges at once<br>
-- Then Click on the button<br>
+- Then Click on the Button/Icon<br>
 <br>
 <i>Click in view window without selection will popup<br>
  - a Warning Window and<br>
@@ -247,7 +247,7 @@ Limits : [-1000:1000]
             print_msg("n = " + str(n))
 
         try:
-            Vector_point = alongLinePoint(selfobj.Edge[0].Shape.Edges[n-1],
+            Vector_point = alongLinePoint(selfobj.Edge[0].Shape.Edges[n - 1],
                                           selfobj.IndexPart,
                                           selfobj.NumberLinePart)
 
@@ -304,8 +304,8 @@ Limits : [-1000:1000]
                     print_msg("n1 = " + str(n1))
                     print_msg("n2 = " + str(n2))
 
-                point1 = selfobj.Point1[0].Shape.Vertexes[n1-1].Point
-                point2 = selfobj.Point2[0].Shape.Vertexes[n2-1].Point
+                point1 = selfobj.Point1[0].Shape.Vertexes[n1 - 1].Point
+                point2 = selfobj.Point2[0].Shape.Vertexes[n2 - 1].Point
 
                 Vector_point = alongTwoPointsPoint(point1,
                                                    point2,
@@ -320,7 +320,7 @@ Limits : [-1000:1000]
 
                 if len(selfobj.Edge[0].Shape.Edges) == 0:
                     return
-                Vector_point = alongLinePoint(selfobj.Edge[0].Shape.Edges[n-1],
+                Vector_point = alongLinePoint(selfobj.Edge[0].Shape.Edges[n - 1],
                                               selfobj.IndexPart,
                                               selfobj.NumberLinePart)
             if Vector_point is not None:
@@ -337,11 +337,11 @@ Limits : [-1000:1000]
             printError_msg(err.args[0], title=m_macro)
 
     def onChanged(self, selfobj, prop):
-        if m_debug:
-            print("running CenterLinePoint.onChanged !")
-
         if WF.verbose():
             App.Console.PrintMessage("Change property : " + str(prop) + "\n")
+
+        if m_debug:
+            print("running CenterLinePoint.onChanged !")
 
         WF_Point.onChanged(self, selfobj, prop)
 
@@ -485,7 +485,7 @@ def run():
                     selfobj.IndexPart = m_indexPart
                     selfobj.Proxy.execute(selfobj)
                 else:
-                    for m_iPart in range(m_numberLinePart+1):
+                    for m_iPart in range(m_numberLinePart + 1):
                         App.ActiveDocument.openTransaction(m_macro)
                         selfobj = makeCenterLinePointFeature(m_group)
                         selfobj.Edge = edge
@@ -502,7 +502,7 @@ def run():
                             selfobj.Parametric = 'Dynamic'
                             selfobj.touch()
                             selfobj.Parametric = 'Not'
-                            
+
             # From Vertexes
             if Number_of_Vertexes > 2:
                 try:
@@ -535,7 +535,7 @@ def run():
                         selfobj.IndexPart = m_indexPart
                         selfobj.Proxy.execute(selfobj)
                     else:
-                        for m_iPart in range(m_numberLinePart+1):
+                        for m_iPart in range(m_numberLinePart + 1):
                             App.ActiveDocument.openTransaction(m_macro)
                             selfobj = makeCenterLinePointFeature(m_group)
                             selfobj.Edge = None
@@ -545,9 +545,9 @@ def run():
                             selfobj.IndexPart = m_iPart
                             selfobj.Proxy.execute(selfobj)
                 else:
-                    for i in range(0, Number_of_Vertexes-2, 2):
+                    for i in range(0, Number_of_Vertexes - 2, 2):
                         vertex1 = Vertex_List[i]
-                        vertex2 = Vertex_List[i+1]
+                        vertex2 = Vertex_List[i + 1]
 
                         if WF.verbose():
                             print_msg("vertex1 = " + str(vertex1))
@@ -563,7 +563,7 @@ def run():
                             selfobj.IndexPart = m_indexPart
                             selfobj.Proxy.execute(selfobj)
                         else:
-                            for m_iPart in range(m_numberLinePart+1):
+                            for m_iPart in range(m_numberLinePart + 1):
                                 App.ActiveDocument.openTransaction(m_macro)
                                 selfobj = makeCenterLinePointFeature(m_group)
                                 selfobj.Edge = None
@@ -576,9 +576,9 @@ def run():
             else:
                 if WF.verbose():
                     print_msg("Odd number of points")
-                for i in range(Number_of_Vertexes-1):
+                for i in range(Number_of_Vertexes - 1):
                     vertex1 = Vertex_List[i]
-                    vertex2 = Vertex_List[i+1]
+                    vertex2 = Vertex_List[i + 1]
 
                     if WF.verbose():
                         print_msg("vertex1 = " + str(vertex1))
@@ -594,7 +594,7 @@ def run():
                         selfobj.IndexPart = m_indexPart
                         selfobj.Proxy.execute(selfobj)
                     else:
-                        for m_iPart in range(m_numberLinePart+1):
+                        for m_iPart in range(m_numberLinePart + 1):
                             App.ActiveDocument.openTransaction(m_macro)
                             selfobj = makeCenterLinePointFeature(m_group)
                             selfobj.Edge = None
@@ -604,8 +604,10 @@ def run():
                             selfobj.IndexPart = m_iPart
                             selfobj.Proxy.execute(selfobj)
 
-        finally:
-            App.ActiveDocument.commitTransaction()
+        except Exception as err:
+            printError_msg(err.args[0], title=m_macro)
+
+        App.ActiveDocument.commitTransaction()
 
     except Exception as err:
         printError_msg(err.args[0], title=m_macro)

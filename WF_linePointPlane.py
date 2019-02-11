@@ -1,78 +1,80 @@
 # -*- coding: utf-8 -*-
 """
 ***************************************************************************
-*   FreeCAD Work Feature workbench                                        *
+*   This file is part of Work Feature workbench                           *
 *                                                                         *
-*   Copyright (c) 2017 <rentlau_64>                                       *
+*   Copyright (c) 2017-2019 <rentlau_64>                                  *
+*   https://github.com/Rentlau/WorkFeature-WB                             *
+*                                                                         *
 *   Code rewrite by <rentlau_64> from Work Features macro:                *
 *   https://github.com/Rentlau/WorkFeature                                *
 *                                                                         *
-*   This file is a supplement to the FreeCAD CAx development system.      *  
+*   This workbench is a supplement to the FreeCAD CAx development system. *
 *   http://www.freecadweb.org                                             *
 *                                                                         *
-*   This program is free software; you can redistribute it and/or modify  *
-*   it under the terms of the GNU Lesser General Public License (LGPL)    *
-*   as published by the Free Software Foundation; either version 2 of     *
-*   the License, or (at your option) any later version.                   *
-*   for detail see the COPYING and COPYING.LESSER text files.             *
-*   http://en.wikipedia.org/wiki/LGPL                                     *
+*   This workbench is free software; you can redistribute it and/or modify*
+*   it under the terms of the GNU General Public License as published by  *
+*   the Free Software Foundation, either version 3 of the License, or     *
+*   (at your option) any later version.                                   *
+*   for detail see the LICENSE text file or:                              *
+*   https://www.gnu.org/licenses/gpl-3.0.html                             *
 *                                                                         *
-*   This software is distributed in the hope that it will be useful,      *
+*   This workbench is distributed in the hope that it will be useful,     *
 *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the          *
 *   GNU Library General Public License for more details.                  *
 *                                                                         *
 *   You should have received a copy of the GNU Library General Public     *
-*   License along with this macro; if not, write to the Free Software     *
-*   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  *
-*   USA or see <http://www.gnu.org/licenses/>                             *
+*   License along with this workbench;                                    *
+*   If not, see <https://www.gnu.org/licenses/>                           *
 ***************************************************************************
 """
-__title__="Macro LinePointPlane"
+import sys
+import os.path
+import FreeCAD as App
+import Part
+from PySide import QtGui, QtCore
+import WF
+from WF_Objects_base import WF_Plane
+# from InitGui import m_debug
+if App.GuiUp:
+    import FreeCADGui as Gui
+    
+__title__= "Macro LinePointPlane"
 __author__ = "Rentlau_64"
 __brief__ = '''
 Macro LinePointPlane.
 Creates a parametric LinePointPlane from a point and a line
 '''
 ###############
-
+m_debug = True
 ###############
-import sys
-import os.path
-import FreeCAD as App
-if App.GuiUp:
-    import FreeCADGui as Gui
-import Part
-from PySide import QtGui,QtCore
-import WF
-from WF_Objects_base import WF_Plane
-
-# get the path of the current python script 
+# get the path of the current python script
 path_WF = os.path.dirname(__file__)
- 
-path_WF_icons     = os.path.join(path_WF, 'Resources', 'Icons')
-path_WF_utils     = os.path.join(path_WF, 'Utils')
+
+path_WF_icons = os.path.join(path_WF, 'Resources', 'Icons')
+path_WF_utils = os.path.join(path_WF, 'Utils')
 path_WF_resources = os.path.join(path_WF, 'Resources')
-path_WF_ui        = os.path.join(path_WF, 'Resources', 'Ui')
- 
+path_WF_ui = os.path.join(path_WF, 'Resources', 'Ui')
+
 if not sys.path.__contains__(str(path_WF_utils)):
     sys.path.append(str(path_WF_utils))
     sys.path.append(str(path_WF_ui))
-     
+
 try:
     from WF_selection import Selection, getSel
     from WF_print import printError_msg, print_msg
     from WF_directory import createFolders, addObjectToGrp
     from WF_geometry import *
-    #from WF_utils import *
-except:
-    print "ERROR: cannot load WF modules !!"
+
+except ImportError:
+    print("ERROR: cannot load WF modules !")
     sys.exit(1)
 
 ###############
-m_icon          = "/WF_linePointPlane.svg"
-m_dialog        = "/WF_UI_linePointPlane.ui"
-m_dialog_title  = "Define extension of the plane."
+m_icon = "/WF_linePointPlane.svg"
+m_dialog = "/WF_UI_linePointPlane.ui"
+m_dialog_title = "Define extension of the plane."
 
 m_exception_msg = """Unable to create Plane :
     Select one Line and one Point only

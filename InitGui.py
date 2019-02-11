@@ -86,14 +86,17 @@ class WorkFeatureWorkbenchDev(Workbench):
             import WF_centerLinePoint
             import WF_alongLinePoint
             import WF_extremaLinePoint
+            import WF_nPointsPoint
             # import WF_centerCirclePoint
             # import WF_centerFacePoint
             # import WF_pointFacePoint
             # import WF_lineFacePoint
 
             import WF_twoPointsLine
+            import WF_nPointsLine
 
-            # import WF_linePointPlane
+            import WF_threePointsPlane
+            import WF_linePointPlane
             # import WF_perpendicularLinePointPlane
         except ImportError:
             m_error = "Error: One of WF_ module not found,"
@@ -121,6 +124,7 @@ class WorkFeatureWorkbenchDev(Workbench):
         self.Point_commands_list = ["CenterLinePoint",
                                     "AlongLinePoint",
                                     "ExtremaLinePoint",
+                                    "NPointsPoint",
                                     # "CenterCirclePoint",
                                     # "CenterFacePoint",
                                     # "PointFacePoint",
@@ -134,20 +138,23 @@ class WorkFeatureWorkbenchDev(Workbench):
         self.m_Line_menu = ["Work Feature",
                             "Lines"]
         self.m_Line_commands_list = ["TwoPointsLine",
+                                     "NPointsLine",
                                      ]
         self.appendCommandbar("Lines", self.m_Line_commands_list)
         self.appendMenu(self.m_Line_menu, self.m_Line_commands_list)
         self.appendToolbar("WF Lines", self.m_Line_commands_list)
 
         # Set menu and commands for Planes
-        self.m_Line_menu = ["Work Feature",
-                            "Planes"]
-        self.m_Line_commands_list = ["LinePointPlane",
-                                     "PerpendicularLinePointPlane",
-                                     ]
-        # self.appendCommandbar("Planes", self.m_Line_commands_list)
-        # self.appendMenu(self.m_Line_menu, self.m_Line_commands_list)
-        # self.appendToolbar("WF Planes", self.m_Line_commands_list)
+        self.m_Plane_menu = ["Work Feature",
+                             "Planes"]
+        self.m_Plane_commands_list = ["ThreePointsPlane",
+                                      "LinePointPlane",
+                                      # "PerpendicularLinePointPlane",
+                                      ]
+        self.appendCommandbar("Planes", self.m_Plane_commands_list)
+        self.appendMenu(self.m_Plane_menu, self.m_Plane_commands_list)
+        self.appendToolbar("WF Planes", self.m_Plane_commands_list)
+
         # m_submenu = ['WorkFeature.pdf']
         # self.appendMenu(["Work Feature", "Help"], m_submenu)
 

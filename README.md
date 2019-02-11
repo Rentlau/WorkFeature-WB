@@ -142,6 +142,7 @@ Functions are organised by sub menus:
 | **WF General** | ![alt](./Doc/Images/WF_General.png) |
 | **WF Points** | ![alt](./Doc/Images/WF_Points.png?1) |
 | **WF Lines** | ![alt](./Doc/Images/WF_Lines.png) |
+| **WF Planes** | ![alt](./Doc/Images/WF_Planes.png) |
 
  - WF_General:
 
@@ -159,6 +160,7 @@ Functions are organised by sub menus:
 |![alt](./Resources/Icons/WF_centerLinePoint.svg)  | Create Point(s) at Center location of each selected Line(s). <br>Can also create several Points along selected Line(s)|
 |![alt](./Resources/Icons/WF_alongLinePoint.svg)  | Create Point(s) along Line(s) <br>at a defined distance of intersection from selected Point(s)/Line(s).|
 |![alt](./Resources/Icons/WF_extremaLinePoint.svg)  | Create Point(s) at edges of selected Line(s).|
+|![alt](./Resources/Icons/WF_nPointsPoint.svg)  | Create a Point at MEAN location of all selected points.|
 |![alt](./Resources/Icons/WF_centerCirclePoint.svg)  | Create Point(s) at center location of selected Circle(s). **<span style="color:red">NOT YET DEV in 2019 release!</span>** |
 |![alt](./Resources/Icons/WF_centerFacePoint.svg)  | Create Point(s) at center location of selected Plane(s). **<span style="color:red">NOT YET DEV in 2019 release!</span>**|
 
@@ -167,12 +169,13 @@ Functions are organised by sub menus:
 | Icon                           | Function  |
 |:------|:------|
 |![alt](./Resources/Icons/WF_twoPointsLine.svg)  | Create Line(s) in between two selected Points. |
-
+|![alt](./Resources/Icons/WF_nPointsLine.svg)  | Create a "best fit" Line from a set of points using Singular Value Decomposition (SVD). |
 
 - WF_Planes sub menu :
 
 | Icon                           | Function  |
 |:------|:------|
+|![alt](./Resources/Icons/WF_threePointsPlane.svg)  | Create a Plane from three selected Points.|
 |![alt](./Resources/Icons/WF_linePointPlane.svg)  | Create Plane(s) crossing a Point and a Line. **<span style="color:red">NOT YET DEV in 2019 release!</span>**|
 |![alt](./Resources/Icons/WF_perpendicularLinePointPlane.svg)  | Create Planes(s) crossing a Point and perpendicular to a Line. **<span style="color:red">NOT YET DEV in 2019 release!</span>**|
 

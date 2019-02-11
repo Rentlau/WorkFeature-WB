@@ -30,31 +30,31 @@ def isColinearVectors(A, B, C, tolerance=1e-12):
     Vector_1 = B - A
     Vector_2 = C - B
     Vector_3 = Vector_1.cross(Vector_2)
-        
+
     if abs(Vector_3.x) <= tolerance and abs(Vector_3.y) <= tolerance and abs(Vector_3.z) <= tolerance:
         return True
-    
+
     return False
-    
+
 
 def isEqualVectors(A, B, tolerance=1e-12):
     """ Return true if the 2 points are equal.
     """
     Vector = B - A
-    
+
     if abs(Vector.x) <= tolerance and abs(Vector.y) <= tolerance and abs(Vector.z) <= tolerance:
         return True
-    
+
     return False
-    
-    
+
+
 def centerLinePoint(edge):
     """ Return the center point of the Line.
     """
     Vector_A = edge.Vertexes[0].Point
     Vector_B = edge.Vertexes[-1].Point
     Vector_AB = Vector_B + Vector_A
-    
+
     return Vector_AB.multiply(0.5)
 
 
@@ -66,10 +66,10 @@ def alongTwoPointsPoint(A, B, index, number):
     Vector_A = A
     Vector_B = B
     distance = Vector_B.sub(Vector_A).Length / 2
-    
+
     if number != 0:
-        distance = index * (Vector_B.sub(Vector_A).Length / number)    
-    Vector_A = Vector_A.add(Vector_B.sub(Vector_A).normalize().multiply( distance ))    
+        distance = index * (Vector_B.sub(Vector_A).Length / number)
+    Vector_A = Vector_A.add(Vector_B.sub(Vector_A).normalize().multiply(distance))
 
     return Vector_A
 
@@ -82,10 +82,10 @@ def alongLinePoint(edge, index, number):
     Vector_A = edge.Vertexes[0].Point
     Vector_B = edge.Vertexes[-1].Point
     distance = Vector_B.sub(Vector_A).Length / 2
-    
+
     if number != 0:
-        distance = index * (edge.Length / number)    
-    Vector_A = Vector_A.add(Vector_B.sub(Vector_A).normalize().multiply( distance ))    
+        distance = index * (edge.Length / number)
+    Vector_A = Vector_A.add(Vector_B.sub(Vector_A).normalize().multiply(distance))
 
     return Vector_A
 
@@ -93,7 +93,7 @@ def alongLinePoint(edge, index, number):
 def coordVectorPoint(vertex):
     """ Return the coordinates (x,y,z) of selcted Vector.
     """
-    m_coord = (0.0,0.0,0.0)
+    m_coord = (0.0, 0.0, 0.0)
     m_vert = vertex
 
     if vertex is None:
@@ -278,9 +278,9 @@ def intersectPerpendicularLine(A, B, C,):
     # ux * (tx - cx) + uy * (ty - cy) + uz * (tz - cz) = 0
     # ux * (ax + k * ux  - cx) + uy * (ay + k * uy - cy) + uz * (az + k * uz  - cz) = 0
     # ux*ax + ux*(k*ux) - ux*cx + uy*ay + uy*(k*uy) - uy*cy +  uz*az + uz*(k*uz) - uz*cz = 0
-    if (ux*ux + uy*uy + uz*uz) == 0.0:
+    if (ux * ux + uy * uy + uz * uz) == 0.0:
         return None
-    k = (ux*cx + uy*cy + uz*cz - ux*ax - uy*ay - uz*az)/(ux*ux + uy*uy + uz*uz)
+    k = (ux * cx + uy * cy + uz * cz - ux * ax - uy * ay - uz*az)/(ux*ux + uy*uy + uz*uz)
     tx = ax + k * ux
     ty = ay + k * uy
     tz = az + k * uz
@@ -380,7 +380,7 @@ def propertiesLine(Line_User_Name,
 
 def propertiesPlane(Plane_User_Name,
                     color=(1.00, 0.67, 0.00),
-                    s_color=(0.00,0.33,1.00)):
+                    s_color=(0.00, 0.33, 1.00)):
     """ Define the properties of a Work feature Plane.
     PointColor
     LineColor

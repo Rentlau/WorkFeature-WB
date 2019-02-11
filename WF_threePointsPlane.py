@@ -35,16 +35,16 @@ import FreeCAD as App
 import Part
 from PySide import QtGui, QtCore
 import WF
-from WF_Objects_base import WF_Line
+from WF_Objects_base import WF_Plane
 # from InitGui import m_debug
 if App.GuiUp:
     import FreeCADGui as Gui
 
-__title__ = "Macro TwoPointsLine"
+__title__ = "Macro ThreePointsPlane"
 __author__ = "Rentlau_64"
 __brief__ = '''
-Macro TwoPointsLine.
-Creates a parametric TwoPointsLine from two points
+Macro ThreePointsPlane.
+Creates a parametric ThreePointsPlane from 3 points
 '''
 ###############
 m_debug = False
@@ -72,20 +72,21 @@ except ImportError:
     sys.exit(1)
 
 ###############
-m_icon = "/WF_twoPointsLine.svg"
-m_dialog = "/WF_UI_twoPointsLine.ui"
-m_dialog_title = "Define extension."
+m_icon = "/WF_threePointsPlane.svg"
+m_dialog = "/WF_UI_threePointsPlane.ui"
+m_dialog_title = "Define extension of the plane."
+
 m_exception_msg = """
-Unable to create Line(s) from 2 Points :
-- Select two or several Points !
+Unable to create Plane from 3 Points :
+- Select three seperated Points !
 
 Go to Parameter(s) Window in Task Panel!"""
-m_result_msg = " : Line(s) from 2 Points created !"
-m_menu_text = "Line(s) = (Point, Point)"
+m_result_msg = " : Plane from 3 Points created !"
+m_menu_text = "Plane = (3 Points)"
 m_accel = ""
-m_tool_tip = """<b>Create Line(s)</b> from at least two selected Points.<br>
+m_tool_tip = """<b>Create Plane</b>  from three selected Points.<br>
 <br>
-- Select two or more Points<br>
+- Select three Points only<br>
 - Then Click on the Button/Icon<br>
 <br>
 <i>Click in view window without selection will popup<br>
@@ -93,31 +94,23 @@ m_tool_tip = """<b>Create Line(s)</b> from at least two selected Points.<br>
  - a Parameter(s) Window in Task Panel!</i>
 """
 ###############
-m_macro = "Macro TwoPointsLine"
-m_line_ext = 0.0
-m_byPair = False
+m_macro = "Macro Macro ThreePointsPlane"
+m_extension = 100.0
 ###############
 
 
-class TwoPointsLinePanel:
+class ThreePointsPlanePanel:
     def __init__(self):
         self.form = Gui.PySideUic.loadUi(path_WF_ui + m_dialog)
         self.form.setWindowTitle(m_dialog_title)
-        self.form.UI_Line_extension.setText(str(m_line_ext))
-        self.form.UI_Point_by_Pair_checkBox.setCheckState(QtCore.Qt.Unchecked)
-        if m_byPair:
-            self.form.UI_Point_by_Pair_checkBox.setCheckState(QtCore.Qt.Checked)
+        self.form.UI_Plane_extension.setText(str(m_extension))
 
     def accept(self):
-        global m_line_ext
-        global m_byPair
-
-        m_line_ext = float(self.form.UI_Line_extension.text())
-        m_byPair = self.form.UI_Point_by_Pair_checkBox.isChecked()
+        global m_extension
+        m_extension = float(self.form.UI_Plane_extension.text())
 
         if WF.verbose():
-            print_msg("m_line_ext = " + str(m_line_ext))
-            print_msg("m_byPair = " + str(m_byPair))
+            print_msg("m_extension = " + str(m_extension))
 
         Gui.Control.closeDialog()
         m_actDoc = App.activeDocument()
@@ -134,23 +127,20 @@ class TwoPointsLinePanel:
         return (len(Gui.Selection.getSelectionEx(App.activeDocument().Name)) == 0)
 
 
-def makeTwoPointsLineFeatureFromList(selectionset, group):
-    """ Makes a TwoPointsLine parametric feature object from a selection set.
+def makeThreePointsPlaneFeature(group):
+    """ Makes a ThreePointsPlane parametric feature object.
     into the given Group
     Returns the new object.
     """
-    m_name = "TwoPointsLine_P"
+    m_name = "ThreePointsPlane_P"
     m_part = "Part::FeaturePython"
 
-    if not isinstance(selectionset, list):
-        selectionset = [selectionset]
     try:
         m_obj = App.ActiveDocument.addObject(str(m_part), str(m_name))
         if group is not None:
             addObjectToGrp(m_obj, group, info=1)
-        TwoPointsLine(m_obj)
-        ViewProviderTwoPointsLine(m_obj.ViewObject)
-        m_obj.Proxy.addSubobjects(m_obj, selectionset)
+        ThreePointsPlane(m_obj)
+        ViewProviderThreePointsPlane(m_obj.ViewObject)
     except Exception as err:
         printError_msg("Not able to add an object to Model!")
         printError_msg(err.args[0], title=m_macro)
@@ -159,58 +149,42 @@ def makeTwoPointsLineFeatureFromList(selectionset, group):
     return m_obj
 
 
-def makeTwoPointsLineFeature(group):
-    """ Makes a TwoPointsLine parametric feature object.
-    into the given Group
-    Returns the new object.
-    """
-    m_name = "TwoPointsLine_P"
-    m_part = "Part::FeaturePython"
-
-    try:
-        m_obj = App.ActiveDocument.addObject(str(m_part), str(m_name))
-        if group is not None:
-            addObjectToGrp(m_obj, group, info=1)
-        TwoPointsLine(m_obj)
-        ViewProviderTwoPointsLine(m_obj.ViewObject)
-    except Exception as err:
-        printError_msg("Not able to add an object to Model!")
-        printError_msg(err.args[0], title=m_macro)
-        return None
-
-    return m_obj
-
-
-class TwoPointsLine(WF_Line):
-    """ The TwoPointsLine feature object. """
+class ThreePointsPlane(WF_Plane):
+    """ The ThreePointsPlane feature object. """
     # this method is mandatory
     def __init__(self, selfobj):
         if m_debug:
-            print("running TwoPointsLine.__init__ !")
+            print("running ThreePointsPlane.__init__ !")
 
-        self.name = "TwoPointsLine"
-        WF_Line.__init__(self, selfobj, self.name)
-        # Add some custom properties to our TwoPointsLine feature object.
+        self.name = "ThreePointsPlane"
+        WF_Plane.__init__(self, selfobj, self.name)
+        """ Add some custom properties to our ThreePointsPlane feature object. """
         selfobj.addProperty("App::PropertyLinkSub",
                             "Point1",
                             self.name,
-                            "Start point")
+                            "Point1")
         selfobj.addProperty("App::PropertyLinkSub",
                             "Point2",
                             self.name,
-                            "End point")
+                            "Point2")
+        selfobj.addProperty("App::PropertyLinkSub",
+                            "Point3",
+                            self.name,
+                            "Point3")
 
-        m_tooltip = """This is the amount of extension
-on each part of the line.
-Negative number allowed.
-"""
+        m_tooltip = """Extensions of plane in percentage of the Line Length.
+Positive values upper than 100.0 will enlarge the Plane.
+Positive values lower than 100.0 will start to shrink it."""
         selfobj.addProperty("App::PropertyFloat",
                             "Extension",
                             self.name,
-                            m_tooltip).Extension = m_line_ext
-
+                            m_tooltip).Extension = m_extension
+        # 0 -- default mode, read and write
+        # 1 -- read-only
+        # 2 -- hidden
         selfobj.setEditorMode("Point1", 1)
         selfobj.setEditorMode("Point2", 1)
+        selfobj.setEditorMode("Point3", 1)
 
         selfobj.Proxy = self
 
@@ -219,7 +193,7 @@ Negative number allowed.
         """ Doing a recomputation.
         """
         if m_debug:
-            print("running TwoPointsLine.execute !")
+            print("running ThreePointsPlane.execute !")
 
         # To be compatible with previous version > 2019
         if 'Parametric' in selfobj.PropertiesList:
@@ -231,60 +205,78 @@ Negative number allowed.
                 return
 
         if WF.verbose():
-            m_msg = "Recompute Python TwoPointsLine feature\n"
+            m_msg = "Recompute Python ThreePointsPlane feature\n"
             App.Console.PrintMessage(m_msg)
 
-        m_PropertiesList = ['Point1',
-                            'Point2',
-                            'Extension'
-                            ]
-        for m_Property in m_PropertiesList:
-            if m_Property not in selfobj.PropertiesList:
-                return
-
         try:
-            Line = None
-            if selfobj.Point1 is not None and selfobj.Point2 is not None:
+            Plane = None
+            if selfobj.Point1 is not None and selfobj.Point2 is not None and selfobj.Point3 is not None:
                 n1 = eval(selfobj.Point1[1][0].lstrip('Vertex'))
                 n2 = eval(selfobj.Point2[1][0].lstrip('Vertex'))
+                n3 = eval(selfobj.Point3[1][0].lstrip('Vertex'))
                 if m_debug:
                     print_msg(str(selfobj.Point1))
                     print_msg(str(selfobj.Point2))
+                    print_msg(str(selfobj.Point3))
                     print_msg("n1 = " + str(n1))
                     print_msg("n2 = " + str(n2))
+                    print_msg("n3 = " + str(n3))
 
+                points = []
                 point1 = selfobj.Point1[0].Shape.Vertexes[n1 - 1].Point
                 point2 = selfobj.Point2[0].Shape.Vertexes[n2 - 1].Point
+                point3 = selfobj.Point3[0].Shape.Vertexes[n3 - 1].Point
 
                 if isEqualVectors(point1, point2):
-                    m_msg = """Unable to create Line(s) from 2 Points :
-                    Given Points are equals !
+                    m_msg = """Unable to create Plane from 2 equals Points :
+                    Points 1 and 2 are equals !
                     """
                     printError_msg(m_msg, title=m_macro)
 
-                Axis_dir = point2 - point1
-                Point_E1 = point2
-                Point_E2 = point1
-                m_line_ext = selfobj.Extension
-                if m_line_ext != 0.0:
-                    Point_E1 += Axis_dir.normalize().multiply(m_line_ext)
-                    if m_line_ext >= 0.0:
-                        Point_E2 -= Axis_dir.normalize().multiply(m_line_ext)
-                    else:
-                        Point_E2 += Axis_dir.normalize().multiply(m_line_ext)
+                if isEqualVectors(point1, point3):
+                    m_msg = """Unable to create Plane from 2 equals Points :
+                    Points 1 an 3 are equals !
+                    """
+                    printError_msg(m_msg, title=m_macro)
 
-                Line = Part.makeLine(coordVectorPoint(Point_E2),
-                                     coordVectorPoint(Point_E1))
+                if isEqualVectors(point2, point3):
+                    m_msg = """Unable to create Plane from 2 equals Points :
+                    Points 2 an 3 are equals !
+                    """
+                    printError_msg(m_msg, title=m_macro)
 
-            if Line is not None:
-                selfobj.Shape = Line
-                propertiesLine(selfobj.Label, self.color)
+                points.append(point1)
+                points.append(point2)
+                points.append(point2)
+
+                Vector_Center = meanVectorsPoint(points)
+                xmax, xmin, ymax, ymin, zmax, zmin = minMaxVectorsLimits(points)
+
+                Vector21 = point2 - point1
+                Vector31 = point3 - point1
+                Plane_Point = Vector_Center
+                Plane_Normal = Vector21.cross(Vector31)
+
+                Plane = Part.makePlane(m_extension,
+                                       m_extension,
+                                       Plane_Point,
+                                       Plane_Normal)
+                Plane_Center = Plane.CenterOfMass
+                # Plane.translate(- Plane_Center)
+                Plane.translate(Vector_Center - Plane_Center)
+
+            if Plane is not None:
+                selfobj.Shape = Plane
+                propertiesPlane(selfobj.Label, self.color)
                 selfobj.Point1_X = float(point1.x)
                 selfobj.Point1_Y = float(point1.y)
                 selfobj.Point1_Z = float(point1.z)
                 selfobj.Point2_X = float(point2.x)
                 selfobj.Point2_Y = float(point2.y)
                 selfobj.Point2_Z = float(point2.z)
+                selfobj.Point3_X = float(point3.x)
+                selfobj.Point3_Y = float(point3.y)
+                selfobj.Point3_Z = float(point3.z)
                 # To be compatible with previous version 2018
                 if 'Parametric' in selfobj.PropertiesList:
                     self.created = True
@@ -296,9 +288,9 @@ Negative number allowed.
             App.Console.PrintMessage("Change property : " + str(prop) + "\n")
 
         if m_debug:
-            print("running TwoPointsLine.onChanged !")
+            print("running ThreePointsPlane.onChanged !")
 
-        WF_Line.onChanged(self, selfobj, prop)
+        WF_Plane.onChanged(self, selfobj, prop)
 
         if prop == "Parametric":
             if 'Parametric' in selfobj.PropertiesList:
@@ -306,36 +298,15 @@ Negative number allowed.
                     selfobj.setEditorMode("Extension", 1)
                 else:
                     selfobj.setEditorMode("Extension", 0)
-            propertiesLine(selfobj.Label, self.color)
+            propertiesPlane(selfobj.Label, self.color)
 
         if prop == "Extension":
             selfobj.Proxy.execute(selfobj)
 
-        if prop == "Point1":
-            selfobj.Proxy.execute(selfobj)
-        if prop == "Point2":
-            selfobj.Proxy.execute(selfobj)
 
-    def addSubobjects(self, selfobj, pointlinks):
-        "adds pointlinks to this TwoPointsLine object"
-        objs = selfobj.Points
-        for o in pointlinks:
-            if isinstance(o, tuple) or isinstance(o, list):
-                if o[0].Name != selfobj.Name:
-                    objs.append(tuple(o))
-            else:
-                for el in o.SubElementNames:
-                    if "Point" in el:
-                        if o.Object.Name != selfobj.Name:
-                            objs.append((o.Object, el))
-        selfobj.Points = objs
-        selfobj.Proxy.execute(selfobj)
-        # self.execute(selfobj)
-
-
-class ViewProviderTwoPointsLine:
+class ViewProviderThreePointsPlane:
     global path_WF_icons
-    icon = '/WF_twoPointsLine.svg'
+    icon = '/WF_threePointsPlane.svg'
 
     def __init__(self, vobj):
         """ Set this object to the proxy object of the actual view provider """
@@ -365,14 +336,14 @@ class ViewProviderTwoPointsLine:
     # This method is optional and if not defined a default icon is shown.
     def getIcon(self):
         """ Return the icon which will appear in the tree view. """
-        return (path_WF_icons + ViewProviderTwoPointsLine.icon)
+        return (path_WF_icons + ViewProviderThreePointsPlane.icon)
 
-    def setIcon(self, icon='/WF_twoPointsLine.svg'):
-        ViewProviderTwoPointsLine.icon = icon
+    def setIcon(self, icon='/WF_threePointsPlane.svg'):
+        ViewProviderThreePointsPlane.icon = icon
 
 
-class CommandTwoPointsLine:
-    """ Command to create TwoPointsLine feature object. """
+class CommandThreePointsPlane:
+    """ Command to create ThreePointsPlane feature object. """
     def GetResources(self):
         return {'Pixmap': path_WF_icons + m_icon,
                 'MenuText': m_menu_text,
@@ -383,7 +354,8 @@ class CommandTwoPointsLine:
         m_actDoc = App.activeDocument()
         if m_actDoc is not None:
             if len(Gui.Selection.getSelectionEx(m_actDoc.Name)) == 0:
-                Gui.Control.showDialog(TwoPointsLinePanel())
+                Gui.Control.showDialog(ThreePointsPlanePanel())
+
         run()
 
     def IsActive(self):
@@ -394,7 +366,7 @@ class CommandTwoPointsLine:
 
 
 if App.GuiUp:
-    Gui.addCommand("TwoPointsLine", CommandTwoPointsLine())
+    Gui.addCommand("ThreePointsPlane", CommandThreePointsPlane())
 
 
 def run():
@@ -409,17 +381,18 @@ def run():
             print_msg("Number_of_Vertexes = " + str(Number_of_Vertexes))
             print_msg("Vertex_List = " + str(Vertex_List))
 
-        if Number_of_Vertexes < 2:
+        if Number_of_Vertexes < 3:
             raise Exception(m_exception_msg)
+
         try:
-            m_main_dir = "WorkAxis_P"
+            m_main_dir = "WorkPlanes_P"
             m_sub_dir = "Set001"
             m_group = createFolders(str(m_main_dir))
             m_error_msg = "Could not Create '"
             m_error_msg += str(m_sub_dir) + "' Objects Group!"
 
             # Create a sub group if needed
-            if Number_of_Vertexes > 2:
+            if Number_of_Vertexes > 6:
                 try:
                     m_ob = App.ActiveDocument.getObject(str(m_main_dir)).newObject("App::DocumentObjectGroup", str(m_sub_dir))
                     m_group = m_actDoc.getObject(str(m_ob.Label))
@@ -430,106 +403,29 @@ def run():
             if WF.verbose():
                 print_msg("Group = " + str(m_group.Label))
 
-            # Case of only 2 points
-            if Number_of_Vertexes == 2:
+            # Case of only 3 points
+            if Number_of_Vertexes == 3:
                 if WF.verbose():
-                    print_msg("Process only 2 points")
+                    print_msg("Process only 3 points")
+
                 vertex1 = Vertex_List[0]
                 vertex2 = Vertex_List[1]
+                vertex3 = Vertex_List[2]
 
                 if WF.verbose():
                     print_msg("vertex1 = " + str(vertex1))
                     print_msg("vertex2 = " + str(vertex2))
+                    print_msg("vertex3 = " + str(vertex3))
 
                 App.ActiveDocument.openTransaction(m_macro)
-                selfobj = makeTwoPointsLineFeature(m_group)
+                selfobj = makeThreePointsPlaneFeature(m_group)
                 selfobj.Point1 = vertex1
                 selfobj.Point2 = vertex2
-                selfobj.Extension = m_line_ext
+                selfobj.Point3 = vertex3
+                selfobj.Extension = m_extension
                 selfobj.Proxy.execute(selfobj)
-            # Case of more than 2 points
             else:
-                if m_byPair:
-                    if WF.verbose():
-                        print_msg("Process points by pair")
-                    # even
-                    if (Number_of_Vertexes % 2 == 0):
-                        if WF.verbose():
-                            print_msg("Even number of points")
-                        for i in range(0, Number_of_Vertexes - 1, 2):
-                            vertex1 = Vertex_List[i]
-                            vertex2 = Vertex_List[i + 1]
-
-                            if WF.verbose():
-                                print_msg("vertex1 = " + str(vertex1))
-                                print_msg("vertex2 = " + str(vertex2))
-
-                            App.ActiveDocument.openTransaction(m_macro)
-                            selfobj = makeTwoPointsLineFeature(m_group)
-                            selfobj.Point1 = vertex1
-                            selfobj.Point2 = vertex2
-                            selfobj.Extension = m_line_ext
-                            selfobj.Proxy.execute(selfobj)
-                    # odd
-                    else:
-                        if WF.verbose():
-                            print_msg("Odd number of points")
-                        for i in range(0, Number_of_Vertexes - 2, 2):
-                            vertex1 = Vertex_List[i]
-                            vertex2 = Vertex_List[i + 1]
-
-                            if WF.verbose():
-                                print_msg("vertex1 = " + str(vertex1))
-                                print_msg("vertex2 = " + str(vertex2))
-
-                            App.ActiveDocument.openTransaction(m_macro)
-                            selfobj = makeTwoPointsLineFeature(m_group)
-                            selfobj.Point1 = vertex1
-                            selfobj.Point2 = vertex2
-                            selfobj.Extension = m_line_ext
-                            selfobj.Proxy.execute(selfobj)
-                        if WF.closePolyline():
-                            vertex1 = Vertex_List[-1]
-                            vertex2 = Vertex_List[0]
-
-                            App.ActiveDocument.openTransaction(m_macro)
-                            selfobj = makeTwoPointsLineFeature(m_group)
-                            selfobj.Point1 = vertex1
-                            selfobj.Point2 = vertex2
-                            selfobj.Extension = m_line_ext
-                            selfobj.Proxy.execute(selfobj)
-                else:
-                    if WF.verbose():
-                        print_msg("Process points as list")
-                    for i in range(Number_of_Vertexes - 1):
-                        vertex1 = Vertex_List[i]
-                        vertex2 = Vertex_List[i + 1]
-
-                        if WF.verbose():
-                            print_msg("vertex1 = " + str(vertex1))
-                            print_msg("vertex2 = " + str(vertex2))
-
-                        App.ActiveDocument.openTransaction(m_macro)
-                        selfobj = makeTwoPointsLineFeature(m_group)
-                        selfobj.Point1 = vertex1
-                        selfobj.Point2 = vertex2
-                        selfobj.Extension = m_line_ext
-                        selfobj.Proxy.execute(selfobj)
-
-                    if WF.closePolyline():
-                        vertex1 = Vertex_List[-1]
-                        vertex2 = Vertex_List[0]
-
-                        if WF.verbose():
-                            print_msg("vertex1 = " + str(vertex1))
-                            print_msg("vertex2 = " + str(vertex2))
-
-                        App.ActiveDocument.openTransaction(m_macro)
-                        selfobj = makeTwoPointsLineFeature(m_group)
-                        selfobj.Point1 = vertex1
-                        selfobj.Point2 = vertex2
-                        selfobj.Extension = m_line_ext
-                        selfobj.Proxy.execute(selfobj)
+                pass
 
         except Exception as err:
             printError_msg(err.args[0], title=m_macro)

@@ -41,7 +41,7 @@ __brief__ = '''
 
 '''
 ###############
-m_debug = False
+m_debug = True
 ###############
 
 WF_ParametricList = ['Not', 'Interactive', 'Dynamic']
@@ -212,22 +212,82 @@ class WF_Plane(WF_Object):
     """ The Plane WF object. """
     # this method is mandatory
     def __init__(self, selfobj, name):
+        if m_debug:
+            print("running WF_Plane.__init__ !")
         WF_Object.__init__(self, selfobj)
-        # Add some custom properties to our Plane WF object.
-
-#         selfobj.addProperty("App::PropertyFloat","X",name,"X of the point").X1=1.0
-#         selfobj.addProperty("App::PropertyFloat","Y",name,"Y of the point").Y1=1.0
-#         selfobj.addProperty("App::PropertyFloat","Z",name,"Z of the point").Z1=1.0
-
-#         # 0 -- default mode, read and write
-#         # 1 -- read-only
-#         # 2 -- hidden
-#         selfobj.setEditorMode("X", 1)
-#         selfobj.setEditorMode("Y", 1)
-#         selfobj.setEditorMode("Z", 1)
+        # Add some custom properties to our Line WF object.
+        selfobj.addProperty("App::PropertyFloat",
+                            "Point1_X",
+                            name,
+                            "X of the start point").Point1_X = 1.0
+        selfobj.addProperty("App::PropertyFloat",
+                            "Point1_Y",
+                            name,
+                            "Y of the start point").Point1_Y = 1.0
+        selfobj.addProperty("App::PropertyFloat",
+                            "Point1_Z",
+                            name,
+                            "Z of the start point").Point1_Z = 1.0
+        selfobj.addProperty("App::PropertyFloat",
+                            "Point2_X",
+                            name,
+                            "X of the end point").Point2_X = 1.0
+        selfobj.addProperty("App::PropertyFloat",
+                            "Point2_Y",
+                            name,
+                            "Y of the end point").Point2_Y = 1.0
+        selfobj.addProperty("App::PropertyFloat",
+                            "Point2_Z",
+                            name,
+                            "Z of the end point").Point2_Z = 1.0
+        selfobj.addProperty("App::PropertyFloat",
+                            "Point3_X",
+                            name,
+                            "X of the end point").Point3_X = 1.0
+        selfobj.addProperty("App::PropertyFloat",
+                            "Point3_Y",
+                            name,
+                            "Y of the end point").Point3_Y = 1.0
+        selfobj.addProperty("App::PropertyFloat",
+                            "Point3_Z",
+                            name,
+                            "Z of the end point").Point3_Z = 1.0
+        # 0 -- default mode, read and write
+        # 1 -- read-only
+        # 2 -- hidden
+        selfobj.setEditorMode("Point1_X", 1)
+        selfobj.setEditorMode("Point1_Y", 1)
+        selfobj.setEditorMode("Point1_Z", 1)
+        selfobj.setEditorMode("Point2_X", 1)
+        selfobj.setEditorMode("Point2_Y", 1)
+        selfobj.setEditorMode("Point2_Z", 1)
+        selfobj.setEditorMode("Point3_X", 1)
+        selfobj.setEditorMode("Point3_Y", 1)
+        selfobj.setEditorMode("Point3_Z", 1)
 
     # this method is mandatory
     def execute(self, selfobj):
+        if m_debug:
+            print("running WF_Plane.execute !")
+        pass
+
+    def onChanged(self, selfobj, prop):
+        WF_Object.onChanged(self, selfobj, prop)
+
+class WF_Plane2(WF_Point, WF_Line):
+    """ The Plane WF object. """
+    # this method is mandatory
+    def __init__(self, selfobj, name):
+        if m_debug:
+            print("running WF_Plane.__init__ !")
+        WF_Point.__init__(self, selfobj)
+        WF_Line.__init__(self, selfobj)
+        # Add some custom properties to our Plane WF object.
+
+    # this method is mandatory
+    def execute(self, selfobj):
+        if m_debug:
+            print("running WF_Plane.execute !")
         pass
 
     def onChanged(self, selfobj, prop):

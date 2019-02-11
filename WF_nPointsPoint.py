@@ -37,17 +37,18 @@ import Part
 from PySide import QtGui, QtCore
 import WF
 from WF_Objects_base import WF_Point
+# from InitGui import m_debug
 if App.GuiUp:
     import FreeCADGui as Gui
 
-__title__= "Macro ExtremaLinePoint"
+__title__ = "Macro_NPointsPoint"
 __author__ = "Rentlau_64"
 __brief__ = '''
-Macro ExtremaLinePoint.
-Creates a parametric ExtremaLinePoint from an Edge
+Macro NPointsPoint.
+Creates a parametric NPointsPoint from a list of Points
 '''
 ###############
-m_debug = False
+m_debug = True
 ###############
 
 # get the path of the current python script
@@ -72,28 +73,27 @@ except ImportError:
     sys.exit(1)
 
 ###############
-m_icon = "/WF_extremaLinePoint.svg"
-m_icons = ["/WF_startLinePoint.svg",
-           "/WF_endLinePoint.svg",
-           "/WF_extremaLinePoint.svg"]
-m_dialog = "/WF_UI_extremaLinePoint.ui"
-m_dialog_title = "Define location(s)."
+m_icon = "/WF_nPointsPoint.svg"
+m_dialog = "/WF_UI_nPointsPoint.ui"
+m_dialog_title = ""
 m_exception_msg = """
-Unable to create Extrema Line Point(s) :
-- Select one or several Line/Edge(s) and/or
-- Select one Plane/Face to process all (4) Edges and/or
-- Select one Object to process all Edges at once !
+Unable to create a Mean Point :
+- Select several Points(s) and/or
+- Select several Line/Edge(s) to process 2 ends points and/or
+- Select one or several Plane/Face(s) to process all Points at once and/or
+- Select one or several Object(s) to process all Points at once;
 
-Go to Parameter(s) Window in Task Panel!"""
-m_result_msg = " : Extrema Line Point(s) created !"
-m_menu_text = "Point(s) = Extrema(Line) "
+and go to Parameter(s) Window in Task Panel!"""
+m_result_msg = " : N Points Point created !"
+m_menu_text = "Point = center(Points)"
 m_accel = ""
-m_tool_tip = """<b>Create Point(s)</b> at Start and End location<br>
-of each selected Line(s).<br>
+m_tool_tip = """<b>Create a Point</b> at MEAN location of all selected points.<br>
+
 <br>
-- Select one or several Line/Edge(s) and/or<br>
-- Select one Plane/Face to process all (4) Edges and/or<br>
-- Select one Object to process all Edges at once<br>
+- Select several Points and/or<br>
+- Select several Line/Edge(s) to process 2 ends points and/or<br>
+- Select one Plane/Face to process all Points at once and/or<br>
+- Select one Object to process all Points at once;<br>
 - Then Click on the Button/Icon<br>
 <br>
 <i>Click in view window without selection will popup<br>
@@ -101,23 +101,32 @@ of each selected Line(s).<br>
  - a Parameter(s) Window in Task Panel!</i>
 """
 ###############
-m_macro = "Macro ExtremaLinePoint"
-m_location = "Both ends"
-m_locationList = ["Begin", "End", "Both ends"]
+m_macro = "Macro NPointsPoint"
 ###############
 
 
-class ExtremaLinePointPanel:
+def linkSubList_convertToOldStyle(references):
+    """("input: [(obj1, (sub1, sub2)), (obj2, (sub1, sub2))]\n"
+    "output: [(obj1, sub1), (obj1, sub2), (obj2, sub1), (obj2, sub2)]")"""
+    result = []
+    for tup in references:
+        if type(tup[1]) is tuple or type(tup[1]) is list:
+            for subname in tup[1]:
+                result.append((tup[0], subname))
+            if len(tup[1]) == 0:
+                result.append((tup[0], ''))
+        else:
+            # old style references, no conversion required
+            result.append(tup)
+    return result
+
+
+class NPointsPointPanel:
     def __init__(self):
         self.form = Gui.PySideUic.loadUi(path_WF_ui + m_dialog)
         self.form.setWindowTitle(m_dialog_title)
 
-        self.form.UI_ExtremaLinePoint_comboBox.setCurrentIndex(self.form.UI_ExtremaLinePoint_comboBox.findText(m_location))
-
     def accept(self):
-        global m_location
-        m_location = self.form.UI_ExtremaLinePoint_comboBox.currentText()
-
         Gui.Control.closeDialog()
         m_actDoc = App.activeDocument()
         if m_actDoc is not None:
@@ -133,62 +142,56 @@ class ExtremaLinePointPanel:
         return (len(Gui.Selection.getSelectionEx(App.activeDocument().Name)) == 0)
 
 
-def makeExtremaLinePointFeature(group):
-    """ Makes a ExtremaLinePoint" parametric feature object.
+def makeNPointsPointFeature(group):
+    """ Makes a NPointsPoint parametric feature object.
     into the given Group
     Returns the new object.
     """
-    m_name = "ExtremaLinePoint_P"
+    m_name = "NPointsPoint_P"
     m_part = "Part::FeaturePython"
 
     try:
         m_obj = App.ActiveDocument.addObject(str(m_part), str(m_name))
         if group is not None:
             addObjectToGrp(m_obj, group, info=1)
-        ExtremaLinePoint(m_obj)
-        ViewProviderExtremaLinePoint(m_obj.ViewObject)
+        m_inst = NPointsPoint(m_obj)
+        ViewProviderNPointsPoint(m_obj.ViewObject)
     except Exception as err:
         printError_msg("Not able to add an object to Model!")
         printError_msg(err.args[0], title=m_macro)
         return None
 
-    return m_obj
+    return m_obj, m_inst
 
 
-class ExtremaLinePoint(WF_Point):
-    """ The ExtremaLinePoint feature object. """
+class NPointsPoint(WF_Point):
+    """ The NPointsPoint feature object. """
     # this method is mandatory
     def __init__(self, selfobj):
         if m_debug:
-            print("running ExtremaLinePoint.__init__ !")
+            print("running NPointsPoint.__init__ !")
 
-        self.name = "ExtremaLinePoint"
+        self.name = "NPointsPoint"
         WF_Point.__init__(self, selfobj, self.name)
-        # Add some custom properties to our CenterLinePoint feature object.
-        selfobj.addProperty("App::PropertyLinkSub",
-                            "Edge",
+        # Add some custom properties to our NPointsPoint feature object.
+        selfobj.addProperty("App::PropertyLinkSubList",
+                            "Points",
                             self.name,
-                            "Input edge")
-        m_tooltip = """Indicates where is located the Point
-relative to the parent Line.
-        """
-        selfobj.addProperty("App::PropertyEnumeration",
-                            "At",
-                            self.name,
-                            m_tooltip)
-        selfobj.At = [v.encode('utf8') for v in m_locationList]
-        selfobj.At = 'Both ends'.encode('utf8')
-
-        selfobj.setEditorMode("Edge", 1)
+                            "List of Points")
+        selfobj.Points = []
+        selfobj.setEditorMode("Points", 1)
 
         selfobj.Proxy = self
+        # save the object in the class, to store or retrieve specific data from it
+        # from within the class
+        # self.Object = selfobj
 
     # this method is mandatory
     def execute(self, selfobj):
         """ Doing a recomputation.
         """
         if m_debug:
-            print("running ExtremaLinePoint.execute !")
+            print("running NPointsPoint.execute !")
 
         # To be compatible with previous version > 2019
         if 'Parametric' in selfobj.PropertiesList:
@@ -200,11 +203,13 @@ relative to the parent Line.
                 return
 
         if WF.verbose():
-            m_msg = "Recompute Python ExtremaLinePoint feature\n"
+            m_msg = "Recompute Python NPointsPoint feature\n"
             App.Console.PrintMessage(m_msg)
 
-        m_PropertiesList = ['Edge',
-                            'At',
+        if m_debug:
+            print("selfobj.PropertiesList = " + str(selfobj.PropertiesList))
+
+        m_PropertiesList = ['Points',
                             ]
         for m_Property in m_PropertiesList:
             if m_Property not in selfobj.PropertiesList:
@@ -212,19 +217,18 @@ relative to the parent Line.
 
         try:
             Vector_point = None
-            n = eval(selfobj.Edge[1][0].lstrip('Edge'))
             if m_debug:
-                print_msg(str(selfobj.Edge))
-                print_msg("n = " + str(n))
-                print_msg(str(selfobj.Edge[0].Shape.Edges))
+                print("selfobj.Points = " + str(selfobj.Points))
+            if selfobj.Points is not None:
+                m_points = []
+                for p in linkSubList_convertToOldStyle(selfobj.Points):
+                    n = eval(p[1].lstrip('Vertex'))
+                    if m_debug:
+                        print("p " + str(p))
+                        print_msg("n = " + str(n))
+                    m_points.append(p[0].Shape.Vertexes[n - 1].Point)
 
-            if len(selfobj.Edge[0].Shape.Edges) == 0:
-                    return
-
-            if selfobj.At == "Begin":
-                Vector_point = selfobj.Edge[0].Shape.Edges[n - 1].Vertexes[0].Point
-            else:
-                Vector_point = selfobj.Edge[0].Shape.Edges[n - 1].Vertexes[-1].Point
+            Vector_point = meanVectorsPoint(m_points)
 
             if Vector_point is not None:
                 point = Part.Point(Vector_point)
@@ -240,29 +244,52 @@ relative to the parent Line.
             printError_msg(err.args[0], title=m_macro)
 
     def onChanged(self, selfobj, prop):
-        if WF.verbose() != 0:
-            App.Console.PrintMessage("Change property: " + str(prop) + "\n")
+        if WF.verbose():
+            App.Console.PrintMessage("Change property : " + str(prop) + "\n")
 
         if m_debug:
-            print("running CenterLinePoint.onChanged !")
+            print("running NPointsPoint.onChanged !")
 
         WF_Point.onChanged(self, selfobj, prop)
 
         if prop == "Parametric":
             if 'Parametric' in selfobj.PropertiesList:
                 if selfobj.Parametric == 'Not':
-                    selfobj.setEditorMode("At", 1)
+                    selfobj.setEditorMode("X", 1)
+                    selfobj.setEditorMode("Y", 1)
+                    selfobj.setEditorMode("Z", 1)
                 else:
-                    selfobj.setEditorMode("At", 0)
+                    selfobj.setEditorMode("X", 0)
+                    selfobj.setEditorMode("Y", 0)
+                    selfobj.setEditorMode("Z", 0)
             propertiesPoint(selfobj.Label, self.color)
 
-        if prop == "At":
+        if prop == "Points":
             selfobj.Proxy.execute(selfobj)
 
+    def addSubobjects(self, selfobj, points_list=[]):
+        "adds pointlinks to this TwoPointsLine object"
+        objs = selfobj.Points
+        if points_list:
+            s1 = []
+            for o in points_list:
+                if isinstance(o, tuple) or isinstance(o, list):
+                    if o[0].Name != selfobj.Name:
+                        s1.append(tuple(o))
+                else:
+                    for el in o.SubElementNames:
+                        if "Point" in el:
+                            if o.Object.Name != selfobj.Name:
+                                s1.append((o.Object, el))
+        selfobj.Points = list(s1)
 
-class ViewProviderExtremaLinePoint:
+        selfobj.Proxy.execute(selfobj)
+        # self.execute(selfobj)
+
+
+class ViewProviderNPointsPoint:
     global path_WF_icons
-    icon = "/WF_extremaLinePoint.svg"
+    icon = '/WF_nPointsPoint.svg'
 
     def __init__(self, vobj):
         """ Set this object to the proxy object of the actual view provider """
@@ -292,14 +319,14 @@ class ViewProviderExtremaLinePoint:
     # This method is optional and if not defined a default icon is shown.
     def getIcon(self):
         """ Return the icon which will appear in the tree view. """
-        return (path_WF_icons + ViewProviderExtremaLinePoint.icon)
+        return (path_WF_icons + ViewProviderNPointsPoint.icon)
 
-    def setIcon(self, icon='/WF_extremaLinePoint.svg'):
-        ViewProviderExtremaLinePoint.icon = icon
+    def setIcon(self, icon='/WF_nPointsPoint.svg'):
+        ViewProviderNPointsPoint.icon = icon
 
 
-class CommandExtremaLinePoint:
-    """ Command to create ExtremaLinePoint feature object. """
+class CommandNPointsPoint:
+    """ Command to create NPointsPoint feature object. """
     def GetResources(self):
         return {'Pixmap': path_WF_icons + m_icon,
                 'MenuText': m_menu_text,
@@ -310,7 +337,7 @@ class CommandExtremaLinePoint:
         m_actDoc = App.activeDocument()
         if m_actDoc is not None:
             if len(Gui.Selection.getSelectionEx(m_actDoc.Name)) == 0:
-                Gui.Control.showDialog(ExtremaLinePointPanel())
+                Gui.Control.showDialog(NPointsPointPanel())
 
         run()
 
@@ -322,24 +349,24 @@ class CommandExtremaLinePoint:
 
 
 if App.GuiUp:
-    Gui.addCommand("ExtremaLinePoint", CommandExtremaLinePoint())
+    Gui.addCommand("NPointsPoint", CommandNPointsPoint())
 
 
 def run():
-    m_sel, m_actDoc = getSel(WF.verbose())
+    m_sel, _ = getSel(WF.verbose())
 
     try:
-        Number_of_Edges, Edge_List = m_sel.get_segmentsNames(
-            getfrom=["Segments",
+        Number_of_Vertexes, Vertex_List = m_sel.get_pointsNames(
+            getfrom=["Points",
                      "Curves",
-                     "Planes",
                      "Objects"])
         if WF.verbose():
-            print_msg("Number_of_Edges = " + str(Number_of_Edges))
-            print_msg("Edge_List = " + str(Edge_List))
+            print_msg("Number_of_Vertexes = " + str(Number_of_Vertexes))
+            print_msg("Vertex_List = " + str(Vertex_List))
 
-        if Number_of_Edges == 0:
+        if Number_of_Vertexes < 2:
             raise Exception(m_exception_msg)
+
         try:
             m_main_dir = "WorkPoints_P"
             m_sub_dir = "Set001"
@@ -347,53 +374,41 @@ def run():
             m_error_msg = "Could not Create '"
             m_error_msg += str(m_sub_dir) + "' Objects Group!"
 
-            # Create a sub group if needed
-            if Number_of_Edges > 1 or m_location == "Both ends":
-                try:
-                    m_ob = App.ActiveDocument.getObject(str(m_main_dir)).newObject("App::DocumentObjectGroup", str(m_sub_dir))
-                    m_group = m_actDoc.getObject(str(m_ob.Label))
-                except Exception as err:
-                    printError_msg(err.args[0], title=m_macro)
-                    printError_msg(m_error_msg)
-
-            if WF.verbose():
-                print_msg("Group = " + str(m_group.Label))
-
-            for i in range(Number_of_Edges):
-                edge = Edge_List[i]
+            points = []
+            # Case of only 2 points
+            if Number_of_Vertexes == 2:
+                if WF.verbose():
+                    print_msg("Process only 2 points")
+                vertex1 = Vertex_List[0]
+                vertex2 = Vertex_List[1]
+                points.append(vertex1)
+                points.append(vertex2)
 
                 if WF.verbose():
-                    print_msg("Location = " + str(m_location))
+                    print_msg("vertex1 = " + str(vertex1))
+                    print_msg("vertex2 = " + str(vertex2))
 
-                if m_location in ["Begin", "Both ends"]:
-                    App.ActiveDocument.openTransaction(m_macro)
-                    selfobj1 = makeExtremaLinePointFeature(m_group)
-                    selfobj1.Edge = edge
-                    selfobj1.At = "Begin"
-                    selfobj1.Proxy.execute(selfobj1)
-                    if str(selfobj1.Parametric) == 'Interactive':
-                        selfobj1.Parametric = 'Dynamic'
-                        selfobj1.touch()
-                        selfobj1.Parametric = 'Interactive'
-                    if str(selfobj1.Parametric) == 'Not':
-                        selfobj1.Parametric = 'Dynamic'
-                        selfobj1.touch()
-                        selfobj1.Parametric = 'Not'
-                if m_location in ["End", "Both ends"]:
-                    App.ActiveDocument.openTransaction(m_macro)
-                    selfobj2 = makeExtremaLinePointFeature(m_group)
-                    selfobj2.Edge = edge
-                    selfobj2.At = "End"
-                    selfobj2.Proxy.execute(selfobj2)
-                    if str(selfobj2.Parametric) == 'Interactive':
-                        selfobj2.Parametric = 'Dynamic'
-                        selfobj2.touch()
-                        selfobj2.Parametric = 'Interactive'
-                    if str(selfobj2.Parametric) == 'Not':
-                        selfobj2.Parametric = 'Dynamic'
-                        selfobj2.touch()
-                        selfobj2.Parametric = 'Not'
+                App.ActiveDocument.openTransaction(m_macro)
+                selfobj, m_inst = makeNPointsPointFeature(m_group)
+                if m_debug:
+                    print("selfobj : " + str(selfobj))
+                m_inst.addSubobjects(selfobj, points)
+                selfobj.Proxy.execute(selfobj)
+            # Case of more than 2 points
+            else:
+                if WF.verbose():
+                    print_msg("Process more than 2 points")
+                for i in range(Number_of_Vertexes):
+                    vertex1 = Vertex_List[i]
+                    points.append(vertex1)
+                    if WF.verbose():
+                        print_msg("vertex1 = " + str(vertex1))
 
+                App.ActiveDocument.openTransaction(m_macro)
+                selfobj, m_inst = makeNPointsPointFeature(m_group)
+                if m_debug:
+                    print("selfobj : " + str(selfobj))
+                m_inst.addSubobjects(selfobj, points)
         except Exception as err:
             printError_msg(err.args[0], title=m_macro)
 
