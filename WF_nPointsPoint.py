@@ -29,7 +29,6 @@
 *   If not, see <https://www.gnu.org/licenses/>                           *
 ***************************************************************************
 """
-
 import sys
 import os.path
 import FreeCAD as App

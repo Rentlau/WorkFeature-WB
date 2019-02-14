@@ -140,7 +140,7 @@ Functions are organised by sub menus:
 | Name                           | Icons  |
 |:------|:------|
 | **WF General** | ![alt](./Doc/Images/WF_General.png) |
-| **WF Points** | ![alt](./Doc/Images/WF_Points.png?1) |
+| **WF Points** | ![alt](./Doc/Images/WF_Points.png?2) |
 | **WF Lines** | ![alt](./Doc/Images/WF_Lines.png) |
 | **WF Planes** | ![alt](./Doc/Images/WF_Planes.png) |
 
@@ -162,7 +162,7 @@ Functions are organised by sub menus:
 |![alt](./Resources/Icons/WF_extremaLinePoint.svg)  | Create Point(s) at edges of selected Line(s).|
 |![alt](./Resources/Icons/WF_nPointsPoint.svg)  | Create a Point at MEAN location of all selected points.|
 |![alt](./Resources/Icons/WF_centerCirclePoint.svg)  | Create Point(s) at center location of selected Circle(s). **<span style="color:red">NOT YET DEV in 2019 release!</span>** |
-|![alt](./Resources/Icons/WF_centerFacePoint.svg)  | Create Point(s) at center location of selected Plane(s). **<span style="color:red">NOT YET DEV in 2019 release!</span>**|
+|![alt](./Resources/Icons/WF_centerFacePoint.svg)  | Create Point(s) at center location of selected Plane(s). |
 
 - WF_Lines sub menu :
 

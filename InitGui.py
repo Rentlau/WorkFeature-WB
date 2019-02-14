@@ -88,7 +88,7 @@ class WorkFeatureWorkbenchDev(Workbench):
             import WF_extremaLinePoint
             import WF_nPointsPoint
             # import WF_centerCirclePoint
-            # import WF_centerFacePoint
+            import WF_centerFacePoint
             # import WF_pointFacePoint
             # import WF_lineFacePoint
 
@@ -126,7 +126,7 @@ class WorkFeatureWorkbenchDev(Workbench):
                                     "ExtremaLinePoint",
                                     "NPointsPoint",
                                     # "CenterCirclePoint",
-                                    # "CenterFacePoint",
+                                    "CenterFacePoint",
                                     # "PointFacePoint",
                                     # "LineFacePoint",
                                     ]

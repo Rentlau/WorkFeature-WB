@@ -262,9 +262,11 @@ Positive values lower than 100.0 will start to shrink it."""
                                        Plane_Point,
                                        Plane_Normal)
                 Plane_Center = Plane.CenterOfMass
-                # Plane.translate(- Plane_Center)
-                Plane.translate(Vector_Center - Plane_Center)
+                Plane_Translate = Plane_Point - Plane_Center
+                Plane.translate(Plane_Translate)
 
+#                 Plane = Part.Plane(point1, point2, point3)
+#                 .toShape()
             if Plane is not None:
                 selfobj.Shape = Plane
                 propertiesPlane(selfobj.Label, self.color)

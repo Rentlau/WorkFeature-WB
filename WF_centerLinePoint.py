@@ -436,7 +436,10 @@ def run():
 
     try:
         Number_of_Edges, Edge_List = m_sel.get_segmentsNames(
-            getfrom=["Segments", "Curves", "Planes", "Objects"])
+            getfrom=["Segments",
+                     "Curves",
+                     "Planes",
+                     "Objects"])
         if WF.verbose():
             print_msg("Number_of_Edges = " + str(Number_of_Edges))
             print_msg("Edge_List = " + str(Edge_List))

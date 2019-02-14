@@ -74,7 +74,7 @@ except ImportError:
 
 ###############
 m_icon = "/WF_nPointsLine.svg"
-m_dialog = "/WF_UI_nPointsPoint.ui"
+m_dialog = "/WF_UI_nPointsLine.ui"
 m_dialog_title = ""
 m_exception_msg = """
 Unable to create a Line :
@@ -87,7 +87,7 @@ and go to Parameter(s) Window in Task Panel!"""
 m_result_msg = " : N Points Linz created !"
 m_menu_text = "Line = SVD(Points)"
 m_accel = ""
-m_tool_tip = """<b>Create a "best fit" Line</b> from a set of points using Singular Value Decomposition (SVD).<br>
+m_tool_tip = """<b>Create a "best fit" Line</b> from a set of Points using Singular Value Decomposition (SVD).<br>
 
 <br>
 - Select several Points(s) and/or<br>
@@ -102,6 +102,7 @@ m_tool_tip = """<b>Create a "best fit" Line</b> from a set of points using Singu
 """
 ###############
 m_macro = "Macro NPointsLine"
+m_svd_flag = False
 ###############
 
 
@@ -125,8 +126,15 @@ class NPointsLinePanel:
     def __init__(self):
         self.form = Gui.PySideUic.loadUi(path_WF_ui + m_dialog)
         self.form.setWindowTitle(m_dialog_title)
+        self.form.UI_nPointsLine_checkBox.setCheckState(QtCore.Qt.Unchecked)
+        if m_svd_flag:
+            self.form.UI_nPointsLine_checkBox.setCheckState(QtCore.Qt.Checked)
 
     def accept(self):
+        global m_svd_flag
+
+        m_svd_flag = self.form.UI_nPointsLine_checkBox.isChecked()
+
         Gui.Control.closeDialog()
         m_actDoc = App.activeDocument()
         if m_actDoc is not None:
@@ -173,6 +181,7 @@ class NPointsLine(WF_Line):
 
         self.name = "NPointsLine"
         WF_Line.__init__(self, selfobj, self.name)
+
         # Add some custom properties to our NPointsLine feature object.
         selfobj.addProperty("App::PropertyLinkSubList",
                             "Points",
@@ -181,6 +190,17 @@ class NPointsLine(WF_Line):
         selfobj.Points = []
         selfobj.setEditorMode("Points", 1)
 
+        m_tooltip = """This is the Vector index
+of the Singular Value Decomposition (SVD).
+1, 2 or 3 are allowed.
+"""
+        selfobj.addProperty("App::PropertyEnumeration",
+                            "VectorIndex",
+                            self.name,
+                            m_tooltip)
+
+        selfobj.VectorIndex = [v.encode('utf8') for v in ['1', '2', '3']]
+        selfobj.VectorIndex = '1'.encode('utf8')
         selfobj.Proxy = self
         # save the object in the class, to store or retrieve specific data from it
         # from within the class
@@ -210,6 +230,7 @@ class NPointsLine(WF_Line):
             print("selfobj.PropertiesList = " + str(selfobj.PropertiesList))
 
         m_PropertiesList = ['Points',
+                            "VectorIndex",
                             ]
         for m_Property in m_PropertiesList:
             if m_Property not in selfobj.PropertiesList:
@@ -267,23 +288,29 @@ class NPointsLine(WF_Line):
                     print_msg(" m_uu=" + str(m_uu))
                     print_msg(" m_dd=" + str(m_dd))
                     print_msg(" m_vv=" + str(m_vv))
+
                 # Now vv[0] contains the first principal component, i.e. the direction
                 # vector of the 'best fit' line in the least squares sense.
                 Axis_dir = Base.Vector(m_vv[0][0], m_vv[0][1], m_vv[0][2])
                 point1 = Axis_E0 - Axis_dir.normalize().multiply(m_dd[0] / 2.)
-                point2 = Axis_E0 + Axis_dir.normalize().multiply(m_dd[0] / 2.)
+
+                if selfobj.VectorIndex == '1':
+                    point2 = Axis_E0 + Axis_dir.normalize().multiply(m_dd[0] / 2.)
+
+                if selfobj.VectorIndex == '2':
+                    Axis_dir = Base.Vector(m_vv[1][0], m_vv[1][1], m_vv[1][2])
+                    point1 = Axis_E0 - Axis_dir.normalize().multiply(m_dd[0] / 2.)
+                    point2 = Axis_E0 + Axis_dir.normalize().multiply(m_dd[1] / 2.)
+                    # point2 = Axis_E0 + Axis_dir
+
+                if selfobj.VectorIndex == '3':
+                    Axis_dir = Base.Vector(m_vv[2][0], m_vv[2][1], m_vv[2][2])
+                    point1 = Axis_E0 - Axis_dir.normalize().multiply(m_dd[0] / 2.)
+                    point2 = Axis_E0 + Axis_dir.normalize().multiply(m_dd[2] / 2.)
+                    # point2 = Axis_E0 + Axis_dir
+
                 Point_E1 = point2
                 Point_E2 = point1
-
-#             Axis_dir = Base.Vector(m_vv[1][0], m_vv[1][1], m_vv[1][2])
-#             # Axis_E2 = Axis_E0 + Axis_dir.normalize().multiply(m_dd[1]/2.)
-#             Axis_E2 = Axis_E0 + Axis_dir
-#             Axis_User_Name, axis = plot_axis(Axis_E0, Axis_E2, part, name, grp, red)
-#
-#             Axis_dir = Base.Vector(m_vv[2][0], m_vv[2][1], m_vv[2][2])
-#             # Axis_E2 = Axis_E0 + Axis_dir.normalize().multiply(m_dd[2]/2.)
-#             Axis_E2 = Axis_E0 + Axis_dir
-#             Axis_User_Name, axis = plot_axis(Axis_E0, Axis_E2, part, name, grp, green)
 
                 Line = Part.makeLine(coordVectorPoint(Point_E2),
                                      coordVectorPoint(Point_E1))
@@ -314,17 +341,21 @@ class NPointsLine(WF_Line):
         if prop == "Parametric":
             if 'Parametric' in selfobj.PropertiesList:
                 if selfobj.Parametric == 'Not':
-                    selfobj.setEditorMode("X", 1)
-                    selfobj.setEditorMode("Y", 1)
-                    selfobj.setEditorMode("Z", 1)
+                    pass
                 else:
-                    selfobj.setEditorMode("X", 0)
-                    selfobj.setEditorMode("Y", 0)
-                    selfobj.setEditorMode("Z", 0)
+                    pass
             propertiesLine(selfobj.Label, self.color)
 
         if prop == "Points":
             selfobj.Proxy.execute(selfobj)
+
+#         if prop == 'VectorIndex':
+#             if selfobj.VectorIndex <= 1:
+#                 selfobj.VectorIndex = 1
+#             if selfobj.VectorIndex >= 3:
+#                 selfobj.VectorIndex = 3
+# 
+#             selfobj.Proxy.execute(selfobj)
 
     def addSubobjects(self, selfobj, points_list=[]):
         "adds pointlinks to this TwoPointsLine object"
@@ -412,7 +443,7 @@ if App.GuiUp:
 
 
 def run():
-    m_sel, _ = getSel(WF.verbose())
+    m_sel, m_actDoc = getSel(WF.verbose())
 
     try:
         Number_of_Vertexes, Vertex_List = m_sel.get_pointsNames(
@@ -433,6 +464,18 @@ def run():
             m_error_msg = "Could not Create '"
             m_error_msg += str(m_sub_dir) + "' Objects Group!"
 
+            # Create a sub group if needed
+            if m_svd_flag:
+                try:
+                    m_ob = App.ActiveDocument.getObject(str(m_main_dir)).newObject("App::DocumentObjectGroup", str(m_sub_dir))
+                    m_group = m_actDoc.getObject(str(m_ob.Label))
+                except Exception as err:
+                    printError_msg(err.args[0], title=m_macro)
+                    printError_msg(m_error_msg)
+
+            if WF.verbose():
+                print_msg("Group = " + str(m_group.Label))
+
             points = []
             # Case of only 2 points
             if Number_of_Vertexes == 2:
@@ -452,22 +495,52 @@ def run():
                 if m_debug:
                     print("selfobj : " + str(selfobj))
                 m_inst.addSubobjects(selfobj, points)
+                selfobj.VectorIndex = '1'
                 selfobj.Proxy.execute(selfobj)
+
+                if m_svd_flag:
+                    App.ActiveDocument.openTransaction(m_macro)
+                    selfobj, m_inst = makeNPointsLineFeature(m_group)
+                    m_inst.addSubobjects(selfobj, points)
+                    selfobj.VectorIndex = '2'
+                    selfobj.Proxy.execute(selfobj)
+
+                    App.ActiveDocument.openTransaction(m_macro)
+                    selfobj, m_inst = makeNPointsLineFeature(m_group)
+                    m_inst.addSubobjects(selfobj, points)
+                    selfobj.VectorIndex = '3'
+                    selfobj.Proxy.execute(selfobj)
             # Case of more than 2 points
             else:
                 if WF.verbose():
                     print_msg("Process more than 2 points")
                 for i in range(Number_of_Vertexes):
-                    vertex1 = Vertex_List[i]
-                    points.append(vertex1)
+                    vertex = Vertex_List[i]
+                    points.append(vertex)
                     if WF.verbose():
-                        print_msg("vertex1 = " + str(vertex1))
+                        print_msg("vertex = " + str(vertex))
 
                 App.ActiveDocument.openTransaction(m_macro)
                 selfobj, m_inst = makeNPointsLineFeature(m_group)
                 if m_debug:
                     print("selfobj : " + str(selfobj))
                 m_inst.addSubobjects(selfobj, points)
+                selfobj.VectorIndex = '1'
+                selfobj.Proxy.execute(selfobj)
+
+                if m_svd_flag:
+                    App.ActiveDocument.openTransaction(m_macro)
+                    selfobj, m_inst = makeNPointsLineFeature(m_group)
+                    m_inst.addSubobjects(selfobj, points)
+                    selfobj.VectorIndex = '2'
+                    selfobj.Proxy.execute(selfobj)
+
+                    App.ActiveDocument.openTransaction(m_macro)
+                    selfobj, m_inst = makeNPointsLineFeature(m_group)
+                    m_inst.addSubobjects(selfobj, points)
+                    selfobj.VectorIndex = '3'
+                    selfobj.Proxy.execute(selfobj)
+
         except Exception as err:
             printError_msg(err.args[0], title=m_macro)
 
