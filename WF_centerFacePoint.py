@@ -84,7 +84,7 @@ and go to Parameter(s) Window in Task Panel!"""
 m_result_msg = " : Center Face Point(s) created !"
 m_menu_text = "Point = center(Plane)"
 m_accel = ""
-m_tool_tip = """<b>Create Point(s)</b> at Center location
+m_tool_tip = """<b>Create Point(s)</b> at Center of mass location
 of each selected Face(s).<br>
 <br>
 - Select one or several Plane/Face(s) to process and/or<br>
@@ -222,6 +222,14 @@ class CenterFacePoint(WF_Point):
             print("running CenterFacePoint.onChanged !")
 
         WF_Point.onChanged(self, selfobj, prop)
+
+        if prop == "Parametric":
+            if 'Parametric' in selfobj.PropertiesList:
+                if selfobj.Parametric == 'Not':
+                    pass
+                else:
+                    pass
+            propertiesPoint(selfobj.Label, self.color)
 
 
 class ViewProviderCenterFacePoint:

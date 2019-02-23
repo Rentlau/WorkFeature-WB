@@ -198,9 +198,14 @@ of the Singular Value Decomposition (SVD).
                             "VectorIndex",
                             self.name,
                             m_tooltip)
-
-        selfobj.VectorIndex = [v.encode('utf8') for v in ['1', '2', '3']]
-        selfobj.VectorIndex = '1'.encode('utf8')
+        if (sys.version_info > (3, 0)):
+            # Python 3 code in this block
+            selfobj.VectorIndex = [v.encode('utf8').decode('utf-8') for v in ['1', '2', '3']]
+            selfobj.VectorIndex = '1'.encode('utf8').decode('utf-8')
+        else:
+            # Python 2 code in this block
+            selfobj.VectorIndex = [v.encode('utf8') for v in ['1', '2', '3']]
+            selfobj.VectorIndex = '1'.encode('utf8')
         selfobj.Proxy = self
         # save the object in the class, to store or retrieve specific data from it
         # from within the class
@@ -354,7 +359,7 @@ of the Singular Value Decomposition (SVD).
 #                 selfobj.VectorIndex = 1
 #             if selfobj.VectorIndex >= 3:
 #                 selfobj.VectorIndex = 3
-# 
+#
 #             selfobj.Proxy.execute(selfobj)
 
     def addSubobjects(self, selfobj, points_list=[]):

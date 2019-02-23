@@ -29,7 +29,6 @@
 *   If not, see <https://www.gnu.org/licenses/>                           *
 ***************************************************************************
 """
-
 import sys
 import os.path
 import FreeCAD as App
@@ -176,8 +175,14 @@ relative to the parent Line.
                             "At",
                             self.name,
                             m_tooltip)
-        selfobj.At = [v.encode('utf8') for v in m_locationList]
-        selfobj.At = 'Both ends'.encode('utf8')
+        if (sys.version_info > (3, 0)):
+            # Python 3 code in this block
+            selfobj.At = [v.encode('utf8').decode('utf-8') for v in m_locationList]
+            selfobj.At = 'Both ends'.encode('utf8').decode('utf-8')
+        else:
+            # Python 2 code in this block
+            selfobj.At = [v.encode('utf8') for v in m_locationList]
+            selfobj.At = 'Both ends'.encode('utf8')
 
         selfobj.setEditorMode("Edge", 1)
 

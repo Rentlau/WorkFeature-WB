@@ -84,7 +84,7 @@ Go to Parameter(s) Window in Task Panel!"""
 m_result_msg = " : Plane from 3 Points created !"
 m_menu_text = "Plane = (3 Points)"
 m_accel = ""
-m_tool_tip = """<b>Create Plane</b>  from three selected Points.<br>
+m_tool_tip = """<b>Create Plane</b> from three selected Points.<br>
 <br>
 - Select three Points only<br>
 - Then Click on the Button/Icon<br>
@@ -94,7 +94,7 @@ m_tool_tip = """<b>Create Plane</b>  from three selected Points.<br>
  - a Parameter(s) Window in Task Panel!</i>
 """
 ###############
-m_macro = "Macro Macro ThreePointsPlane"
+m_macro = "Macro ThreePointsPlane"
 m_extension = 100.0
 ###############
 
@@ -172,9 +172,7 @@ class ThreePointsPlane(WF_Plane):
                             self.name,
                             "Point3")
 
-        m_tooltip = """Extensions of plane in percentage of the Line Length.
-Positive values upper than 100.0 will enlarge the Plane.
-Positive values lower than 100.0 will start to shrink it."""
+        m_tooltip = """Width and Length of the plane in current units."""
         selfobj.addProperty("App::PropertyFloat",
                             "Extension",
                             self.name,
@@ -208,6 +206,13 @@ Positive values lower than 100.0 will start to shrink it."""
             m_msg = "Recompute Python ThreePointsPlane feature\n"
             App.Console.PrintMessage(m_msg)
 
+        m_PropertiesList = ['Point1',
+                            'Point2',
+                            'Point3'
+                            ]
+        for m_Property in m_PropertiesList:
+            if m_Property not in selfobj.PropertiesList:
+                return
         try:
             Plane = None
             if selfobj.Point1 is not None and selfobj.Point2 is not None and selfobj.Point3 is not None:
@@ -223,62 +228,70 @@ Positive values lower than 100.0 will start to shrink it."""
                     print_msg("n3 = " + str(n3))
 
                 points = []
-                point1 = selfobj.Point1[0].Shape.Vertexes[n1 - 1].Point
-                point2 = selfobj.Point2[0].Shape.Vertexes[n2 - 1].Point
-                point3 = selfobj.Point3[0].Shape.Vertexes[n3 - 1].Point
+                point_A = selfobj.Point1[0].Shape.Vertexes[n1 - 1].Point
+                point_B = selfobj.Point2[0].Shape.Vertexes[n2 - 1].Point
+                point_C = selfobj.Point3[0].Shape.Vertexes[n3 - 1].Point
 
-                if isEqualVectors(point1, point2):
+                if isEqualVectors(point_A, point_B):
                     m_msg = """Unable to create Plane from 2 equals Points :
                     Points 1 and 2 are equals !
                     """
                     printError_msg(m_msg, title=m_macro)
+                    return
 
-                if isEqualVectors(point1, point3):
+                if isEqualVectors(point_A, point_C):
                     m_msg = """Unable to create Plane from 2 equals Points :
                     Points 1 an 3 are equals !
                     """
                     printError_msg(m_msg, title=m_macro)
+                    return
 
-                if isEqualVectors(point2, point3):
+                if isEqualVectors(point_B, point_C):
                     m_msg = """Unable to create Plane from 2 equals Points :
                     Points 2 an 3 are equals !
                     """
                     printError_msg(m_msg, title=m_macro)
+                    return
 
-                points.append(point1)
-                points.append(point2)
-                points.append(point2)
+                if isColinearVectors(point_A, point_B, point_C, tolerance=1e-12):
+                    printError_msg(m_exception_msg, title=m_macro)
+                    return
+
+                points.append(point_A)
+                points.append(point_B)
+                points.append(point_C)
 
                 Vector_Center = meanVectorsPoint(points)
                 xmax, xmin, ymax, ymin, zmax, zmin = minMaxVectorsLimits(points)
 
-                Vector21 = point2 - point1
-                Vector31 = point3 - point1
+                Vector21 = point_B - point_A
+                Vector31 = point_C - point_A
                 Plane_Point = Vector_Center
                 Plane_Normal = Vector21.cross(Vector31)
 
-                Plane = Part.makePlane(m_extension,
-                                       m_extension,
+                Edge_Length = selfobj.Extension
+                Plane = Part.makePlane(Edge_Length,
+                                       Edge_Length,
                                        Plane_Point,
                                        Plane_Normal)
                 Plane_Center = Plane.CenterOfMass
                 Plane_Translate = Plane_Point - Plane_Center
                 Plane.translate(Plane_Translate)
 
-#                 Plane = Part.Plane(point1, point2, point3)
+#                 Plane = Part.Plane(point_A, point_B, point_C)
 #                 .toShape()
             if Plane is not None:
                 selfobj.Shape = Plane
                 propertiesPlane(selfobj.Label, self.color)
-                selfobj.Point1_X = float(point1.x)
-                selfobj.Point1_Y = float(point1.y)
-                selfobj.Point1_Z = float(point1.z)
-                selfobj.Point2_X = float(point2.x)
-                selfobj.Point2_Y = float(point2.y)
-                selfobj.Point2_Z = float(point2.z)
-                selfobj.Point3_X = float(point3.x)
-                selfobj.Point3_Y = float(point3.y)
-                selfobj.Point3_Z = float(point3.z)
+                selfobj.Point1_X = float(point_A.x)
+                selfobj.Point1_Y = float(point_A.y)
+                selfobj.Point1_Z = float(point_A.z)
+                selfobj.Point2_X = float(point_B.x)
+                selfobj.Point2_Y = float(point_B.y)
+                selfobj.Point2_Z = float(point_B.z)
+                selfobj.Point3_X = float(point_C.x)
+                selfobj.Point3_Y = float(point_C.y)
+                selfobj.Point3_Z = float(point_C.z)
                 # To be compatible with previous version 2018
                 if 'Parametric' in selfobj.PropertiesList:
                     self.created = True
@@ -427,7 +440,7 @@ def run():
                 selfobj.Extension = m_extension
                 selfobj.Proxy.execute(selfobj)
             else:
-                pass
+                raise Exception(m_exception_msg)
 
         except Exception as err:
             printError_msg(err.args[0], title=m_macro)

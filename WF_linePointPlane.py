@@ -39,8 +39,8 @@ from WF_Objects_base import WF_Plane
 # from InitGui import m_debug
 if App.GuiUp:
     import FreeCADGui as Gui
-    
-__title__= "Macro LinePointPlane"
+
+__title__ = "Macro LinePointPlane"
 __author__ = "Rentlau_64"
 __brief__ = '''
 Macro LinePointPlane.
@@ -76,230 +76,285 @@ m_icon = "/WF_linePointPlane.svg"
 m_dialog = "/WF_UI_linePointPlane.ui"
 m_dialog_title = "Define extension of the plane."
 
-m_exception_msg = """Unable to create Plane :
-    Select one Line and one Point only
-    with the Point NOT on the Line !
+m_exception_msg = """
+Unable to create Plane :
+- Select one Line and one Point only
+with the Point NOT on the Line !
 
 Go to Parameter(s) Window in Task Panel!"""
-m_result_msg    = " : Plane created !"
-m_menu_text     = "Plane = (Point, Line)"
-m_accel         = ""
-m_tool_tip      = """<b>Create Plane</b> crossing one Point and one Line.<br>
+m_result_msg = " : Plane created !"
+m_menu_text = "Plane = (Point, Line)"
+m_accel = ""
+m_tool_tip = """<b>Create Plane</b> crossing one Point and one Line.<br>
 ...<br>
+- Select one Line and one Point only<br>
+- Then Click on the Button/Icon<br>
 <i>Click in view window without selection will popup<br>
- - a Warning Window and<br> 
+ - a Warning Window and<br>
  - a Parameter(s) Window in Task Panel!</i>
-""" 
-m_extension      = 100.0
+"""
+###############
+m_macro = "Macro LinePointPlane"
+m_extension = 100.0
 ###############
 
-class LinePointPlanePanel:  
+
+class LinePointPlanePanel:
     def __init__(self):
         self.form = Gui.PySideUic.loadUi(path_WF_ui + m_dialog)
         self.form.setWindowTitle(m_dialog_title)
         self.form.UI_Plane_extension.setText(str(m_extension))
-                        
+
     def accept(self):
         global m_extension
-        m_extension = float(self.form.UI_Plane_extension.text())        
-  
-        if WF.verbose() != 0:
+        m_extension = float(self.form.UI_Plane_extension.text())
+
+        if WF.verbose():
             print_msg("m_extension = " + str(m_extension))
-            
+
         Gui.Control.closeDialog()
         m_actDoc = App.activeDocument()
         if m_actDoc is not None:
             if len(Gui.Selection.getSelectionEx(m_actDoc.Name)) != 0:
                 run()
         return True
-    
+
     def reject(self):
         Gui.Control.closeDialog()
         return False
-    
-    def shouldShow(self):    
-        return (len(Gui.Selection.getSelectionEx(App.activeDocument().Name)) == 0 )   
+
+    def shouldShow(self):
+        return (len(Gui.Selection.getSelectionEx(App.activeDocument().Name)) == 0)
 
 
 def makeLinePointPlaneFeature(group):
-    """ Makes a LinePointPlane parametric feature object. 
+    """ Makes a LinePointPlane parametric feature object.
     into the given Group
     Returns the new object.
-    """ 
+    """
     m_name = "LinePointPlane_P"
-    m_part = "Part::FeaturePython"     
-    
-    try:     
-        m_obj = App.ActiveDocument.addObject(str(m_part),str(m_name))
-        if group != None :
-            addObjectToGrp(m_obj,group,info=1)
+    m_part = "Part::FeaturePython"
+
+    try:
+        m_obj = App.ActiveDocument.addObject(str(m_part), str(m_name))
+        if group is not None:
+            addObjectToGrp(m_obj, group, info=1)
         LinePointPlane(m_obj)
         ViewProviderLinePointPlane(m_obj.ViewObject)
-    except:
-        printError_msg( "Not able to add an object to Model!")
+    except Exception as err:
+        printError_msg("Not able to add an object to Model!")
+        printError_msg(err.args[0], title=m_macro)
         return None
-    
+
     return m_obj
 
 
 class LinePointPlane(WF_Plane):
     """ The LinePointPlane feature object. """
     # this method is mandatory
-    def __init__(self,selfobj):
+    def __init__(self, selfobj):
+        if m_debug:
+            print("running LinePointPlane.__init__ !")
+
         self.name = "LinePointPlane"
         WF_Plane.__init__(self, selfobj, self.name)
         """ Add some custom properties to our LinePointPlane feature object. """
-        selfobj.addProperty("App::PropertyLinkSub","Edge",self.name,
+        selfobj.addProperty("App::PropertyLinkSub",
+                            "Edge",
+                            self.name,
                             "Input edge")
-        selfobj.addProperty("App::PropertyLinkSub","Point",self.name,
+        selfobj.addProperty("App::PropertyLinkSub",
+                            "Point",
+                            self.name,
                             "Input point")
-        m_tooltip = """Extensions of plane in percentage of the Line Length.
-Positive values upper than 100.0 will enlarge the Plane.
-Positive values lower than 100.0 will start to shrink it.""" 
-        selfobj.addProperty("App::PropertyFloat","Extension",self.name,
-                            m_tooltip).Extension=100.0  
+
+        m_tooltip = """Width and Length of the plane in current units."""
+        selfobj.addProperty("App::PropertyFloat",
+                            "Extension",
+                            self.name,
+                            m_tooltip).Extension = m_extension
         # 0 -- default mode, read and write
         # 1 -- read-only
-        # 2 -- hidden 
+        # 2 -- hidden
         selfobj.setEditorMode("Edge", 1)
         selfobj.setEditorMode("Point", 1)
-        selfobj.Proxy = self    
-     
-    # this method is mandatory   
-    def execute(self,selfobj): 
-        """ Print a short message when doing a recomputation. """
-#         if WF.verbose() != 0:
-#             App.Console.PrintMessage("Recompute Python LinePointPlane feature\n")
-        
-        if 'Edge' not in selfobj.PropertiesList:
-            return         
-        if 'Point' not in selfobj.PropertiesList:
-            return 
-        if 'Extension' not in selfobj.PropertiesList:
-            return  
-              
-        if selfobj.Edge != None and selfobj.Point != None :
-            points = []
-            
-            n1 = eval(selfobj.Point[1][0].lstrip('Vertex'))
-            n2 = eval(selfobj.Edge[1][0].lstrip('Edge'))
-#             if WF.verbose() != 0:
-#                 print_msg("n1 = " + str(n1))
-#                 print_msg("n2 = " + str(n2))
-                    
-            try:    
-                point_C = selfobj.Point[0].Shape.Vertexes[n1-1].Point
-                points.append(point_C)
-                  
-                point_A = selfobj.Edge[0].Shape.Edges[n2-1].Vertexes[0].Point
-                point_B = selfobj.Edge[0].Shape.Edges[n2-1].Vertexes[-1].Point
-    
+        selfobj.Proxy = self
+
+    # this method is mandatory
+    def execute(self, selfobj):
+        """ Doing a recomputation.
+        """
+        if m_debug:
+            print("running LinePointPlane.execute !")
+
+        # To be compatible with previous version > 2019
+        if 'Parametric' in selfobj.PropertiesList:
+            # Create the object the first time regardless
+            # the parametric behavior
+            if selfobj.Parametric == 'Not' and self.created:
+                return
+            if selfobj.Parametric == 'Interactive' and self.created:
+                return
+
+        if WF.verbose():
+            m_msg = "Recompute Python LinePointPlane feature\n"
+            App.Console.PrintMessage(m_msg)
+
+        m_PropertiesList = ['Edge',
+                            'Point',
+                            'Extension'
+                            ]
+        for m_Property in m_PropertiesList:
+            if m_Property not in selfobj.PropertiesList:
+                return
+
+        try:
+            Plane = None
+            if selfobj.Edge is not None and selfobj.Point is not None:
+                n1 = eval(selfobj.Point[1][0].lstrip('Vertex'))
+                n2 = eval(selfobj.Edge[1][0].lstrip('Edge'))
+                if m_debug:
+                    print_msg(str(selfobj.Point))
+                    print_msg(str(selfobj.Edge))
+                    print_msg("n1 = " + str(n1))
+                    print_msg("n2 = " + str(n2))
+
+                points = []
+                point_A = selfobj.Edge[0].Shape.Edges[n2 - 1].Vertexes[0].Point
+                point_B = selfobj.Edge[0].Shape.Edges[n2 - 1].Vertexes[-1].Point
+                point_C = selfobj.Point[0].Shape.Vertexes[n1 - 1].Point
+
+                if isEqualVectors(point_A, point_B):
+                    m_msg = """Unable to create Plane from 2 equals Points :
+                    Points 1 and 2 are equals !
+                    """
+                    printError_msg(m_msg, title=m_macro)
+                    return
+
+                if isEqualVectors(point_A, point_C):
+                    m_msg = """Unable to create Plane from 2 equals Points :
+                    Points 1 an 3 are equals !
+                    """
+                    printError_msg(m_msg, title=m_macro)
+                    return
+
+                if isEqualVectors(point_B, point_C):
+                    m_msg = """Unable to create Plane from 2 equals Points :
+                    Points 2 an 3 are equals !
+                    """
+                    printError_msg(m_msg, title=m_macro)
+                    return
+
+                if isColinearVectors(point_A, point_B, point_C, tolerance=1e-12):
+                    printError_msg(m_exception_msg, title=m_macro)
+                    return
                 points.append(point_A)
                 points.append(point_B)
-                
-                if isColinearVectors(point_A, point_B, point_C, tolerance=1e-12):
-                    printError_msg(m_exception_msg, title="Macro LinePointPlane")
-                    return
-                
+                points.append(point_C)
+
                 Vector_Center = meanVectorsPoint(points)
                 xmax, xmin, ymax, ymin, zmax, zmin = minMaxVectorsLimits(points)
-    
-                length = xmax - xmin
-                if (ymax - ymin) > length:
-                    length = ymax - ymin
-                if (zmax - zmin) > length:
-                    length = zmax - zmin
-                if length == 0:
-                    length = 10.0
-                             
-                Edge_Vector = point_B - point_A
-                AC_Vector = point_C - point_A
-                
-                Edge_Length = length
-                if selfobj.Extension == 0.0 :
-                    selfobj.Extension = 100.0
-                if selfobj.Extension < 0.0 :
-                    selfobj.Extension *= -1
-                
-                Edge_Length = length * (selfobj.Extension / 100.0)     
-                
-                Plane_Point  = Vector_Center
-                Plane_Normal = Edge_Vector.cross( AC_Vector )
-                            
-                Plane_face = Part.makePlane(Edge_Length, Edge_Length, 
-                                            Plane_Point, Plane_Normal )
-                Plane_Center = Plane_face.CenterOfMass
-                Plane_Translate =  Plane_Point - Plane_Center
-                Plane_face.translate( Plane_Translate )
-                selfobj.Shape = Plane_face
-                
-                propertiesPlane(selfobj.Label)
-            except:
-                pass
-                
-                
+
+                Vector21 = point_B - point_A
+                Vector31 = point_C - point_A
+                Plane_Point = Vector_Center
+                Plane_Normal = Vector21.cross(Vector31)
+
+                Edge_Length = selfobj.Extension
+                Plane = Part.makePlane(Edge_Length,
+                                       Edge_Length,
+                                       Plane_Point,
+                                       Plane_Normal)
+                Plane_Center = Plane.CenterOfMass
+                Plane_Translate = Plane_Point - Plane_Center
+                Plane.translate(Plane_Translate)
+
+            if Plane is not None:
+                selfobj.Shape = Plane
+                propertiesPlane(selfobj.Label, self.color)
+                selfobj.Point1_X = float(point_A.x)
+                selfobj.Point1_Y = float(point_A.y)
+                selfobj.Point1_Z = float(point_A.z)
+                selfobj.Point2_X = float(point_B.x)
+                selfobj.Point2_Y = float(point_B.y)
+                selfobj.Point2_Z = float(point_B.z)
+                selfobj.Point3_X = float(point_C.x)
+                selfobj.Point3_Y = float(point_C.y)
+                selfobj.Point3_Z = float(point_C.z)
+                # To be compatible with previous version 2018
+                if 'Parametric' in selfobj.PropertiesList:
+                    self.created = True
+        except Exception as err:
+            printError_msg(err.args[0], title=m_macro)
+
     def onChanged(self, selfobj, prop):
         """ Print the name of the property that has changed """
         # Debug mode
-        if WF.verbose() != 0:
+        if WF.verbose():
             App.Console.PrintMessage("Change property : " + str(prop) + "\n")
-        
-        if 'parametric' in selfobj.PropertiesList:
-            if selfobj.parametric == 'Not' :
-                selfobj.setEditorMode("Extension", 1)
-            else :
-                selfobj.setEditorMode("Extension", 0)
-            
-        if prop == "Extension":            
+
+        if m_debug:
+            print("running LinePointPlane.onChanged !")
+
+        WF_Plane.onChanged(self, selfobj, prop)
+
+        if prop == "Parametric":
+            if 'Parametric' in selfobj.PropertiesList:
+                if selfobj.Parametric == 'Not':
+                    selfobj.setEditorMode("Extension", 1)
+                else:
+                    selfobj.setEditorMode("Extension", 0)
+            propertiesPlane(selfobj.Label, self.color)
+
+        if prop == "Extension":
             selfobj.Proxy.execute(selfobj)
 
-        WF_Plane.onChanged(self, selfobj, prop)   
-    
-            
+
 class ViewProviderLinePointPlane:
     global path_WF_icons
-    icon = '/WF_linePointPlane.svg'  
-    def __init__(self,vobj):
+    icon = '/WF_linePointPlane.svg'
+
+    def __init__(self, vobj):
         """ Set this object to the proxy object of the actual view provider """
         vobj.Proxy = self
-    
-    # this method is mandatory    
-    def attach(self, vobj): 
+
+    # this method is mandatory
+    def attach(self, vobj):
         self.ViewObject = vobj
         self.Object = vobj.Object
-  
-    def setEdit(self,vobj,mode):
+
+    def setEdit(self, vobj, mode):
         return False
-    
-    def unsetEdit(self,vobj,mode):
+
+    def unsetEdit(self, vobj, mode):
         return
 
     def __getstate__(self):
         return None
 
-    def __setstate__(self,state):
+    def __setstate__(self, state):
         return None
-    
+
     # subelements is a tuple of strings
-    def onDelete(self, feature, subelements): 
+    def onDelete(self, feature, subelements):
         return True
-    
+
     # This method is optional and if not defined a default icon is shown.
-    def getIcon(self):        
+    def getIcon(self):
         """ Return the icon which will appear in the tree view. """
         return (path_WF_icons + ViewProviderLinePointPlane.icon)
-           
-    def setIcon(self, icon = '/WF_linePointPlane.svg'):
+
+    def setIcon(self, icon='/WF_linePointPlane.svg'):
         ViewProviderLinePointPlane.icon = icon
-  
-            
+
+
 class CommandLinePointPlane:
     """ Command to create LinePointPlane feature object. """
     def GetResources(self):
-        return {'Pixmap'  : path_WF_icons + m_icon,
+        return {'Pixmap': path_WF_icons + m_icon,
                 'MenuText': m_menu_text,
-                'Accel'   : m_accel,
-                'ToolTip' : m_tool_tip}
+                'Accel': m_accel,
+                'ToolTip': m_tool_tip}
 
     def Activated(self):
         m_actDoc = App.activeDocument()
@@ -308,12 +363,13 @@ class CommandLinePointPlane:
                 Gui.Control.showDialog(LinePointPlanePanel())
 
         run()
-        
+
     def IsActive(self):
         if App.ActiveDocument:
             return True
         else:
             return False
+
 
 if App.GuiUp:
     Gui.addCommand("LinePointPlane", CommandLinePointPlane())
@@ -321,48 +377,68 @@ if App.GuiUp:
 
 def run():
     m_sel, _ = getSel(WF.verbose())
-      
-    try:        
-        Number_of_Edges, Edge_List = m_sel.get_segmentsNames(getfrom=["Segments","Curves","Planes","Objects"])        
-        Number_of_Vertexes, Vertex_List = m_sel.get_pointsNames(getfrom=["Points","Curves","Objects"])
-        
-        if WF.verbose() != 0:
+
+    try:
+        Number_of_Edges, Edge_List = m_sel.get_segmentsNames(
+            getfrom=["Segments",
+                     "Curves",
+                     "Planes",
+                     "Objects"])
+        Number_of_Vertexes, Vertex_List = m_sel.get_pointsNames(
+            getfrom=["Points",
+                     "Curves",
+                     "Objects"])
+
+        if WF.verbose():
             print_msg("Number_of_Edges = " + str(Number_of_Edges))
-            print_msg("Edge_List = " + str(Edge_List))        
+            print_msg("Edge_List = " + str(Edge_List))
             print_msg("Number_of_Vertexes = " + str(Number_of_Vertexes))
             print_msg("Vertex_List = " + str(Vertex_List))
-                
+
         if Number_of_Edges < 1:
             raise Exception(m_exception_msg)
         if Number_of_Vertexes < 1:
             raise Exception(m_exception_msg)
+
         try:
             m_main_dir = "WorkPlanes_P"
-            m_sub_dir  = "Set"    
+            m_sub_dir = "Set001"
             m_group = createFolders(str(m_main_dir))
-            
+            m_error_msg = "Could not Create '"
+            m_error_msg += str(m_sub_dir) + "' Objects Group!"
+
             # Create a sub group if needed
             # To develop
-            
-            if WF.verbose() != 0:
-                print_msg("Group = " + str(m_group.Label))
-                               
-            edge = Edge_List[0]
-            vertex =  Vertex_List [0] 
-               
-            App.ActiveDocument.openTransaction("Macro LinePointPlane")
-            selfobj = makeLinePointPlaneFeature(m_group)    
-            selfobj.Edge      = edge
-            selfobj.Point     = vertex
-            selfobj.Extension = m_extension
-            selfobj.Proxy.execute(selfobj)
-                       
-        finally:
-            App.ActiveDocument.commitTransaction()
-            
-    except Exception as err:
-        printError_msg(err.message, title="Macro LinePointPlane")
 
-                           
+            if WF.verbose():
+                print_msg("Group = " + str(m_group.Label))
+
+            # Case of only 1 point and 1 Edge
+            if Number_of_Edges == 1 and Number_of_Vertexes == 1:
+                edge = Edge_List[0]
+                vertex = Vertex_List[0]
+
+                if WF.verbose():
+                    print_msg("edge = " + str(edge))
+                    print_msg("vertex = " + str(vertex))
+
+                App.ActiveDocument.openTransaction(m_macro)
+                selfobj = makeLinePointPlaneFeature(m_group)
+                selfobj.Edge = edge
+                selfobj.Point = vertex
+                selfobj.Extension = m_extension
+                selfobj.Proxy.execute(selfobj)
+            else:
+                raise Exception(m_exception_msg)
+
+        except Exception as err:
+            printError_msg(err.args[0], title=m_macro)
+
+        App.ActiveDocument.commitTransaction()
+
+    except Exception as err:
+        printError_msg(err.args[0], title=m_macro)
+
+
 if __name__ == '__main__':
     run()

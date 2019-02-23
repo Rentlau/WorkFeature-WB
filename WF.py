@@ -167,7 +167,8 @@ def set_parametric(value):
     """ Sets the parametric index to WF user settings
     """
     setParam("parametric", value)
-    
+
+
 def pointSize():
     """ Returns the point size from WF user settings
     """
@@ -179,7 +180,7 @@ def set_pointSize(value):
     """
     setParam("pointSize", value)
 
-    
+
 def lineThickness():
     """ Returns the line thickness from WF user settings
     """
@@ -202,14 +203,14 @@ def set_linelinePointSize(value):
     """ Sets the line point size to WF user settings
     """
     setParam("linePointSize", value)
-    
-    
+
+
 def closePolyline():
     """ Returns the close polyline value from WF user settings
     """
     return getParam("closePolyline", False)
 
-       
+
 def tolerance():
     """ Returns the tolerance from WF user settings
     """

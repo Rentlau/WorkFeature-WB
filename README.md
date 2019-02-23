@@ -5,7 +5,7 @@
 
 <center>by Rentlau_64</center>
 
-Updated in January 2019
+Updated in February 2019
 
 
 
@@ -118,6 +118,16 @@ The **"Parametric"** property of objects can have any of the following behavior 
 - **Interactive** : Update only when user asks for (click on **`Update`** Button).
 - **Dynamic** : Update each time one of parents change.
 
+A color code regarding the **"Parametric"** property is used:
+
+| | |
+|:------|:------|
+|**Not** parametric color | ![alt](./Resources/Icons/WF_pointNot.svg) |
+|**Interactive** parametric color | ![alt](./Resources/Icons/WF_pointInteractive.svg) |
+|**Dynamic** parametric color | ![alt](./Resources/Icons/WF_pointDynamic.svg?1) |
+
+The **"Parametric"** property can be changed for each single object in his **Data** panel:
+
 ![alt](./Doc/Images/Parametric.png?1)
 
 | Name                           | Icon  |
@@ -142,7 +152,7 @@ Functions are organised by sub menus:
 | **WF General** | ![alt](./Doc/Images/WF_General.png) |
 | **WF Points** | ![alt](./Doc/Images/WF_Points.png?2) |
 | **WF Lines** | ![alt](./Doc/Images/WF_Lines.png) |
-| **WF Planes** | ![alt](./Doc/Images/WF_Planes.png) |
+| **WF Planes** | ![alt](./Doc/Images/WF_Planes.png?2) |
 
  - WF_General:
 
@@ -162,7 +172,7 @@ Functions are organised by sub menus:
 |![alt](./Resources/Icons/WF_extremaLinePoint.svg)  | Create Point(s) at edges of selected Line(s).|
 |![alt](./Resources/Icons/WF_nPointsPoint.svg)  | Create a Point at MEAN location of all selected points.|
 |![alt](./Resources/Icons/WF_centerCirclePoint.svg)  | Create Point(s) at center location of selected Circle(s). **<span style="color:red">NOT YET DEV in 2019 release!</span>** |
-|![alt](./Resources/Icons/WF_centerFacePoint.svg)  | Create Point(s) at center location of selected Plane(s). |
+|![alt](./Resources/Icons/WF_centerFacePoint.svg)  | Create Point(s) at center of mass location of selected Plane(s). |
 
 - WF_Lines sub menu :
 
@@ -176,7 +186,7 @@ Functions are organised by sub menus:
 | Icon                           | Function  |
 |:------|:------|
 |![alt](./Resources/Icons/WF_threePointsPlane.svg)  | Create a Plane from three selected Points.|
-|![alt](./Resources/Icons/WF_linePointPlane.svg)  | Create Plane(s) crossing a Point and a Line. **<span style="color:red">NOT YET DEV in 2019 release!</span>**|
+|![alt](./Resources/Icons/WF_linePointPlane.svg)  | Create Plane(s) crossing a Point and a Line.|
 |![alt](./Resources/Icons/WF_perpendicularLinePointPlane.svg)  | Create Planes(s) crossing a Point and perpendicular to a Line. **<span style="color:red">NOT YET DEV in 2019 release!</span>**|
 
 [[back to top](#Sections)]
@@ -245,6 +255,22 @@ Tool utility that creates:
 
     A - FreeCAD 0.16.6712  : Not Yet
     B - FreeCAD 0.17.13142 : Not yet
+    
+    C - FreeCAD_0.18.15671_Conda_Py3Qt5_glibc2.12-x86_64.AppImage : ok
+    
+    OS: Ubuntu 18.04.2 LTS
+    Word size of OS: 64-bit
+    Word size of FreeCAD: 64-bit
+    Version: 0.18.15671 (Git) AppImage
+    Build type: Release
+    Branch: master
+    Hash: 28cbe2bd8986701bb7404842cf60138957e23ed6
+    Python version: 3.6.7
+    Qt version: 5.6.2
+    Coin version: 4.0.0a
+    OCC version: 7.3.0
+    Locale: French/France (fr_FR)
+
 
 ### Tested on Windows
     A - FreeCAD 0.16.6706 : Not Yet

@@ -32,7 +32,7 @@
         </size>
        </property>
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Extensions of plane in percentage of the Line Length.&lt;/p&gt;&lt;p&gt;Positive values upper than 100.0 will enlarge the Plane.&lt;/p&gt;&lt;p&gt;Positive values lower than 100.0 will start to shrink it.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Width and Length of the plane in current units.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>100.0</string>

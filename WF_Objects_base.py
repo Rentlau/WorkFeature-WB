@@ -29,7 +29,6 @@
 *   If not, see <https://www.gnu.org/licenses/>                           *
 ***************************************************************************
 """
-
 import sys
 import FreeCAD as App
 import WF
@@ -78,8 +77,18 @@ regarding parent changes.
                             self.name,
                             m_tooltip)
 
-        selfobj.Parametric = [v.encode('utf8') for v in WF_ParametricList]
-        selfobj.Parametric = 'Dynamic'.encode('utf8')
+        if (sys.version_info > (3, 0)):
+            # Python 3 code in this block
+            # import base64
+            # return base64.b64encode(data).decode()
+            selfobj.Parametric = [v.encode('utf8').decode('utf-8') for v in WF_ParametricList]
+            selfobj.Parametric = 'Dynamic'.encode('utf8').decode('utf-8')
+        else:
+            # Python 2 code in this block
+            # return data.encode("base64")
+            selfobj.Parametric = [v.encode('utf8') for v in WF_ParametricList]
+            selfobj.Parametric = 'Dynamic'.encode('utf8')
+
         selfobj.Parametric = WF.parametric()
         # obj.setEditorMode("MyPropertyName", mode)
         # 0 -- default mode, read and write
@@ -274,21 +283,22 @@ class WF_Plane(WF_Object):
     def onChanged(self, selfobj, prop):
         WF_Object.onChanged(self, selfobj, prop)
 
-class WF_Plane2(WF_Point, WF_Line):
-    """ The Plane WF object. """
-    # this method is mandatory
-    def __init__(self, selfobj, name):
-        if m_debug:
-            print("running WF_Plane.__init__ !")
-        WF_Point.__init__(self, selfobj)
-        WF_Line.__init__(self, selfobj)
-        # Add some custom properties to our Plane WF object.
 
-    # this method is mandatory
-    def execute(self, selfobj):
-        if m_debug:
-            print("running WF_Plane.execute !")
-        pass
-
-    def onChanged(self, selfobj, prop):
-        WF_Object.onChanged(self, selfobj, prop)
+# class WF_Plane2(WF_Point, WF_Line):
+#     """ The Plane WF object. """
+#     # this method is mandatory
+#     def __init__(self, selfobj, name):
+#         if m_debug:
+#             print("running WF_Plane.__init__ !")
+#         WF_Point.__init__(self, selfobj)
+#         WF_Line.__init__(self, selfobj)
+#         # Add some custom properties to our Plane WF object.
+# 
+#     # this method is mandatory
+#     def execute(self, selfobj):
+#         if m_debug:
+#             print("running WF_Plane.execute !")
+#         pass
+# 
+#     def onChanged(self, selfobj, prop):
+#         WF_Object.onChanged(self, selfobj, prop)
