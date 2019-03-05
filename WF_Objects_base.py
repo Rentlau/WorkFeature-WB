@@ -120,6 +120,8 @@ regarding parent changes.
                 App.Console.PrintMessage(m_msg)
                 m_msg = "New color : " + str(self.color) + "\n"
                 App.Console.PrintMessage(m_msg)
+        if m_debug:
+            print("running WF_Object.onChanged done!")
 
 
 class WF_Point(WF_Object):

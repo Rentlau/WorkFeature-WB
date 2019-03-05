@@ -397,6 +397,27 @@ if App.GuiUp:
     Gui.addCommand("TwoPointsLine", CommandTwoPointsLine())
 
 
+def buildFromOnePointAndOneObject(vertex1, object1, group):
+    try:
+        if WF.verbose():
+            print_msg("vertex1 = " + str(vertex1))
+            print_msg("object1 = " + str(object1))
+
+        App.ActiveDocument.openTransaction("Macro TwoPointsLine")
+        selfobj = makeTwoPointsLineFeature(group)
+        selfobj.Point1 = vertex1
+        selfobj.Point2 = [object1, "Vertex1"]
+        selfobj.Extension = 0.0
+        selfobj.Proxy.execute(selfobj)
+        try:
+            Gui.ActiveDocument.getObject(selfobj.Label).DrawStyle = "Dotted"
+        except Exception as err:
+            printError_msg(err.args[0], title="Macro TwoPointsLine")
+            print_msg("Not able to set DrawStyle !")
+    except Exception as err:
+        printError_msg(err.args[0], title="Macro TwoPointsLine")
+
+
 def run():
     m_sel, m_actDoc = getSel(WF.verbose())
 

@@ -102,7 +102,10 @@ of each selected Line(s).<br>
 ###############
 m_macro = "Macro ExtremaLinePoint"
 m_location = "Both ends"
-m_locationList = ["Begin", "End", "Both ends"]
+m_locationList = ["Begin",
+                  "End",
+                  # "Both ends"
+                  ]
 ###############
 
 
@@ -178,11 +181,11 @@ relative to the parent Line.
         if (sys.version_info > (3, 0)):
             # Python 3 code in this block
             selfobj.At = [v.encode('utf8').decode('utf-8') for v in m_locationList]
-            selfobj.At = 'Both ends'.encode('utf8').decode('utf-8')
+            selfobj.At = 'Begin'.encode('utf8').decode('utf-8')
         else:
             # Python 2 code in this block
             selfobj.At = [v.encode('utf8') for v in m_locationList]
-            selfobj.At = 'Both ends'.encode('utf8')
+            selfobj.At = 'Begin'.encode('utf8')
 
         selfobj.setEditorMode("Edge", 1)
 

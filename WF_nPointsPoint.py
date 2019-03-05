@@ -47,7 +47,7 @@ Macro NPointsPoint.
 Creates a parametric NPointsPoint from a list of Points
 '''
 ###############
-m_debug = True
+m_debug = False
 ###############
 
 # get the path of the current python script
@@ -67,6 +67,7 @@ try:
     from WF_print import printError_msg, print_msg
     from WF_directory import createFolders, addObjectToGrp
     from WF_geometry import *
+    from WF_utils import *
 except ImportError:
     print("ERROR: Cannot load WF modules !")
     sys.exit(1)
@@ -104,20 +105,20 @@ m_macro = "Macro NPointsPoint"
 ###############
 
 
-def linkSubList_convertToOldStyle(references):
-    """("input: [(obj1, (sub1, sub2)), (obj2, (sub1, sub2))]\n"
-    "output: [(obj1, sub1), (obj1, sub2), (obj2, sub1), (obj2, sub2)]")"""
-    result = []
-    for tup in references:
-        if type(tup[1]) is tuple or type(tup[1]) is list:
-            for subname in tup[1]:
-                result.append((tup[0], subname))
-            if len(tup[1]) == 0:
-                result.append((tup[0], ''))
-        else:
-            # old style references, no conversion required
-            result.append(tup)
-    return result
+# def linkSubList_convertToOldStyle(references):
+#     """("input: [(obj1, (sub1, sub2)), (obj2, (sub1, sub2))]\n"
+#     "output: [(obj1, sub1), (obj1, sub2), (obj2, sub1), (obj2, sub2)]")"""
+#     result = []
+#     for tup in references:
+#         if type(tup[1]) is tuple or type(tup[1]) is list:
+#             for subname in tup[1]:
+#                 result.append((tup[0], subname))
+#             if len(tup[1]) == 0:
+#                 result.append((tup[0], ''))
+#         else:
+#             # old style references, no conversion required
+#             result.append(tup)
+#     return result
 
 
 class NPointsPointPanel:

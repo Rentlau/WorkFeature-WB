@@ -86,7 +86,11 @@ On Windows most of the time the place all your extra workbench add-ons are insta
 - <b>Freecad</b> >= v0.15
 - <b>Numpy</b> is a required dependency (numpy >= v1.14.3).
 
-The development of the macro is still currently done with Python2.7 (so this addon is not py3 compatible (yet) and may not work well in FreeCAD >= v0.18).
+The development of the macro was originaly done with Python2.7.
+
+The project is now developped under Python 3.6.
+
+So this addon start to be py3 compatible and may work in FreeCAD >= v0.18.
 
 Please "[Open an issue](https://github.com/Rentlau/WorkFeature-WB/issues)", if you detect any problem.
 
@@ -124,7 +128,7 @@ A color code regarding the **"Parametric"** property is used:
 |:------|:------|
 |**Not** parametric color | ![alt](./Resources/Icons/WF_pointNot.svg) |
 |**Interactive** parametric color | ![alt](./Resources/Icons/WF_pointInteractive.svg) |
-|**Dynamic** parametric color | ![alt](./Resources/Icons/WF_pointDynamic.svg?1) |
+|**Dynamic** parametric color | ![alt](./Resources/Icons/WF_pointDynamic.svg) |
 
 The **"Parametric"** property can be changed for each single object in his **Data** panel:
 

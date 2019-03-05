@@ -89,6 +89,7 @@ class WorkFeatureWorkbenchDev(Workbench):
             import WF_nPointsPoint
             # import WF_centerCirclePoint
             import WF_centerFacePoint
+            import WF_projectedPoint
             # import WF_pointFacePoint
             # import WF_lineFacePoint
 
@@ -129,6 +130,7 @@ class WorkFeatureWorkbenchDev(Workbench):
                                     "CenterFacePoint",
                                     # "PointFacePoint",
                                     # "LineFacePoint",
+                                    "ProjectedPoint"
                                     ]
         self.appendCommandbar("Points", self.Point_commands_list)
         self.appendMenu(self.Point_menu, self.Point_commands_list)
