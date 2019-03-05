@@ -270,8 +270,8 @@ class Selection():
                 for m_subobj in m_obj.SubObjects:
                     if m_debug:
                         print("m_subobj = " + str(m_subobj))
-                    if issubclass(type(m_subobj),
-                                  Part.Face) and "Planes" in getfrom:
+
+                    if issubclass(type(m_subobj), Part.Face) and "Planes" in getfrom:
                         m_i = 0
                         for m_v in m_subobj.Vertexes:
                             m_i_in_list = find(m_v, m_obj.Object.Shape)
@@ -279,6 +279,13 @@ class Selection():
                                                       "Vertex" + str(m_i_in_list)])
                             m_i += 1
                         # m_i = 0
+                    if issubclass(type(m_subobj), Part.Edge):
+                        m_i = 0
+                        for m_v in m_subobj.Vertexes:
+                            m_i_in_list = find(m_v, m_obj.Object.Shape)
+                            Selected_Entities.append([m_obj.Object,
+                                                      "Vertex" + str(m_i_in_list)])
+                            m_i += 1
                     if issubclass(type(m_subobj), Part.Vertex):
                         Selected_Entities.append([m_obj.Object,
                                                   m_obj.SubElementNames[m_i]])
@@ -286,16 +293,14 @@ class Selection():
             else:
                 m_i = 0
 
-                if issubclass(type(m_shape),
-                              Part.Vertex) and "Points" in getfrom:
+                if issubclass(type(m_shape), Part.Vertex) and "Points" in getfrom:
                     if hasattr(m_shape, 'Vertexes'):
                         for m_v in m_shape.Vertexes:
                             Selected_Entities.append([m_obj.Object,
                                                       "Vertex" + str(m_i)])
                             m_i += 1
 
-                if issubclass(type(m_shape),
-                              Part.Wire) and "Curves" or "Segments" in getfrom:
+                if issubclass(type(m_shape), Part.Wire) and "Curves" or "Segments" in getfrom:
                     if hasattr(m_shape, 'Vertexes'):
                         if self.__numberOfObjects == 2:
                             if m_obj == self.__selEx[0]:

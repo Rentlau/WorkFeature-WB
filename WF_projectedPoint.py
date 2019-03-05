@@ -258,7 +258,6 @@ class ProjectedPoint(WF_Point):
             if m_debug:
                 print_msg("selfobj.Point = " + str(selfobj.Point))
                 print_msg("selfobj.Plane = " + str(selfobj.Plane))
-                # print_msg("selfobj.Show = " + str(selfobj.Show))
 
             if selfobj.Point is not None:
                 n = eval(selfobj.Point[1][0].lstrip('Vertex'))
@@ -430,6 +429,7 @@ def run():
     try:
         Number_of_Vertexes, Vertex_List = m_sel.get_pointsNames(
             getfrom=["Points",
+                     "Segments",
                      "Curves",
                      "Planes",
                      "Objects"
