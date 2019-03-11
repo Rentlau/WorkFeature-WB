@@ -37,7 +37,7 @@ Post on FreeCAD Forum : https://forum.freecadweb.org/viewtopic.php?f=9&t=27195
 
 <img src="./Doc/Images/Title02.png?1">
 
-<b>Version 2019-03-05-dev</b> 
+<b>Version 2019-03-11-dev</b> 
 
 [[back to top](#Sections)]
 
@@ -158,9 +158,9 @@ Functions are organised by sub menus:
 | Name                           | Icons  |
 |:------|:------|
 | **WF General** | ![alt](./Doc/Images/WF_General.png) |
-| **WF Points** | ![alt](./Doc/Images/WF_Points.png?2) |
+| **WF Points** | ![alt](./Doc/Images/WF_Points.png) |
 | **WF Lines** | ![alt](./Doc/Images/WF_Lines.png) |
-| **WF Planes** | ![alt](./Doc/Images/WF_Planes.png?2) |
+| **WF Planes** | ![alt](./Doc/Images/WF_Planes.png) |
 
  - WF_General:
 
