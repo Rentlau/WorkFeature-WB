@@ -6,156 +6,216 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>364</width>
-    <height>132</height>
+    <width>509</width>
+    <height>720</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_2">
+  <layout class="QGridLayout" name="gridLayout_3">
    <item row="0" column="0">
-    <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="0">
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QLabel" name="UI_ExtremaLinePoint_label_2">
-         <property name="text">
-          <string>Line(s) selected will be cut in </string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QSpinBox" name="UI_CenterLinePoint_spin_numberLinePart">
-         <property name="minimumSize">
-          <size>
-           <width>60</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>50</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number indicates in how many &lt;span style=&quot; font-weight:600;&quot;&gt;Parts&lt;/span&gt; each selected parent Lines(s) will be cut in (Max 100).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="minimum">
-          <number>2</number>
-         </property>
-         <property name="maximum">
-          <number>100</number>
-         </property>
-         <property name="singleStep">
-          <number>1</number>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="UI_ExtremaLinePoint_label_3">
-         <property name="text">
-          <string>parts</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="1" column="0">
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <item>
-          <widget class="QLabel" name="UI_ExtremaLinePoint_label">
-           <property name="text">
-            <string>Point(s) will be located at</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="UI_CenterLinePoint_checkBox">
-           <property name="text">
-            <string>all part's ends</string>
-           </property>
-           <property name="autoExclusive">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_2">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item>
-          <widget class="QLabel" name="UI_ExtremaLinePoint_label_4">
-           <property name="text">
-            <string>or at part's end number</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="UI_CenterLinePoint_spin_indexPart">
-           <property name="minimumSize">
-            <size>
-             <width>60</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>50</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The location of the point : 1/2 means middle of the segment !&lt;/p&gt;&lt;p&gt;The number indicates at which &lt;span style=&quot; font-weight:600;&quot;&gt;part's end&lt;/span&gt; the point will be located.&lt;/p&gt;&lt;p&gt;- If the Number of parts is&lt;span style=&quot; font-weight:600;&quot;&gt; 2&lt;/span&gt; and Point at part's end &lt;span style=&quot; font-weight:600;&quot;&gt;1&lt;/span&gt;,&lt;/p&gt;&lt;p&gt;this means that the point will be located in the &lt;span style=&quot; font-weight:600;&quot;&gt;middle&lt;/span&gt; of the Line.&lt;/p&gt;&lt;p&gt;- If the Number of parts is &lt;span style=&quot; font-weight:600;&quot;&gt;2&lt;/span&gt; and Point at part's end &lt;span style=&quot; font-weight:600;&quot;&gt;2&lt;/span&gt;, &lt;/p&gt;&lt;p&gt;this means that the point will be located in the &lt;span style=&quot; font-weight:600;&quot;&gt;end&lt;/span&gt; of the Line.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Negative value are allowed&lt;/p&gt;&lt;p&gt;Limits : [-1000:1000]&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="minimum">
-            <number>-1000</number>
-           </property>
-           <property name="maximum">
-            <number>1000</number>
-           </property>
-           <property name="singleStep">
-            <number>1</number>
-           </property>
-           <property name="value">
-            <number>1</number>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </item>
-    </layout>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Numbers of Parts : n</string>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="UI_ExtremaLinePoint_label_2">
+          <property name="text">
+           <string>Line(s) selected will be cut in </string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="UI_CenterLinePoint_spin_numberLinePart">
+          <property name="minimumSize">
+           <size>
+            <width>60</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>50</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This number indicates in how many &lt;span style=&quot; font-weight:600;&quot;&gt;Parts&lt;/span&gt; each selected parent Lines(s) will be cut in (Max 100).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="minimum">
+           <number>2</number>
+          </property>
+          <property name="maximum">
+           <number>100</number>
+          </property>
+          <property name="singleStep">
+           <number>1</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="UI_ExtremaLinePoint_label_3">
+          <property name="text">
+           <string>parts</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Point's location</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QLabel" name="UI_ExtremaLinePoint_label">
+            <property name="text">
+             <string>Point(s) will be located at</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="UI_CenterLinePoint_checkBox">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked then one point will be created at each ends of &lt;span style=&quot; font-weight:600;&quot;&gt;Parts.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Even at extrema!&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Ie&lt;/span&gt; : if the number of &lt;span style=&quot; font-weight:600;&quot;&gt;Parts&lt;/span&gt; is &lt;span style=&quot; font-weight:600;&quot;&gt;3&lt;/span&gt; then &lt;span style=&quot; font-weight:600;&quot;&gt;5&lt;/span&gt; points will be created!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>all part's ends</string>
+            </property>
+            <property name="autoExclusive">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QLabel" name="UI_ExtremaLinePoint_label_4">
+            <property name="text">
+             <string>or at part's end number</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="UI_CenterLinePoint_spin_indexPart">
+            <property name="minimumSize">
+             <size>
+              <width>60</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>50</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This number indicates at which &lt;span style=&quot; font-weight:600;&quot;&gt;part's end&lt;/span&gt; point(s) will be located.&lt;/p&gt;&lt;p&gt;- If the Number of &lt;span style=&quot; font-weight:600;&quot;&gt;Parts&lt;/span&gt; is&lt;span style=&quot; font-weight:600;&quot;&gt; 2&lt;/span&gt; and &lt;span style=&quot; font-weight:600;&quot;&gt;part's end number&lt;/span&gt; is &lt;span style=&quot; font-weight:600;&quot;&gt;1&lt;/span&gt;, this means that the point will be located in the &lt;span style=&quot; font-weight:600;&quot;&gt;middle&lt;/span&gt; of the Line, &lt;span style=&quot; font-weight:600;&quot;&gt;1&lt;/span&gt;/&lt;span style=&quot; font-weight:600;&quot;&gt;2&lt;/span&gt; means &lt;span style=&quot; font-weight:600;&quot;&gt;middle&lt;/span&gt; of the segment !&lt;/p&gt;&lt;p&gt;- If the Number of&lt;span style=&quot; font-weight:600;&quot;&gt; Part&lt;/span&gt;s is &lt;span style=&quot; font-weight:600;&quot;&gt;2&lt;/span&gt; and &lt;span style=&quot; font-weight:600;&quot;&gt;part's end number&lt;/span&gt; is &lt;span style=&quot; font-weight:600;&quot;&gt;2&lt;/span&gt;, this means that the point will be located in the &lt;span style=&quot; font-weight:600;&quot;&gt;end&lt;/span&gt; of the Line, &lt;span style=&quot; font-weight:600;&quot;&gt;2&lt;/span&gt;/&lt;span style=&quot; font-weight:600;&quot;&gt;2&lt;/span&gt; means&lt;span style=&quot; font-weight:600;&quot;&gt; end&lt;/span&gt; of the segment !&lt;/p&gt;&lt;p&gt;- If the Number of&lt;span style=&quot; font-weight:600;&quot;&gt; Part&lt;/span&gt;s is &lt;span style=&quot; font-weight:600;&quot;&gt;2&lt;/span&gt; and &lt;span style=&quot; font-weight:600;&quot;&gt;part's end number&lt;/span&gt; is &lt;span style=&quot; font-weight:600;&quot;&gt;0&lt;/span&gt;, this means that the point will be located in the &lt;span style=&quot; font-weight:600;&quot;&gt;start&lt;/span&gt; of the Line, &lt;span style=&quot; font-weight:600;&quot;&gt;0&lt;/span&gt;/&lt;span style=&quot; font-weight:600;&quot;&gt;2&lt;/span&gt; means&lt;span style=&quot; font-weight:600;&quot;&gt; start&lt;/span&gt; of the segment !&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;1&lt;/span&gt;/&lt;span style=&quot; font-weight:600;&quot;&gt;3&lt;/span&gt; means &lt;span style=&quot; font-weight:600;&quot;&gt;first third&lt;/span&gt; of the segment !&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Negative values are allowed&lt;/p&gt;&lt;p&gt;Limits : [-1000:1000]&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="minimum">
+             <number>-1000</number>
+            </property>
+            <property name="maximum">
+             <number>1000</number>
+            </property>
+            <property name="singleStep">
+             <number>1</number>
+            </property>
+            <property name="value">
+             <number>1</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QTextBrowser" name="textBrowser">
+     <property name="html">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Create Point(s)&lt;/span&gt; at Center location of each selected &lt;span style=&quot; font-weight:600;&quot;&gt;Line/Edge&lt;/span&gt;(s) .&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Cut each selected &lt;span style=&quot; font-weight:600;&quot;&gt;Line/Edge&lt;/span&gt;(s) in 2 (n) &lt;span style=&quot; font-weight:600;&quot;&gt;Parts&lt;/span&gt; and&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;create a (n-1) Point(s) along selected &lt;span style=&quot; font-weight:600;&quot;&gt;Line/Edge&lt;/span&gt;(s).&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline;&quot;&gt;Number of Parts&lt;/span&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt; : &lt;/span&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline;&quot;&gt;n&lt;/span&gt; (2 by default)&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The number (n) indicates in how many &lt;span style=&quot; font-weight:600;&quot;&gt;Parts&lt;/span&gt; each selected parent &lt;span style=&quot; font-weight:600;&quot;&gt;Line/Edge&lt;/span&gt;(s) will be cut in.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Limits : (Min: 2, Max: 100).&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline;&quot;&gt;Point's location:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If &lt;span style=&quot; font-style:italic; text-decoration: underline;&quot;&gt;check box&lt;/span&gt; checked then points will be created at each ends of &lt;span style=&quot; font-weight:600;&quot;&gt;Parts. &lt;/span&gt;Even at extrema!&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Ie&lt;/span&gt; : if &lt;span style=&quot; font-weight:600;&quot;&gt;Number of Parts&lt;/span&gt; is &lt;span style=&quot; font-weight:600;&quot;&gt;3&lt;/span&gt; then &lt;span style=&quot; font-weight:600;&quot;&gt;5&lt;/span&gt; points will be created!&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic; text-decoration: underline;&quot;&gt;Part's end&lt;/span&gt;&lt;span style=&quot; font-weight:600; font-style:italic; text-decoration: underline;&quot;&gt; &lt;/span&gt;&lt;span style=&quot; font-style:italic; text-decoration: underline;&quot;&gt;number&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The number indicates at which &lt;span style=&quot; font-weight:600;&quot;&gt;part's end &lt;/span&gt;the point will be located.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- If the Number of parts is &lt;span style=&quot; font-weight:600;&quot;&gt;2&lt;/span&gt; and Point at part's end &lt;span style=&quot; font-weight:600;&quot;&gt;1&lt;/span&gt;,&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;this means that the point will be located in the middle of the Line.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;1/2 means middle of the segment !&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- If the Number of parts is &lt;span style=&quot; font-weight:600;&quot;&gt;2&lt;/span&gt; and Point at part's end &lt;span style=&quot; font-weight:600;&quot;&gt;2&lt;/span&gt;,&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;this means that the point will be located in the end of the Line.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; Limits : [-1000:1000]. Negative value are allowed.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;span style=&quot; font-style:italic; text-decoration: underline;&quot;&gt;check box&lt;/span&gt; and &lt;span style=&quot; font-style:italic; text-decoration: underline;&quot;&gt;Part's end&lt;/span&gt;&lt;span style=&quot; font-weight:600; font-style:italic; text-decoration: underline;&quot;&gt; &lt;/span&gt;&lt;span style=&quot; font-style:italic; text-decoration: underline;&quot;&gt;number&lt;/span&gt; are exclusive!&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline;&quot;&gt;How to&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- Select one or several &lt;span style=&quot; font-weight:600;&quot;&gt;Line/Edge&lt;/span&gt;(s)&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; (you can also select &lt;span style=&quot; font-weight:600;&quot;&gt;2 points&lt;/span&gt; in place of one &lt;span style=&quot; font-weight:600;&quot;&gt;Line/Edge&lt;/span&gt;) and/or&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- Select one &lt;span style=&quot; font-weight:600;&quot;&gt;Plane/Face&lt;/span&gt; to process all (4) Edges and/or&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- Select one &lt;span style=&quot; font-weight:600;&quot;&gt;Object&lt;/span&gt; to process all Edges at once&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- Then Click on the icon&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
