@@ -116,11 +116,14 @@ class CenterLinePointPanel:
     def __init__(self):
         self.form = Gui.PySideUic.loadUi(path_WF_ui + m_dialog)
         self.form.setWindowTitle(m_dialog_title)
-        self.form.UI_CenterLinePoint_spin_numberLinePart.setValue(m_numberLinePart)
+        self.form.UI_CenterLinePoint_spin_numberLinePart.setValue(
+            m_numberLinePart)
         self.form.UI_CenterLinePoint_spin_indexPart.setValue(m_indexPart)
-        self.form.UI_CenterLinePoint_checkBox.setCheckState(QtCore.Qt.Unchecked)
+        self.form.UI_CenterLinePoint_checkBox.setCheckState(
+            QtCore.Qt.Unchecked)
         if m_location == "All":
-            self.form.UI_CenterLinePoint_checkBox.setCheckState(QtCore.Qt.Checked)
+            self.form.UI_CenterLinePoint_checkBox.setCheckState(
+                QtCore.Qt.Checked)
 
     def accept(self):
         global m_location
@@ -179,6 +182,7 @@ def makeCenterLinePointFeature(group):
 class CenterLinePoint(WF_Point):
     """ The CenterLinePoint feature object. """
     # this method is mandatory
+
     def __init__(self, selfobj):
         if m_debug:
             print("running CenterLinePoint.__init__ !")
@@ -406,6 +410,7 @@ class ViewProviderCenterLinePoint:
 
 class CommandCenterLinePoint:
     """ Command to create CenterLinePoint feature object. """
+
     def GetResources(self):
         return {'Pixmap': path_WF_icons + m_icon,
                 'MenuText': m_menu_text,
@@ -444,13 +449,15 @@ def run():
             print_msg("Number_of_Edges = " + str(Number_of_Edges))
             print_msg("Edge_List = " + str(Edge_List))
 
-        Number_of_Vertexes, Vertex_List = m_sel.get_pointsNames(
-            getfrom=["Points", "Curves", "Objects"])
-        if WF.verbose():
-            print_msg("Number_of_Vertexes = " + str(Number_of_Vertexes))
-            print_msg("Vertex_List = " + str(Vertex_List))
+        if Number_of_Edges == 0:
+            Number_of_Vertexes, Vertex_List = m_sel.get_pointsNames(
+                getfrom=["Points",
+                         ])
+            if WF.verbose():
+                print_msg("Number_of_Vertexes = " + str(Number_of_Vertexes))
+                print_msg("Vertex_List = " + str(Vertex_List))
 
-        if Number_of_Edges == 0 and Number_of_Vertexes == 0:
+        if Number_of_Edges == 0 and Number_of_Vertexes < 2:
             raise Exception(m_exception_msg)
         try:
             m_main_dir = "WorkPoints_P"
@@ -460,95 +467,127 @@ def run():
             m_error_msg += str(m_sub_dir) + "' Objects Group!"
 
             # From Edges
-            # Create a sub group if needed
-            if Number_of_Edges > 1 or m_location != "Single":
-                try:
-                    m_ob = App.ActiveDocument.getObject(str(m_main_dir)).newObject("App::DocumentObjectGroup", str(m_sub_dir))
-                    m_group = m_actDoc.getObject(str(m_ob.Label))
-                except Exception as err:
-                    printError_msg(err.args[0], title=m_macro)
-                    printError_msg(m_error_msg)
-
-            if WF.verbose():
-                print_msg("Group = " + str(m_group.Label))
-
-            for i in range(Number_of_Edges):
-                edge = Edge_List[i]
+            if Number_of_Edges != 0:
+                # Create a sub group if needed
+                if Number_of_Edges > 1 or m_location != "Single":
+                    try:
+                        m_ob = App.ActiveDocument.getObject(
+                            str(m_main_dir)).newObject(
+                            "App::DocumentObjectGroup", str(m_sub_dir))
+                        m_group = m_actDoc.getObject(str(m_ob.Label))
+                    except Exception as err:
+                        printError_msg(err.args[0], title=m_macro)
+                        printError_msg(m_error_msg)
 
                 if WF.verbose():
-                    print_msg("Location = " + str(m_location))
+                    print_msg("Group = " + str(m_group.Label))
 
-                if m_location == "Single":
-                    App.ActiveDocument.openTransaction(m_macro)
-                    selfobj = makeCenterLinePointFeature(m_group)
-                    selfobj.Edge = edge
-                    selfobj.Point1 = None
-                    selfobj.Point2 = None
-                    selfobj.NumberLinePart = m_numberLinePart
-                    selfobj.IndexPart = m_indexPart
-                    selfobj.Proxy.execute(selfobj)
-                else:
-                    for m_iPart in range(m_numberLinePart + 1):
+                for i in range(Number_of_Edges):
+                    edge = Edge_List[i]
+
+                    if WF.verbose():
+                        print_msg("Location = " + str(m_location))
+
+                    if m_location == "Single":
                         App.ActiveDocument.openTransaction(m_macro)
                         selfobj = makeCenterLinePointFeature(m_group)
                         selfobj.Edge = edge
                         selfobj.Point1 = None
                         selfobj.Point2 = None
                         selfobj.NumberLinePart = m_numberLinePart
-                        selfobj.IndexPart = m_iPart
-                        selfobj.Proxy.execute(selfobj)
-                        if str(selfobj.Parametric) == 'Interactive':
-                            selfobj.Parametric = 'Dynamic'
-                            selfobj.touch()
-                            selfobj.Parametric = 'Interactive'
-                        if str(selfobj.Parametric) == 'Not':
-                            selfobj.Parametric = 'Dynamic'
-                            selfobj.touch()
-                            selfobj.Parametric = 'Not'
-
-            # From Vertexes
-            if Number_of_Vertexes > 2:
-                try:
-                    m_ob = App.ActiveDocument.getObject(str(m_main_dir)).newObject("App::DocumentObjectGroup", str(m_sub_dir))
-                    m_group = m_actDoc.getObject(str(m_ob.Label))
-                except Exception as err:
-                    printError_msg(err.args[0], title=m_macro)
-                    printError_msg(m_error_msg)
-
-            # Even number of vertexes
-            if (Number_of_Vertexes % 2 == 0):
-                if WF.verbose():
-                    print_msg("Even number of points")
-
-                if Number_of_Vertexes == 2:
-                    vertex1 = Vertex_List[0]
-                    vertex2 = Vertex_List[1]
-
-                    if WF.verbose():
-                        print_msg("vertex1 = " + str(vertex1))
-                        print_msg("vertex2 = " + str(vertex2))
-
-                    if m_location == "Single":
-                        App.ActiveDocument.openTransaction(m_macro)
-                        selfobj = makeCenterLinePointFeature(m_group)
-                        selfobj.Edge = None
-                        selfobj.Point1 = vertex1
-                        selfobj.Point2 = vertex2
-                        selfobj.NumberLinePart = m_numberLinePart
                         selfobj.IndexPart = m_indexPart
                         selfobj.Proxy.execute(selfobj)
+                        WF.touch(selfobj)
                     else:
                         for m_iPart in range(m_numberLinePart + 1):
+                            App.ActiveDocument.openTransaction(m_macro)
+                            selfobj = makeCenterLinePointFeature(m_group)
+                            selfobj.Edge = edge
+                            selfobj.Point1 = None
+                            selfobj.Point2 = None
+                            selfobj.NumberLinePart = m_numberLinePart
+                            selfobj.IndexPart = m_iPart
+                            selfobj.Proxy.execute(selfobj)
+                            WF.touch(selfobj)
+
+            # From Vertexes
+            else:
+                if Number_of_Vertexes > 2:
+                    try:
+                        m_ob = App.ActiveDocument.getObject(
+                            str(m_main_dir)).newObject(
+                            "App::DocumentObjectGroup", str(m_sub_dir))
+                        m_group = m_actDoc.getObject(str(m_ob.Label))
+                    except Exception as err:
+                        printError_msg(err.args[0], title=m_macro)
+                        printError_msg(m_error_msg)
+
+                # Even number of vertexes
+                if (Number_of_Vertexes % 2 == 0):
+                    if WF.verbose():
+                        print_msg("Even number of points")
+
+                    if Number_of_Vertexes == 2:
+                        vertex1 = Vertex_List[0]
+                        vertex2 = Vertex_List[1]
+
+                        if WF.verbose():
+                            print_msg("vertex1 = " + str(vertex1))
+                            print_msg("vertex2 = " + str(vertex2))
+
+                        if m_location == "Single":
                             App.ActiveDocument.openTransaction(m_macro)
                             selfobj = makeCenterLinePointFeature(m_group)
                             selfobj.Edge = None
                             selfobj.Point1 = vertex1
                             selfobj.Point2 = vertex2
                             selfobj.NumberLinePart = m_numberLinePart
-                            selfobj.IndexPart = m_iPart
+                            selfobj.IndexPart = m_indexPart
                             selfobj.Proxy.execute(selfobj)
+                        else:
+                            for m_iPart in range(m_numberLinePart + 1):
+                                App.ActiveDocument.openTransaction(m_macro)
+                                selfobj = makeCenterLinePointFeature(m_group)
+                                selfobj.Edge = None
+                                selfobj.Point1 = vertex1
+                                selfobj.Point2 = vertex2
+                                selfobj.NumberLinePart = m_numberLinePart
+                                selfobj.IndexPart = m_iPart
+                                selfobj.Proxy.execute(selfobj)
+                    else:
+                        for i in range(0, Number_of_Vertexes - 2, 2):
+                            vertex1 = Vertex_List[i]
+                            vertex2 = Vertex_List[i + 1]
+
+                            if WF.verbose():
+                                print_msg("vertex1 = " + str(vertex1))
+                                print_msg("vertex2 = " + str(vertex2))
+
+                            if m_location == "Single":
+                                App.ActiveDocument.openTransaction(m_macro)
+                                selfobj = makeCenterLinePointFeature(m_group)
+                                selfobj.Edge = None
+                                selfobj.Point1 = vertex1
+                                selfobj.Point2 = vertex2
+                                selfobj.NumberLinePart = m_numberLinePart
+                                selfobj.IndexPart = m_indexPart
+                                selfobj.Proxy.execute(selfobj)
+                            else:
+                                for m_iPart in range(m_numberLinePart + 1):
+                                    App.ActiveDocument.openTransaction(m_macro)
+                                    selfobj = makeCenterLinePointFeature(
+                                        m_group)
+                                    selfobj.Edge = None
+                                    selfobj.Point1 = vertex1
+                                    selfobj.Point2 = vertex2
+                                    selfobj.NumberLinePart = m_numberLinePart
+                                    selfobj.IndexPart = m_iPart
+                                    selfobj.Proxy.execute(selfobj)
+                # Odd number of vertexes
                 else:
-                    for i in range(0, Number_of_Vertexes - 2, 2):
+                    if WF.verbose():
+                        print_msg("Odd number of points")
+                    for i in range(Number_of_Vertexes - 1):
                         vertex1 = Vertex_List[i]
                         vertex2 = Vertex_List[i + 1]
 
@@ -575,37 +614,6 @@ def run():
                                 selfobj.NumberLinePart = m_numberLinePart
                                 selfobj.IndexPart = m_iPart
                                 selfobj.Proxy.execute(selfobj)
-            # Odd number of vertexes
-            else:
-                if WF.verbose():
-                    print_msg("Odd number of points")
-                for i in range(Number_of_Vertexes - 1):
-                    vertex1 = Vertex_List[i]
-                    vertex2 = Vertex_List[i + 1]
-
-                    if WF.verbose():
-                        print_msg("vertex1 = " + str(vertex1))
-                        print_msg("vertex2 = " + str(vertex2))
-
-                    if m_location == "Single":
-                        App.ActiveDocument.openTransaction(m_macro)
-                        selfobj = makeCenterLinePointFeature(m_group)
-                        selfobj.Edge = None
-                        selfobj.Point1 = vertex1
-                        selfobj.Point2 = vertex2
-                        selfobj.NumberLinePart = m_numberLinePart
-                        selfobj.IndexPart = m_indexPart
-                        selfobj.Proxy.execute(selfobj)
-                    else:
-                        for m_iPart in range(m_numberLinePart + 1):
-                            App.ActiveDocument.openTransaction(m_macro)
-                            selfobj = makeCenterLinePointFeature(m_group)
-                            selfobj.Edge = None
-                            selfobj.Point1 = vertex1
-                            selfobj.Point2 = vertex2
-                            selfobj.NumberLinePart = m_numberLinePart
-                            selfobj.IndexPart = m_iPart
-                            selfobj.Proxy.execute(selfobj)
 
         except Exception as err:
             printError_msg(err.args[0], title=m_macro)

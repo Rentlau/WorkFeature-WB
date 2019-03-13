@@ -29,7 +29,6 @@
 *   If not, see <https://www.gnu.org/licenses/>                           *
 ***************************************************************************
 """
-
 import sys
 import os.path
 import FreeCAD
@@ -221,3 +220,14 @@ def set_tolerance(value):
     """ Sets the tolerance to WF user settings
     """
     setParam("tolerance", value)
+
+
+def touch(selfobj):
+    if str(selfobj.Parametric) == 'Interactive':
+        selfobj.Parametric = 'Dynamic'
+        selfobj.touch()
+        selfobj.Parametric = 'Interactive'
+    if str(selfobj.Parametric) == 'Not':
+        selfobj.Parametric = 'Dynamic'
+        selfobj.touch()
+        selfobj.Parametric = 'Not'
