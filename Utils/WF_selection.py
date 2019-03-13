@@ -279,14 +279,14 @@ class Selection():
                                                       "Vertex" + str(m_i_in_list)])
                             m_i += 1
                         # m_i = 0
-                    if issubclass(type(m_subobj), Part.Edge):
+                    elif issubclass(type(m_subobj), Part.Edge):
                         m_i = 0
                         for m_v in m_subobj.Vertexes:
                             m_i_in_list = find(m_v, m_obj.Object.Shape)
                             Selected_Entities.append([m_obj.Object,
                                                       "Vertex" + str(m_i_in_list)])
                             m_i += 1
-                    if issubclass(type(m_subobj), Part.Vertex):
+                    elif issubclass(type(m_subobj), Part.Vertex):
                         Selected_Entities.append([m_obj.Object,
                                                   m_obj.SubElementNames[m_i]])
                     m_i += 1
@@ -300,7 +300,7 @@ class Selection():
                                                       "Vertex" + str(m_i)])
                             m_i += 1
 
-                if issubclass(type(m_shape), Part.Wire) and "Curves" or "Segments" in getfrom:
+                elif issubclass(type(m_shape), Part.Wire) and "Curves" or "Segments" in getfrom:
                     if hasattr(m_shape, 'Vertexes'):
                         if self.__numberOfObjects == 2:
                             if m_obj == self.__selEx[0]:
@@ -319,16 +319,16 @@ class Selection():
                                                           "Vertex" + str(m_i)])
                                 m_i += 1
 
-                if issubclass(type(m_shape),
-                              Part.Solid) and "Objects" in getfrom:
+                elif issubclass(type(m_shape),
+                                Part.Solid) and "Objects" in getfrom:
                     if hasattr(m_shape, 'Vertexes'):
                         for m_v in m_shape.Vertexes:
                             Selected_Entities.append([m_obj.Object,
                                                       "Vertex" + str(m_i)])
                             m_i += 1
 
-                if issubclass(type(m_shape),
-                              Part.Face) and "Planes" in getfrom:
+                elif issubclass(type(m_shape),
+                                Part.Face) and "Planes" in getfrom:
                     if hasattr(m_shape, 'Vertexes'):
                         for m_v in m_shape.Vertexes:
                             Selected_Entities.append([m_obj.Object,
@@ -459,31 +459,31 @@ class Selection():
                                               "Edge" + str(m_i)])
                     m_i += 1
 
-                if issubclass(type(m_shape), Part.Compound):
+                elif issubclass(type(m_shape), Part.Compound):
                     if hasattr(m_shape, 'Edges'):
                         for m_e in m_shape.Edges:
                             Selected_Entities.append([m_obj.Object,
                                                       "Edge" + str(m_i)])
                             m_i += 1
 
-                if issubclass(type(m_shape),
-                              Part.Solid) and "Objects" in getfrom:
+                elif issubclass(type(m_shape),
+                                Part.Solid) and "Objects" in getfrom:
                     if hasattr(m_shape, 'Edges'):
                         for m_e in m_shape.Edges:
                             Selected_Entities.append([m_obj.Object,
                                                       "Edge" + str(m_i)])
                             m_i += 1
 
-                if issubclass(type(m_shape),
-                              Part.Wire) and "Curves" in getfrom:
+                elif issubclass(type(m_shape),
+                                Part.Wire) and "Curves" in getfrom:
                     if hasattr(m_shape, 'Edges'):
                         for m_e in m_shape.Edges:
                             Selected_Entities.append([m_obj.Object,
                                                       "Edge" + str(m_i)])
                             m_i += 1
 
-                if issubclass(type(m_shape),
-                              Part.Face) and "Planes" in getfrom:
+                elif issubclass(type(m_shape),
+                                Part.Face) and "Planes" in getfrom:
                     if hasattr(m_shape, 'Edges'):
                         for m_e in m_shape.Edges:
                             Selected_Entities.append([m_obj.Object,
@@ -665,15 +665,15 @@ class Selection():
                     Selected_Entities.append([m_obj.Object, "Face" + str(m_i)])
                     m_i += 1
 
-                if issubclass(type(m_shape), Part.Compound):
+                elif issubclass(type(m_shape), Part.Compound):
                     if hasattr(m_shape, 'Faces'):
                         for m_e in m_shape.Faces:
                             Selected_Entities.append(
                                 [m_obj.Object, "Face" + str(m_i)])
                             m_i += 1
 
-                if issubclass(type(m_shape),
-                              Part.Solid) and "Objects" in getfrom:
+                elif issubclass(type(m_shape),
+                                Part.Solid) and "Objects" in getfrom:
                     if hasattr(m_shape, 'Faces'):
                         for m_e in m_shape.Faces:
                             Selected_Entities.append(

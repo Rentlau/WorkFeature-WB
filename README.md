@@ -37,7 +37,7 @@ Post on FreeCAD Forum : https://forum.freecadweb.org/viewtopic.php?f=9&t=27195
 
 <img src="./Doc/Images/Title02.png?1">
 
-<b>Version 2019-03-11-dev</b> 
+<b>Version 2019-03-13-dev</b> 
 
 [[back to top](#Sections)]
 
@@ -158,7 +158,7 @@ Functions are organised by sub menus:
 | Name                           | Icons  |
 |:------|:------|
 | **WF General** | ![alt](./Doc/Images/WF_General.png) |
-| **WF Points** | ![alt](./Doc/Images/WF_Points.png) |
+| **WF Points** | ![alt](./Doc/Images/WF_Points.png?1) |
 | **WF Lines** | ![alt](./Doc/Images/WF_Lines.png) |
 | **WF Planes** | ![alt](./Doc/Images/WF_Planes.png) |
 
@@ -176,8 +176,8 @@ Functions are organised by sub menus:
 | Icon                           | Function  |
 |:------|:------|
 |![alt](./Resources/Icons/WF_centerLinePoint.svg)  | Create Point(s) at Center location of each selected Line(s). <br>Can also create several Points along selected Line(s)|
-|![alt](./Resources/Icons/WF_alongLinePoint.svg)  | Create Point(s) along Line(s) <br>at a defined distance of intersection from selected Point(s)/Line(s).|
 |![alt](./Resources/Icons/WF_extremaLinePoint.svg)  | Create Point(s) at edges of selected Line(s).|
+|![alt](./Resources/Icons/WF_alongLinePoint.svg)  | Create Point(s) along Line(s) <br>at a defined distance of intersection from selected Point(s)/Line(s).|
 |![alt](./Resources/Icons/WF_nPointsPoint.svg)  | Create a Point at MEAN location of all selected points.|
 |![alt](./Resources/Icons/WF_projectedPoint.svg)  | Create projected point(s) on chosen or main Planes.|
 |![alt](./Resources/Icons/WF_centerCirclePoint.svg)  | Create Point(s) at center location of selected Circle(s). **<span style="color:red">NOT YET DEV in 2019 release!</span>** |

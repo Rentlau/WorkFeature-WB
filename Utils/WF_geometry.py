@@ -15,8 +15,8 @@ def init_min_max():
     """
     import sys
     if sys.version < '3.0.0':
-        max_val = sys.maxint
-        min_val = -sys.maxint - 1
+        max_val = sys.maxsize
+        min_val = -sys.maxsize - 1
     # for python 3.0 use sys.maxsize
     else:
         max_val = sys.maxsize
@@ -31,7 +31,8 @@ def isColinearVectors(A, B, C, tolerance=1e-12):
     Vector_2 = C - B
     Vector_3 = Vector_1.cross(Vector_2)
 
-    if abs(Vector_3.x) <= tolerance and abs(Vector_3.y) <= tolerance and abs(Vector_3.z) <= tolerance:
+    if abs(Vector_3.x) <= tolerance and abs(
+            Vector_3.y) <= tolerance and abs(Vector_3.z) <= tolerance:
         return True
 
     return False
@@ -42,7 +43,8 @@ def isEqualVectors(A, B, tolerance=1e-12):
     """
     Vector = B - A
 
-    if abs(Vector.x) <= tolerance and abs(Vector.y) <= tolerance and abs(Vector.z) <= tolerance:
+    if abs(Vector.x) <= tolerance and abs(
+            Vector.y) <= tolerance and abs(Vector.z) <= tolerance:
         return True
 
     return False
@@ -69,7 +71,8 @@ def alongTwoPointsPoint(A, B, index, number):
 
     if number != 0:
         distance = index * (Vector_B.sub(Vector_A).Length / number)
-    Vector_A = Vector_A.add(Vector_B.sub(Vector_A).normalize().multiply(distance))
+    Vector_A = Vector_A.add(Vector_B.sub(
+        Vector_A).normalize().multiply(distance))
 
     return Vector_A
 
@@ -85,7 +88,8 @@ def alongLinePoint(edge, index, number):
 
     if number != 0:
         distance = index * (edge.Length / number)
-    Vector_A = Vector_A.add(Vector_B.sub(Vector_A).normalize().multiply(distance))
+    Vector_A = Vector_A.add(Vector_B.sub(
+        Vector_A).normalize().multiply(distance))
 
     return Vector_A
 
@@ -205,11 +209,13 @@ def intersecLinePlane(A, B, Plane_Normal, Plane_Point):
     if U.dot(N) == 0.0:
         # if A belongs to P : the full Line L is included in the Plane
         if (a * ax) + (b * ay) + (c * az) + d == 0.0:
-            print_msg("WARNING : The full Line is included in the Plane, returning first Point !")
+            print_msg(
+                "WARNING : The full Line is included in the Plane, returning first Point !")
             return A
         # if not the Plane and line are paralell without intersection
         else:
-            print_msg("ERROR : The Plane and the line are paralell without intersection !")
+            print_msg(
+                "ERROR : The Plane and the line are paralell without intersection !")
             return None
     # 2> U.N != 0
     else:
@@ -277,10 +283,12 @@ def intersectPerpendicularLine(A, B, C,):
     # so ux * vx + uy * vy + uz * vz = 0
     # ux * (tx - cx) + uy * (ty - cy) + uz * (tz - cz) = 0
     # ux * (ax + k * ux  - cx) + uy * (ay + k * uy - cy) + uz * (az + k * uz  - cz) = 0
-    # ux*ax + ux*(k*ux) - ux*cx + uy*ay + uy*(k*uy) - uy*cy +  uz*az + uz*(k*uz) - uz*cz = 0
+    # ux*ax + ux*(k*ux) - ux*cx + uy*ay + uy*(k*uy) - uy*cy +  uz*az +
+    # uz*(k*uz) - uz*cz = 0
     if (ux * ux + uy * uy + uz * uz) == 0.0:
         return None
-    k = (ux * cx + uy * cy + uz * cz - ux * ax - uy * ay - uz*az)/(ux*ux + uy*uy + uz*uz)
+    k = (ux * cx + uy * cy + uz * cz - ux * ax - uy *
+         ay - uz * az) / (ux * ux + uy * uy + uz * uz)
     tx = ax + k * ux
     ty = ay + k * uy
     tz = az + k * uz
@@ -322,7 +330,8 @@ def propertiesPoint(Point_User_Name,
         print_msg("Not able to set PointColor !")
         print_msg("Color : " + str(color) + " !")
     try:
-        Gui.ActiveDocument.getObject(Point_User_Name).PointSize = WF.pointSize()
+        Gui.ActiveDocument.getObject(
+            Point_User_Name).PointSize = WF.pointSize()
 
     except Exception as err:
         printError_msg(err.message, title="propertiesPoint")
@@ -360,12 +369,14 @@ def propertiesLine(Line_User_Name,
         print_msg("Not able to set LineColor !")
         print_msg("Color : " + str(color) + " !")
     try:
-        Gui.ActiveDocument.getObject(Line_User_Name).LineWidth = WF.lineThickness()
+        Gui.ActiveDocument.getObject(
+            Line_User_Name).LineWidth = WF.lineThickness()
     except Exception as err:
         printError_msg(err.message, title="propertiesLine")
         print_msg("Not able to set LineWidth !")
     try:
-        Gui.ActiveDocument.getObject(Line_User_Name).PointSize = WF.linePointSize()
+        Gui.ActiveDocument.getObject(
+            Line_User_Name).PointSize = WF.linePointSize()
     except Exception as err:
         printError_msg(err.message, title="propertiesLine")
         print_msg("Not able to set PointSize !")

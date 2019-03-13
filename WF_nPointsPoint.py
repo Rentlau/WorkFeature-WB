@@ -359,6 +359,7 @@ def run():
         Number_of_Vertexes, Vertex_List = m_sel.get_pointsNames(
             getfrom=["Points",
                      "Curves",
+                     "Planes",
                      "Objects"])
         if WF.verbose():
             print_msg("Number_of_Vertexes = " + str(Number_of_Vertexes))

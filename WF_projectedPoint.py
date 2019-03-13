@@ -483,7 +483,7 @@ def run():
                     selfobj.Point = point
                     selfobj.At = "XY plane"
                     selfobj.Proxy.execute(selfobj)
-                    touch(selfobj)
+                    WF.touch(selfobj)
 
                 if m_sel_plane in ["YZ plane",
                                    "XY, YZ planes",
@@ -494,7 +494,7 @@ def run():
                     selfobj.Point = point
                     selfobj.At = "YZ plane"
                     selfobj.Proxy.execute(selfobj)
-                    touch(selfobj)
+                    WF.touch(selfobj)
                 if m_sel_plane in ["XZ plane",
                                    "XY, XZ planes",
                                    "YZ, XZ planes",
@@ -504,18 +504,7 @@ def run():
                     selfobj.Point = point
                     selfobj.At = "XZ plane"
                     selfobj.Proxy.execute(selfobj)
-                    touch(selfobj)
-#                 if m_proj_line:
-#                     point_B = Vector_point
-#                     if WF.verbose():
-#                         print_msg("point_A = " + str(point_A))
-#                         print_msg("point_B = " + str(point_B))
-#                     App.ActiveDocument.openTransaction("Macro TwoPointsLine")
-#                     selfobj2 = twoPL.makeTwoPointsLineFeature(m_group)
-#                     selfobj2.Point1 = point_A
-#                     selfobj2.Point2 = point_B
-#                     selfobj2.Extension = 0.0
-#                     selfobj2.Proxy.execute(selfobj2)
+                    WF.touch(selfobj)
         except Exception as err:
             printError_msg(err.args[0], title=m_macro)
 
