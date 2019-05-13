@@ -1,5 +1,5 @@
 
-# FreeCAD WorkFeature Workbench <img src="./Resources/Icons/WF_wf.svg">
+# FreeCAD WorkFeature Workbench ![WFLogo](Resources/Icons/WF_wf.svg)
 
 ### Work Feature workbench with parametric objects For FreeCAD
 
@@ -19,9 +19,9 @@ FreeCAD Forum thread discussion: https://forum.freecadweb.org/viewtopic.php?f=9&
 - [General purpose](#General-purpose)
 - [List of available functions](#List-of-available-functions)
 - [Extra Documentations](#Extra-Documentations)
-- [License](#License)
 - [Releases](#Releases)
 - [Associated project](#Associated-project)
+- [License](#License)
 
 
 ## Introduction
@@ -124,6 +124,7 @@ The **"Parametric"** property can be changed for each single object in it's own 
 
 ![alt](./Doc/Images/Parametric.png?1)
 
+
 | Name                           | Icon  |
 |:------|:------|
 |In General menu click the **`Update`** Button to update all **WorkFeature-WB Interactive** objects | ![alt](./Resources/Icons/WF_refresh.svg) |
@@ -136,6 +137,8 @@ In this panel you can choose by example to set the **Parametric behavior**:
 
 Hereafter the Graph of relationship shows that the parametric **WorkFeature-WB** Object **CenterLinePoint_P001** is depending on 
 **Line002** object, but not the **MidPoint001**!
+
+
 <img src="./Doc/Images/Graph.png" alt="drawing" style="width:500px;"/>
 
 [[back to top](#Sections)]
@@ -193,14 +196,6 @@ Functions are organised by submenus:
 
 Find some more detailed documentations in the `./Doc` directory:  
 * [How to create "Center Line Point(s)"<img src="./Resources/Icons/WF_centerLinePoint.svg">](./Doc/CenterLinePoint/HowTo_WFWB_Create_CenterLinePoint.md)  
-
-[[back to top](#Sections)]
-
-## License
-
-<img src="./Doc/Images/gplv3-with-text-136x68.png">
-[GNU GENERAL PUBLIC LICENSE](https://www.gnu.org/licenses/gpl-3.0.html)
-
 
 [[back to top](#Sections)]
 
@@ -265,3 +260,8 @@ This macro tool utility creates:
 
 ### Tested on Windows
     A - FreeCAD 0.16.6706 : Not Yet
+
+## License
+[![GPL](Doc/Images/gplv3-with-text-136x68.png)](https://www.gnu.org/licenses/gpl-3.0.html)
+
+[[back to top](#Sections)]
