@@ -1,12 +1,13 @@
 
-# <center>WorkFeature-WB :<br> <img src="./Resources/Icons/WF_wf.svg"></center>
-### <center>Work Feature workbench with parametric objects For FreeCAD </center>
+# FreeCAD WorkFeature Workbench <img src="./Resources/Icons/WF_wf.svg">
 
+### Work Feature workbench with parametric objects For FreeCAD
 
-<center>by Rentlau_64</center>
+Author: [@Rentlau_64](https://github.com/Rentlau)  
+GitHub Repo: https://github.com/Rentlau/WorkFeature-WB  
+FreeCAD Forum thread discussion: https://forum.freecadweb.org/viewtopic.php?f=9&t=27195  
 
-Updated in March 2019
-
+**Updated**: March 2019
 
 
 [![forthebadge made-with-python](http://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/)
@@ -23,33 +24,29 @@ Updated in March 2019
 - [Associated project](#Associated-project)
 
 
-##  Introduction
+## Introduction
 
-Workbench utility to create:
-- Points (Mid points, Extremum points, Center of Plane, Projected Point on Plane,),
-- Lines (From 2 points,),
-- Planes (From 1 point and 1 Line, From 3 points,)
- 
- 
-github : https://github.com/Rentlau/WorkFeature-WB
-
-Post on FreeCAD Forum : https://forum.freecadweb.org/viewtopic.php?f=9&t=27195
+A FreeCAD Workbench utility to create:
+- Points (Mid points, Extremum points, Center of Plane, Projected Point on Plane),
+- Lines (From 2 points),
+- Planes (From 1 point and 1 Line, From 3 points)
 
 <img src="./Doc/Images/Title02.png?1">
 
-<b>Version 2019-03-13-dev</b> 
+**Version 2019-03-13-dev**
 
 [[back to top](#Sections)]
 
-##  Installing
-
-
+## Installing  
+### FreeCAD Addon Manager
 **WorkFeature-WB** is part of the [FreeCAD external workbenches,](https://www.freecadweb.org/wiki/External_workbenches)
  and can be automatically installed using the [FreeCAD Add-on Manager](https://github.com/FreeCAD/FreeCAD-addons) which comes bundled with FreeCAD 0.17, under the *Tools* menu. 
 
 See repository at https://github.com/FreeCAD/FreeCAD-addons for more details on add-ons for FreeCAD.
 
-----------
+### Manually Installing 
+<details>
+  <summary>In general, manual installation is not necessary anymore, but in specific situations it's available. Uncollapse this section to learn more.</summary>
 You can also install manually this workbench by (e.g, on Linux system):
   - Cloning the repository from github (https://github.com/Rentlau/WorkFeature-WB) using:
 
@@ -77,50 +74,43 @@ cp /home/your_name/path_to_WorkFeature-WB /home/your_name/.FreeCAD/Mod/
 ```
 
 On Windows most of the time the place all your extra workbench add-ons are installed is <b>C:\Program Files\FreeCAD 0.16\Mod\WorkeFeature-WB-master</b>.
+</details>
 
 [[back to top](#Sections)]
 
 ## Requirements
 
-
 - <b>Freecad</b> >= v0.15
 - <b>Numpy</b> is a required dependency (numpy >= v1.14.3).
 
-The development of the macro was originaly done with Python2.7.
-
-The project is now developped under Python 3.6.
-
-So this addon start to be py3 compatible and may work in FreeCAD >= v0.18.
-
-Please "[Open an issue](https://github.com/Rentlau/WorkFeature-WB/issues)", if you detect any problem.
+**Important Note:**  
+The development of the macro was originally done with Python2.7. The project is now developed under Python 3.6. Therefore this workbench may work fully under FreeCAD v0.18 or higher. Please "[Open an issue](https://github.com/Rentlau/WorkFeature-WB/issues)", if you detect any problems related to py3 compatibility or anything else.
 
 [[back to top](#Sections)]
 
 ## General purpose
 
-
 **WorkFeature-WB** Tool utility to create **Points** (mid points, center of circle...), **Axes** (from 2 points...), **Planes** (from one axis and a point...) to facilitate the creation of your project. 
 
 The idea behind this python workbench for FreeCAD was to give users some "quick" access tiny tools.
 
-Most of the tools are few "clicks" behavior to give the user quick access to functionalities.
+Most of the tools available in this workbench require less "clicks" then normal operations, this is intentional behavior to give the user quick access to functionalities.
 
-The **workbench** will create into your FreeCAD document a new Group named `WorkFeatures`.<br>
-Depending of the tool you will use some objects can be created under the following sub Groups:
+This **workbench** will create, in your FreeCAD document, a new Group named `WorkFeatures`.  
+Depending on the tool you will use, some objects can be created under the following subgroups:  
+```
 - WorkFeatures/
   - WorkPoints_P
   - WorkAxes_P
   - WorkPlanes_P
+```
 
+Most **objects** created with the **WorkFeature-WB** functions are parametric. In other words, if the **"parent"** object changes, all **children WorkFeature-WB** objects will change accordingly!  
 
-Quite all **objects** created with **WorkFeature-WB** functions are parametric.
-
-That means; if the **"parent"** object change, all **children WorkFeature-WB** objects will change accordingly !
-
-The **"Parametric"** property of objects can have any of the following behavior regarding parent changes:
-- **Not** : For static behavior (No update even if one parents change).
-- **Interactive** : Update only when user asks for (click on **`Update`** Button).
-- **Dynamic** : Update each time one of parents change.
+The **"Parametric"** property of objects can have any of the following behavior regarding parent changes:  
+- **Not** : For static behavior (No update even if one parents change).  
+- **Interactive** : Update only when user asks for (click on **`Update`** Button).  
+- **Dynamic** : Update each time one of parents change.  
 
 A color code regarding the **"Parametric"** property is used:
 
@@ -130,7 +120,7 @@ A color code regarding the **"Parametric"** property is used:
 |**Interactive** parametric color | ![alt](./Resources/Icons/WF_pointInteractive.svg) |
 |**Dynamic** parametric color | ![alt](./Resources/Icons/WF_pointDynamic.svg) |
 
-The **"Parametric"** property can be changed for each single object in his **Data** panel:
+The **"Parametric"** property can be changed for each single object in it's own **Data** panel:
 
 ![alt](./Doc/Images/Parametric.png?1)
 
@@ -152,8 +142,7 @@ Hereafter the Graph of relationship shows that the parametric **WorkFeature-WB**
 
 ## List of available functions
 
-
-Functions are organised by sub menus:
+Functions are organised by submenus:
 
 | Name                           | Icons  |
 |:------|:------|
@@ -162,7 +151,7 @@ Functions are organised by sub menus:
 | **WF Lines** | ![alt](./Doc/Images/WF_Lines.png) |
 | **WF Planes** | ![alt](./Doc/Images/WF_Planes.png) |
 
- - WF_General:
+### WF_General
 
 | Icon                           | Function  |
 |:------|:------|
@@ -171,7 +160,7 @@ Functions are organised by sub menus:
 |![alt](./Resources/Icons/WF_showHideNot.svg)  | Hide/Show all **Not** parametric (static) Objects. |
 |![alt](./Resources/Icons/WF_refresh.svg)  | Force  update of all **Interactive** parametric Objects. |
 
- - WF_Points sub menu :
+### WF_Points submenu
 
 | Icon                           | Function  |
 |:------|:------|
@@ -180,36 +169,34 @@ Functions are organised by sub menus:
 |![alt](./Resources/Icons/WF_alongLinePoint.svg)  | Create Point(s) along Line(s) <br>at a defined distance of intersection from selected Point(s)/Line(s).|
 |![alt](./Resources/Icons/WF_nPointsPoint.svg)  | Create a Point at MEAN location of all selected points.|
 |![alt](./Resources/Icons/WF_projectedPoint.svg)  | Create projected point(s) on chosen or main Planes.|
-|![alt](./Resources/Icons/WF_centerCirclePoint.svg)  | Create Point(s) at center location of selected Circle(s). **<span style="color:red">NOT YET DEV in 2019 release!</span>** |
+|![alt](./Resources/Icons/WF_centerCirclePoint.svg)  | Create Point(s) at center location of selected Circle(s). **<span style="color:red">Unsuppported as of 2019 release</span>** |
 |![alt](./Resources/Icons/WF_centerFacePoint.svg)  | Create Point(s) at center of mass location of selected Plane(s). |
 
-- WF_Lines sub menu :
+### WF_Lines submenu
 
 | Icon                           | Function  |
 |:------|:------|
 |![alt](./Resources/Icons/WF_twoPointsLine.svg)  | Create Line(s) in between two selected Points. |
 |![alt](./Resources/Icons/WF_nPointsLine.svg)  | Create a "best fit" Line from a set of points using Singular Value Decomposition (SVD). |
 
-- WF_Planes sub menu :
+### WF_Planes submenu
 
 | Icon                           | Function  |
 |:------|:------|
 |![alt](./Resources/Icons/WF_threePointsPlane.svg)  | Create a Plane from three selected Points.|
 |![alt](./Resources/Icons/WF_linePointPlane.svg)  | Create Plane(s) crossing a Point and a Line.|
-|![alt](./Resources/Icons/WF_perpendicularLinePointPlane.svg)  | Create Planes(s) crossing a Point and perpendicular to a Line. **<span style="color:red">NOT YET DEV in 2019 release!</span>**|
+|![alt](./Resources/Icons/WF_perpendicularLinePointPlane.svg)  | Create Planes(s) crossing a Point and perpendicular to a Line. **<span style="color:red">Unsuppported as of 2019 release</span>**|
 
 [[back to top](#Sections)]
 
 ## Extra Documentations
 
-
-Find some more detailed documentations in ./Doc directory :
-  - [How to create "Center Line Point(s)"<img src="./Resources/Icons/WF_centerLinePoint.svg">](./Doc/CenterLinePoint/HowTo_WFWB_Create_CenterLinePoint.md) <br>
+Find some more detailed documentations in the `./Doc` directory:  
+* [How to create "Center Line Point(s)"<img src="./Resources/Icons/WF_centerLinePoint.svg">](./Doc/CenterLinePoint/HowTo_WFWB_Create_CenterLinePoint.md)  
 
 [[back to top](#Sections)]
 
 ## License
-
 
 <img src="./Doc/Images/gplv3-with-text-136x68.png">
 [GNU GENERAL PUBLIC LICENSE](https://www.gnu.org/licenses/gpl-3.0.html)
@@ -219,21 +206,18 @@ Find some more detailed documentations in ./Doc directory :
 
 ## Releases
 
-
-[Mars 2018](https://github.com/Rentlau/WorkFeature-WB/tree/V18.03)
-First release with only dynamic parametric objects
-
 [January 2019](https://github.com/Rentlau/WorkFeature-WB/tree/release2019_01)
-Second release with **Not**, **Interactive** and **Dynamic** parametric objects. Not all Functions available but in active developpement.
+Second release with **Not**, **Interactive** and **Dynamic** parametric objects. Not all Functions available but in active development.
 
+[March 2018](https://github.com/Rentlau/WorkFeature-WB/tree/V18.03)
+First release with only dynamic parametric objects
 
 [[back to top](#Sections)]
 
-### Associated project
+### Related projects
 
 [Work features addon-on (macro) for FreeCAD](https://github.com/Rentlau/WorkFeature)
-
-Tool utility that creates:
+This macro tool utility creates:
 
     Origin (X, Y Z axes, Origin (0,0,0) point and XZ, XY, YZ planes)
     Points (Center of Mass of object(s), mid points, center of circle, ...),
@@ -241,12 +225,10 @@ Tool utility that creates:
     Planes (from 3 points, from one axis and a point...)
     and many other useful features to facilitate the creation of your project.
 
-
-
 [[back to top](#Sections)]
 
 ### Developed on Linux Ubuntu
-
+```
     OS: Ubuntu 18.04.1 LTS
     Word size of OS: 64-bit
     Word size of FreeCAD: 64-bit
@@ -259,7 +241,7 @@ Tool utility that creates:
     Coin version: 4.0.0a
     OCC version: 7.3.0
     Locale: French/France (fr_FR)
-
+```
 ### Tested on Linux Ubuntu
 
     A - FreeCAD 0.16.6712  : Not Yet
@@ -283,8 +265,3 @@ Tool utility that creates:
 
 ### Tested on Windows
     A - FreeCAD 0.16.6706 : Not Yet
-
-
-```python
-
-```
