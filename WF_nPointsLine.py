@@ -84,7 +84,7 @@ Unable to create a Line :
 - Select one or several Object(s) to process all Points at once;
 
 and go to Parameter(s) Window in Task Panel!"""
-m_result_msg = " : N Points Linz created !"
+m_result_msg = " : N Points Lines created!"
 m_menu_text = "Line = SVD(Points)"
 m_accel = ""
 m_tool_tip = """<b>Create a "best fit" Line</b> from a set of Points using Singular Value Decomposition (SVD).<br>

@@ -4,7 +4,7 @@ import inspect
 import FreeCAD as App
 from PySide import QtCore, QtGui
 
-error_msg_not_yet = "Not yet Developped !"
+error_msg_not_yet = "Not yet Developed !"
 
 
 def gui_infoDialog(msg, title=None):
@@ -50,7 +50,7 @@ def printInfo_msg(message, title=None):
     try:
         gui_infoDialog(m_msg, title)
     except Exception as err:
-        App.Console.PrintError("\nERROR : Not able to launch a QT dialog !")
+        App.Console.PrintError("\nERROR: Not able to launch a QT dialog !")
         App.Console.PrintError(err.message)
         raise Exception
 
@@ -63,7 +63,7 @@ def printError_msg(message, title=None):
     try:
         gui_errorDialog(m_msg, title)
     except Exception as err:
-        App.Console.PrintError("\nERROR : Not able to launch a QT dialog !")
+        App.Console.PrintError("\nERROR: Not able to launch a QT dialog !")
         App.Console.PrintError(err.message)
         raise Exception
 

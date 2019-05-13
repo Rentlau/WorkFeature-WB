@@ -95,7 +95,7 @@ def alongLinePoint(edge, index, number):
 
 
 def coordVectorPoint(vertex):
-    """ Return the coordinates (x,y,z) of selcted Vector.
+    """ Return the coordinates (x,y,z) of selected Vector.
     """
     m_coord = (0.0, 0.0, 0.0)
     m_vert = vertex
@@ -212,10 +212,10 @@ def intersecLinePlane(A, B, Plane_Normal, Plane_Point):
             print_msg(
                 "WARNING : The full Line is included in the Plane, returning first Point !")
             return A
-        # if not the Plane and line are paralell without intersection
+        # if not the Plane and line are parallel without intersection
         else:
             print_msg(
-                "ERROR : The Plane and the line are paralell without intersection !")
+                "ERROR : The Plane and the line are parallel without intersection !")
             return None
     # 2> U.N != 0
     else:
@@ -252,7 +252,7 @@ def intersectPerpendicularLine(A, B, C,):
     and the Line perpendicular crossing the point C.
     This is also the projection of C onto the Line L.
     Return aso the distance between C and the the projection.
-    Return also the symetric point of C versus the Line.
+    Return also the symmetric point of C versus the Line.
     """
     import math
     # L is the line defined by 2 points A(ax, ay, az) and B(bx, by, bz), and
