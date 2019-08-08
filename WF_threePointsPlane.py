@@ -78,7 +78,7 @@ m_dialog_title = "Define extension of the plane."
 
 m_exception_msg = """
 Unable to create Plane from 3 Points :
-- Select three seperated Points !
+- Select three separated Points !
 
 Go to Parameter(s) Window in Task Panel!"""
 m_result_msg = " : Plane from 3 Points created !"
