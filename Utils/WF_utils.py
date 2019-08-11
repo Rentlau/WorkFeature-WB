@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import FreeCAD as App
+from WF_print import printError_msg
 
 
 def print_attributes(obj, doc=False):
@@ -43,3 +45,6 @@ def linkSubList_convertToOldStyle(references):
             # old style references, no conversion required
             result.append(tup)
     return result
+
+
+

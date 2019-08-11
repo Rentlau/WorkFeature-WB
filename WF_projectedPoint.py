@@ -39,6 +39,7 @@ import WF
 from WF_Objects_base import WF_Point
 from WF_Objects_base import WF_Line
 import WF_twoPointsLine as twoPL
+import WF_alongLinePoint as aLP
 # from InitGui import m_debug
 if App.GuiUp:
     import FreeCADGui as Gui
@@ -124,6 +125,7 @@ m_sel_planeList = ["Defined plane",
                    ]
 m_proj_line = False
 m_group = None
+m_numberSymPoint = 0
 ###############
 
 
@@ -136,15 +138,20 @@ class ProjectedPointPanel:
         if m_proj_line:
             self.form.UI_ProjectePoint_checkBox.setCheckState(QtCore.Qt.Checked)
 
+        self.form.UI_ProjectePoint_spin_numberSymPoint.setValue(m_numberSymPoint)
+
     def accept(self):
         global m_sel_plane
         global m_proj_line
+        global m_numberSymPoint
         m_sel_plane = self.form.UI_ProjectePoint_comboBox.currentText()
         m_proj_line = self.form.UI_ProjectePoint_checkBox.isChecked()
+        m_numberSymPoint = self.form.UI_ProjectePoint_spin_numberSymPoint.value()
 
         if WF.verbose():
             print_msg("m_sel_plane = " + str(m_sel_plane))
             print_msg("m_proj_line = " + str(m_proj_line))
+            print_msg("m_numberSymPoint = " + str(m_numberSymPoint))
 
         Gui.Control.closeDialog()
         m_actDoc = App.activeDocument()
@@ -294,10 +301,25 @@ class ProjectedPoint(WF_Point):
                 selfobj.Y = float(Vector_point.y)
                 selfobj.Z = float(Vector_point.z)
 
+                if m_debug:
+                    print("m_proj_line = " + str(m_proj_line))
+                    print("m_numberSymPoint = " + str(m_numberSymPoint))
+
                 if m_proj_line and not self.created:
                     point_1 = selfobj.Point
                     object_1 = selfobj
-                    twoPL.buildFromOnePointAndOneObject(point_1, object_1, m_group)
+                    twoPL.buildFromOnePointAndOneObject(point_1,
+                                                        object_1,
+                                                        m_group)
+
+                if m_numberSymPoint > 0 and not self.created:
+                    for m_i in range(m_numberSymPoint):
+                        index = m_i + 2
+                        aLP.buildFromTwoPoints(point_A,
+                                               Vector_point,
+                                               index,
+                                               object_1,
+                                               m_group)
 
                 # To be compatible with previous version 2018
                 if 'Parametric' in selfobj.PropertiesList:

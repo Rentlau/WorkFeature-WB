@@ -58,3 +58,18 @@ def createFolders(folder=None):
                     printError_msg(m_msg)
 
     return m_group
+
+
+def createSubGroup(m_actDoc,
+                   main_dir,
+                   sub_dir,
+                   error_msg):
+    try:
+        m_ob_dir = App.ActiveDocument.getObject(str(main_dir))
+        m_ob = m_ob_dir.newObject("App::DocumentObjectGroup",
+                                  str(sub_dir))
+        m_group = m_actDoc.getObject(str(m_ob.Label))
+    except Exception as err:
+        printError_msg(err.message, title="createSubGroup")
+        printError_msg(error_msg)
+    return m_group

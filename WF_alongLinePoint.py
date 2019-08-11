@@ -67,7 +67,7 @@ try:
     from WF_print import printError_msg, print_msg
     from WF_directory import createFolders, addObjectToGrp
     from WF_geometry import *
-    # from WF_utils import *
+    from WF_utils import *
 except ImportError:
     print("ERROR: cannot load WF modules !")
     sys.exit(1)
@@ -94,12 +94,14 @@ m_tool_tip = """<b>Create Point(s)</b> along Line(s) at a defined<br>
  distance of Reference Point(s)/Line(s) intersection.<br>
 The reference Point is the projection of the selected Point(s)<br>
  onto the first selected Line.<br>
-Or the reference Point is the projection of Line(s) closest end<br>
+Or the reference Point is the projection of Line(s) two ends<br>
  onto the first selected Line.<br>
 <br>
 Define the Distance along the line from the <br>
 Reference Point(s)/Line(s) intersection.<br>
 Negative values will revert the direction.<br>
+A null distance gives you the projection of point(s)<br>
+onto the first selected Line.<br>
 <br>
 The First selected Line/Edge(s) is  where to attach new Points.<br>
 and Second define one or several Reference Point(s).<br>
@@ -419,35 +421,60 @@ if App.GuiUp:
     Gui.addCommand("AlongLinePoint", CommandAlongLinePoint())
 
 
+def buildFromTwoPoints(vertex1, vertex2, index, object1, group):
+    if WF.verbose():
+            App.Console.PrintMessage("running aLP.buildFromTwoPoints !")
+    try:
+        if m_debug:
+            print_msg("\nvertex1 = " + str(vertex1))
+            print_msg("vertex2 = " + str(vertex2))
+
+        Vector_A = vertex1
+        Vector_B = vertex2
+        m_distance = Vector_B.sub(Vector_A).Length / 2
+        m_distance = index * (Vector_B.sub(Vector_A).Length / 1)
+        if m_debug:
+            print_msg("Vector_A = " + str(Vector_A))
+            print_msg("Vector_B = " + str(Vector_B))
+            print_msg("m_distance = " + str(m_distance))
+
+        Vector_C = Vector_A.add(Vector_B.sub(Vector_A).normalize().multiply(m_distance))
+        if m_debug:
+            print_msg("Vector_C = " + str(Vector_C))
+
+        L1 = Part.LineSegment(Vector_B, Vector_C)
+        edge = Part.Edge(L1)
+
+#         App.ActiveDocument.openTransaction("Macro AlongLinePoint")
+#         selfobj = makeAlongLinePointFeature(group)
+#         selfobj.AlongEdge = edge [object1, "Vertex1"]
+#         selfobj.Point = Vector_C
+#         selfobj.Edge = None
+#         selfobj.Distance = m_distance
+#         selfobj.Proxy.execute(selfobj)
+    except Exception as err:
+        printError_msg(err.args[0], title="Macro AlongLinePoint")
+
+
 def run():
     m_sel, m_actDoc = getSel(WF.verbose())
 
-    if WF.verbose():
-        print_msg("m_sel = " + str(m_sel))
-
-    def createSubGroup(main_dir,
-                       sub_dir,
-                       error_msg):
-        try:
-            m_ob_dir = App.ActiveDocument.getObject(main_dir)
-            m_ob = m_ob_dir.newObject("App::DocumentObjectGroup",
-                                      str(sub_dir))
-            m_group = m_actDoc.getObject(str(m_ob.Label))
-        except Exception as err:
-            printError_msg(err.message, title=m_macro)
-            printError_msg(error_msg)
-        return m_group
-
     try:
-        Number_of_Edges, Edge_List = m_sel.get_segmentsNames(
-            getfrom=["Segments", "Curves"])
+        if m_sel.numberOfEntities == 1:
+            Number_of_Edges, Edge_List = m_sel.get_segmentsNames(
+                getfrom=["Segments", "Curves"],
+                flag_remove=False)
+        else:
+            Number_of_Edges, Edge_List = m_sel.get_segmentsNames(
+                getfrom=["Segments", "Curves"],
+                flag_remove=True)
+
+        Number_of_Vertexes, Vertex_List = m_sel.get_pointsNames(
+            getfrom=["Points"])
+
         if WF.verbose():
             print_msg("Number_of_Edges = " + str(Number_of_Edges))
             print_msg("Edge_List = " + str(Edge_List))
-
-        Number_of_Vertexes, Vertex_List = m_sel.get_pointsNames(
-            getfrom=["Points", "Segments", "Curves", "Objects"])
-        if WF.verbose():
             print_msg("Number_of_Vertexes = " + str(Number_of_Vertexes))
             print_msg("Vertex_List = " + str(Vertex_List))
 
@@ -458,7 +485,7 @@ def run():
                 raise Exception(m_exception_msg)
 
         m_main_dir = "WorkPoints_P"
-        m_sub_dir = "Set"
+        m_sub_dir = "Set001"
         m_group = createFolders(str(m_main_dir))
         m_error_msg = "Could not Create '"
         m_error_msg += str(m_sub_dir) + "' Objects Group!"
@@ -468,12 +495,13 @@ def run():
             try:
                 # Create a sub group if needed
                 if Number_of_Vertexes > 1:
-                    m_group = createSubGroup(m_main_dir,
+                    m_group = createSubGroup(m_actDoc,
+                                             m_main_dir,
                                              m_sub_dir,
                                              m_error_msg)
 
-                if WF.verbose():
-                    print_msg("Group = " + str(m_group.Label))
+#                 if WF.verbose():
+#                     print_msg("Group = " + str(m_group.Label))
 
                 edge = Edge_List[0]
                 if WF.verbose():
@@ -502,7 +530,8 @@ def run():
             try:
                 # Create a sub group if needed
                 if Number_of_Edges > 2:
-                    m_group = createSubGroup(m_main_dir,
+                    m_group = createSubGroup(m_actDoc,
+                                             m_main_dir,
                                              m_sub_dir,
                                              m_error_msg)
 
@@ -535,7 +564,8 @@ def run():
         elif Number_of_Edges > 1 and Number_of_Vertexes == Number_of_Edges:
             try:
                 # Create a sub group if needed
-                m_group = createSubGroup(m_main_dir,
+                m_group = createSubGroup(m_actDoc,
+                                         m_main_dir,
                                          m_sub_dir,
                                          m_error_msg)
 

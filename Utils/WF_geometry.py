@@ -248,11 +248,28 @@ def intersecLinePlane(A, B, Plane_Normal, Plane_Point):
 
 
 def intersectPerpendicularLine(A, B, C,):
-    """ Return the intersection between the Line L defined by A and B
+    """ Return the projection of point C onto line [A,B].
+
+    Calculate the intersection between the Line L defined by A and B
     and the Line perpendicular crossing the point C.
     This is also the projection of C onto the Line L.
+<<<<<<< HEAD
     Return aso the distance between C and the the projection.
     Return also the symmetric point of C versus the Line.
+=======
+
+    Return also the distance between C and the the projection.
+    Return also the symetric point of C versus the Line.
+
+    RETURN:
+    -------
+    T, distance, Tprime
+    PARAMETERS:
+    -----------
+    A    : (Vector, Mandatory)
+    B    : (Vector, Mandatory)
+    C    : (Vector, Mandatory)
+>>>>>>> Build useful functions
     """
     import math
     # L is the line defined by 2 points A(ax, ay, az) and B(bx, by, bz), and

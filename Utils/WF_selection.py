@@ -32,9 +32,25 @@ def getSel(verbose=0):
         print_msg("VERBOSE MODE :")
         print_msg("m_actDoc      = " + str(m_actDoc))
         print_msg("m_actDoc.Name = " + str(m_actDoc.Name))
-        print_msg("m_selEx       = " + str(m_selEx))
+        print_msg(str(m_sel))
+        printObjectStructure()
 
     return m_sel, m_actDoc
+
+
+def printObjectStructure():
+    m_actDoc = App.activeDocument()
+    print(str(m_actDoc.Name))
+
+    m_selEx = Gui.Selection.getSelectionEx(m_actDoc.Name)
+
+    for m_sel in m_selEx:
+        print("|__" + str(m_sel.ObjectName))
+        if m_sel.HasSubObjects:
+            for m_obj_name in m_sel.SubElementNames:
+                print("   |__" + str(m_obj_name))
+        else:
+            pass
 
 
 def parseSel(selectionObject):
@@ -157,6 +173,20 @@ class Selection():
         message = "Initialization done !"
         return message
 
+    def removeItem(self, m_id):
+        if m_debug:
+            print("running Selection.removeItem !")
+
+        self.__numberOfEntities = len(self.__selEx)
+        if self.__numberOfEntities < 1:
+            return
+
+        for c, _ in enumerate(self.__selEx, 0):
+            if c == m_id:
+                del self.__selEx[id]
+                break
+        self.initialize()
+
     def __getNumberOfEntities(self):
         return self.__numberOfEntities
 
@@ -224,17 +254,97 @@ class Selection():
         message += "\nNumber Of Entities   : " + str(self.__numberOfEntities)
         return (message)
 
-    def get_pointsNames(self, getfrom=["Points",
-                                       "Segments",
-                                       "Curves",
-                                       "Objects"]):
+    def get_vertexesFromPlane(self, subObj, selObject, SelEntities):
+        # Object of type Plane
+        m_i = 0
+        for m_v in subObj.Vertexes:
+            m_i_in_list = find(m_v, selObject.Shape)
+            SelEntities.append([selObject,
+                                "Vertex" + str(m_i_in_list)])
+            m_i += 1
+
+    def get_pointsNames(self,
+                        getfrom=["Points",
+                                 "Segments",
+                                 "Curves",
+                                 "Objects"],
+                        flag_remove=False,
+                        ):
         """
         return a list of [obj.Object,"Vertex"+str(i)]
         """
         if m_debug:
-            print("running Selection.get_pointsNames !")
-
+            print("\nrunning Selection.get_pointsNames !")
             print("self.numberOfEntities = " + str(self.numberOfEntities))
+
+        if self.numberOfEntities == 0:
+            return (0, None)
+
+        Selected_Entities = []
+
+        for m_id, m_obj in enumerate(self.__selEx, 0):
+            if m_debug:
+                print("   m_obj = " + str(m_obj))
+                print("   m_obj.Object = " + str(m_obj.Object))
+                print("   m_obj.Object.Shape = " + str(m_obj.Object.Shape))
+                print("   type(m_obj.Object.Shape) = " + str(type(m_obj.Object.Shape)))
+                print("   m_obj.HasSubObjects = " + str(m_obj.HasSubObjects))
+
+            if m_obj.HasSubObjects:
+                for m_obj_name, m_subobj in zip(m_obj.SubElementNames, m_obj.SubObjects):
+
+                    if m_debug:
+                        print("      m_obj_name = " + str(m_obj_name))
+                        print("      m_subobj = " + str(m_subobj))
+                        print("      type(m_subobj) = " + str(type(m_subobj)))
+
+                    # Object of type Plane
+                    if issubclass(type(m_subobj), Part.Face) and "Planes" in getfrom:
+                        self.get_vertexesFromPlane(m_subobj, m_obj.Object, Selected_Entities)
+                        m_i = 0
+                        for m_v in m_subobj.Vertexes:
+                            m_i_in_list = find(m_v, m_obj.Object.Shape)
+                            Selected_Entities.append([m_obj.Object,
+                                                      "Vertex" + str(m_i_in_list)])
+                            m_i += 1
+
+                    # Object of type Edge
+                    if issubclass(type(m_subobj), Part.Edge) and "Segments" in getfrom:
+                        m_i = 0
+                        for m_v in m_subobj.Vertexes:
+                            m_i_in_list = find(m_v, m_obj.Object.Shape)
+                            Selected_Entities.append([m_obj.Object,
+                                                      "Vertex" + str(m_i_in_list)])
+                            m_i += 1
+
+                    # Object of type Vertex
+                    if issubclass(type(m_subobj), Part.Vertex):
+                        Selected_Entities.append([m_obj.Object,
+                                                  m_obj_name])
+
+            else:
+                m_shape = m_obj.Object.Shape
+                pass
+
+        if len(Selected_Entities) != 0:
+            return (len(Selected_Entities), Selected_Entities)
+        else:
+            return (0, None)
+
+    def get_pointsNamesV0(self,
+                          getfrom=["Points",
+                                   "Segments",
+                                   "Curves",
+                                   "Objects"],
+                          flag_remove=False,
+                          ):
+        """
+        return a list of [obj.Object,"Vertex"+str(i)]
+        """
+        if m_debug:
+            print("\nrunning Selection.get_pointsNames !")
+            print("self.numberOfEntities = " + str(self.numberOfEntities))
+
         if self.numberOfEntities == 0:
             return (0, None)
 
@@ -257,20 +367,22 @@ class Selection():
         Selected_Entities1 = []
         Selected_Entities2 = []
 
-        for m_obj in self.__selEx:
+        for m_id, m_obj in enumerate(self.__selEx, 0):
             m_shape = m_obj.Object.Shape
             if m_debug:
+                print("m_obj = " + str(m_obj))
                 print("m_shape = " + str(m_shape))
                 print("type(m_shape) = " + str(type(m_shape)))
-
-            if m_debug:
                 print("m_obj.HasSubObjects = " + str(m_obj.HasSubObjects))
+
             if m_obj.HasSubObjects:
                 m_i = 0
                 for m_subobj in m_obj.SubObjects:
                     if m_debug:
                         print("m_subobj = " + str(m_subobj))
+                        print("type(m_subobj) = " + str(type(m_subobj)))
 
+                    # Object of type Plane
                     if issubclass(type(m_subobj), Part.Face) and "Planes" in getfrom:
                         m_i = 0
                         for m_v in m_subobj.Vertexes:
@@ -278,18 +390,27 @@ class Selection():
                             Selected_Entities.append([m_obj.Object,
                                                       "Vertex" + str(m_i_in_list)])
                             m_i += 1
-                        # m_i = 0
-                    elif issubclass(type(m_subobj), Part.Edge):
+
+                        if flag_remove:
+                            self.removeItem(m_id)
+                    # Object of type Edge
+                    elif issubclass(type(m_subobj), Part.Edge) and "Segments" in getfrom:
                         m_i = 0
                         for m_v in m_subobj.Vertexes:
                             m_i_in_list = find(m_v, m_obj.Object.Shape)
                             Selected_Entities.append([m_obj.Object,
                                                       "Vertex" + str(m_i_in_list)])
                             m_i += 1
+                        if flag_remove:
+                            self.removeItem(m_id)
+                    # Object of type Vertex
                     elif issubclass(type(m_subobj), Part.Vertex):
+                        m_i = 0
                         Selected_Entities.append([m_obj.Object,
                                                   m_obj.SubElementNames[m_i]])
-                    m_i += 1
+                        m_i += 1
+                        if flag_remove:
+                            self.removeItem(m_id)
             else:
                 m_i = 0
 
@@ -387,16 +508,20 @@ class Selection():
         else:
             return (0, None)
 
-    def get_segmentsNames(self, getfrom=["Points",
-                                         "Segments",
-                                         "Curves",
-                                         "Planes",
-                                         "Objects"]):
+    def get_segmentsNames(self,
+                          getfrom=["Points",
+                                   "Segments",
+                                   "Curves",
+                                   "Planes",
+                                   "Objects"],
+                          flag_remove=False,
+                          ):
         """
         return a list of [obj.Object,"Edge"+str(i)]
         """
         if m_debug:
-            print("running Selection.get_segmentsNames !")
+            print("\nrunning Selection.get_segmentsNames !")
+            print("self.numberOfEntities = " + str(self.numberOfEntities))
 
         if self.numberOfEntities == 0:
             return (0, None)
@@ -421,22 +546,24 @@ class Selection():
 
         Selected_Entities = []
 
-        for m_obj in self.__selEx:
-            m_shape = m_obj.Object.Shape
+        for m_id, m_obj in enumerate(self.__selEx, 0):
             if m_debug:
-                print("m_shape = " + str(m_shape))
-                print("type(m_shape) = " + str(type(m_shape)))
-
-            if m_debug:
-                print("m_obj.HasSubObjects = " + str(m_obj.HasSubObjects))
+                print("   m_obj = " + str(m_obj))
+                print("   m_obj.Object = " + str(m_obj.Object))
+                print("   m_obj.Object.Shape = " + str(m_obj.Object.Shape))
+                print("   type(m_obj.Object.Shape) = " + str(type(m_obj.Object.Shape)))
+                print("   m_obj.HasSubObjects = " + str(m_obj.HasSubObjects))
 
             if m_obj.HasSubObjects:
                 m_i = 0
 
                 for m_subobj in m_obj.SubObjects:
                     if m_debug:
-                        print("m_subobj = " + str(m_subobj))
+                        # print("      m_obj_name = " + str(m_obj_name))
+                        print("      m_subobj = " + str(m_subobj))
+                        print("      type(m_subobj) = " + str(type(m_subobj)))
 
+                    # Object of type Plane
                     if issubclass(type(m_subobj),
                                   Part.Face) and "Planes" in getfrom:
                         m_i = 0
@@ -446,12 +573,19 @@ class Selection():
                                                       "Edge" + str(m_i_in_list)])
                             m_i += 1
                         m_i = 0
+                        if flag_remove:
+                            self.removeItem(m_id)
 
-                    if issubclass(type(m_subobj), Part.Edge):
+                    # Object of type Edge
+                    if issubclass(type(m_subobj),
+                                  Part.Edge):
                         Selected_Entities.append([m_obj.Object,
                                                   m_obj.SubElementNames[m_i]])
                         m_i += 1
+                        if flag_remove:
+                            self.removeItem(id)
             else:
+                m_shape = m_obj.Object.Shape
                 m_i = 0
 
                 if issubclass(type(m_shape), Part.Edge):

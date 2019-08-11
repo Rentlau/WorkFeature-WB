@@ -398,6 +398,8 @@ if App.GuiUp:
 
 
 def buildFromOnePointAndOneObject(vertex1, object1, group):
+    if WF.verbose():
+            App.Console.PrintMessage("running twoPL.buildFromOnePointAndOneObject !")
     try:
         if WF.verbose():
             print_msg("vertex1 = " + str(vertex1))
