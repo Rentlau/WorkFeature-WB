@@ -34,6 +34,7 @@ import os.path
 import FreeCAD as App
 import Part
 from PySide import QtGui, QtCore
+
 import WF
 from WF_Objects_base import WF_Point
 # from InitGui import m_debug

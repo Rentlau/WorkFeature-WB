@@ -184,8 +184,8 @@ class CenterLinePoint(WF_Point):
     # this method is mandatory
 
     def __init__(self, selfobj):
-        if m_debug:
-            print("running CenterLinePoint.__init__ !")
+        # if m_debug:
+        #     print("running CenterLinePoint.__init__ !")
 
         self.name = "CenterLinePoint"
         WF_Point.__init__(self, selfobj, self.name)
@@ -268,8 +268,8 @@ Limits : [-1000:1000]
     def execute(self, selfobj):
         """ Doing a recomputation.
         """
-        if m_debug:
-            print("running CenterLinePoint.execute !")
+        # if m_debug:
+        #     print("running CenterLinePoint.execute !")
 
         # To be compatible with previous version > 2019
         if 'Parametric' in selfobj.PropertiesList:
@@ -283,9 +283,9 @@ Limits : [-1000:1000]
         if 'parametric' in selfobj.PropertiesList:
             self.execute_2018(selfobj)
 
-        if WF.verbose():
-            m_msg = "Recompute Python CenterLinePoint feature\n"
-            App.Console.PrintMessage(m_msg)
+        # if WF.verbose():
+        #     m_msg = "Recompute Python CenterLinePoint feature\n"
+        #     App.Console.PrintMessage(m_msg)
 
         m_PropertiesList = ['Edge',
                             'Point1',
@@ -341,11 +341,11 @@ Limits : [-1000:1000]
             printError_msg(err.args[0], title=m_macro)
 
     def onChanged(self, selfobj, prop):
-        if WF.verbose():
-            App.Console.PrintMessage("Change property : " + str(prop) + "\n")
+        # if WF.verbose():
+        #     App.Console.PrintMessage("Change property : " + str(prop) + "\n")
 
-        if m_debug:
-            print("running CenterLinePoint.onChanged !")
+        #  m_debug:
+        #     print("running CenterLinePoint.onChanged !")
 
         WF_Point.onChanged(self, selfobj, prop)
 
@@ -445,17 +445,11 @@ def run():
                      "Curves",
                      "Planes",
                      "Objects"])
-        if WF.verbose():
-            print_msg("Number_of_Edges = " + str(Number_of_Edges))
-            print_msg("Edge_List = " + str(Edge_List))
 
         if Number_of_Edges == 0:
             Number_of_Vertexes, Vertex_List = m_sel.get_pointsNames(
                 getfrom=["Points",
                          ])
-            if WF.verbose():
-                print_msg("Number_of_Vertexes = " + str(Number_of_Vertexes))
-                print_msg("Vertex_List = " + str(Vertex_List))
 
         if Number_of_Edges == 0 and Number_of_Vertexes < 2:
             raise Exception(m_exception_msg)

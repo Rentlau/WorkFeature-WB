@@ -85,8 +85,7 @@ def getParamType(param):
                    "tolerance", ]:
         # return "float"
         return "string"
-    else:
-        return None
+    return None
 
 
 def getParam(param, default=None):

@@ -2,7 +2,7 @@
 import sys
 import os.path
 import FreeCAD as App
-from PySide import QtGui,QtCore
+from PySide import QtGui, QtCore
 import WF
 if App.GuiUp:
     import FreeCADGui as Gui

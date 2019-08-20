@@ -29,18 +29,19 @@
 *   If not, see <https://www.gnu.org/licenses/>                           *
 ***************************************************************************
 """
+import os
 import sys
 import FreeCAD as App
 import WF
 
-__title__ = "Object WF_Point"
+__title__ = "Object WF_Objects_Base"
 __author__ = "Rentlau_64"
 __url__ = "https://github.com/Rentlau/WorkFeature-WB.git"
 __brief__ = '''
 
 '''
 ###############
-m_debug = True
+m_debug = False
 ###############
 
 WF_ParametricList = ['Not', 'Interactive', 'Dynamic']
@@ -53,8 +54,8 @@ class WF_Object():
     """ Abstract class of Work Feature Object.
     """
     def __init__(self, selfobj):
-        if m_debug:
-            print("running WF_Object.__init__ !")
+        # if m_debug:
+        #     print("running WF_Object.__init__ !")
         if self.__class__ is WF_Object:
             m_msg = "Creation not allowed, MUST derive this class first !"
             raise Exception(m_msg)
@@ -62,8 +63,8 @@ class WF_Object():
             self.initiate(selfobj)
 
     def initiate(self, selfobj):
-        if m_debug:
-            print("running WF_Object.initiate !")
+        # if m_debug:
+        #     print("running WF_Object.initiate !")
         self.name = "Parametric"
         self.created = False
         m_tooltip = """Choose the parametric behavior of the Feature
@@ -99,13 +100,13 @@ regarding parent changes.
 
     # this method is mandatory
     def execute(self, selfobj):
-        if m_debug:
-            print("running WF_Object.execute !")
+        # if m_debug:
+        #     print("running WF_Object.execute !")
         pass
 
     def onChanged(self, selfobj, prop):
-        if m_debug:
-            print("running WF_Object.onChanged !")
+        # if m_debug:
+        #     print("running WF_Object.onChanged !")
 
         # To be compatible with previous version 2018
         if 'parametric' in selfobj.PropertiesList:
@@ -120,18 +121,17 @@ regarding parent changes.
                 App.Console.PrintMessage(m_msg)
                 m_msg = "New color : " + str(self.color) + "\n"
                 App.Console.PrintMessage(m_msg)
-        if m_debug:
-            print("running WF_Object.onChanged done!")
 
 
 class WF_Point(WF_Object):
     """ The Point WF object. """
-    # this method is mandatory
+
     def __init__(self, selfobj, name):
-        if m_debug:
-            print("running WF_Point.__init__ !")
+        """ Add some custom properties to our Point WF object."""
+        # if m_debug:
+        #     print("running WF_Point.__init__ !")
         WF_Object.__init__(self, selfobj)
-        # Add some custom properties to our Point WF object.
+
         selfobj.addProperty("App::PropertyFloat",
                             "X",
                             name,
@@ -152,15 +152,16 @@ class WF_Point(WF_Object):
         selfobj.setEditorMode("Y", 1)
         selfobj.setEditorMode("Z", 1)
 
-    # this method is mandatory
     def execute(self, selfobj):
-        if m_debug:
-            print("running WF_Point.execute !")
+        """ Do something when doing a recomputation, this method is mandatory!"""
+        # if m_debug:
+        #     print("running WF_Point.execute !")
         pass
 
     def onChanged(self, selfobj, prop):
-        if m_debug:
-            print("running WF_Point.onChanged !")
+        """ Do something when a property has changed!"""
+        # if m_debug:
+        #     print("running WF_Point.onChanged !")
         WF_Object.onChanged(self, selfobj, prop)
 
 
@@ -168,8 +169,8 @@ class WF_Line(WF_Object):
     """ The Line WF object. """
     # this method is mandatory
     def __init__(self, selfobj, name):
-        if m_debug:
-            print("running WF_Line.__init__ !")
+        # if m_debug:
+        #     print("running WF_Line.__init__ !")
         WF_Object.__init__(self, selfobj)
         # Add some custom properties to our Line WF object.
         selfobj.addProperty("App::PropertyFloat",
@@ -209,13 +210,13 @@ class WF_Line(WF_Object):
 
     # this method is mandatory
     def execute(self, selfobj):
-        if m_debug:
-            print("running WF_Line.execute !")
+        # if m_debug:
+        #     print("running WF_Line.execute !")
         pass
 
     def onChanged(self, selfobj, prop):
-        if m_debug:
-            print("running WF_Line.onChanged !")
+        # if m_debug:
+        #     print("running WF_Line.onChanged !")
         WF_Object.onChanged(self, selfobj, prop)
 
 
@@ -223,8 +224,8 @@ class WF_Plane(WF_Object):
     """ The Plane WF object. """
     # this method is mandatory
     def __init__(self, selfobj, name):
-        if m_debug:
-            print("running WF_Plane.__init__ !")
+        # if m_debug:
+        #     print("running WF_Plane.__init__ !")
         WF_Object.__init__(self, selfobj)
         # Add some custom properties to our Line WF object.
         selfobj.addProperty("App::PropertyFloat",
@@ -278,29 +279,12 @@ class WF_Plane(WF_Object):
 
     # this method is mandatory
     def execute(self, selfobj):
-        if m_debug:
-            print("running WF_Plane.execute !")
+        # if m_debug:
+        #     print("running WF_Plane.execute !")
         pass
 
     def onChanged(self, selfobj, prop):
+        # if m_debug:
+        #     print("running WF_Plane.onChanged !")
         WF_Object.onChanged(self, selfobj, prop)
 
-
-# class WF_Plane2(WF_Point, WF_Line):
-#     """ The Plane WF object. """
-#     # this method is mandatory
-#     def __init__(self, selfobj, name):
-#         if m_debug:
-#             print("running WF_Plane.__init__ !")
-#         WF_Point.__init__(self, selfobj)
-#         WF_Line.__init__(self, selfobj)
-#         # Add some custom properties to our Plane WF object.
-# 
-#     # this method is mandatory
-#     def execute(self, selfobj):
-#         if m_debug:
-#             print("running WF_Plane.execute !")
-#         pass
-# 
-#     def onChanged(self, selfobj, prop):
-#         WF_Object.onChanged(self, selfobj, prop)
