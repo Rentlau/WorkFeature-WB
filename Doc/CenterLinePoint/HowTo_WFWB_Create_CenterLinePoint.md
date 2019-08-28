@@ -1,12 +1,13 @@
 
 #### <center>WorkFeature-WB :<br></center>
 #### <center>Work Feature workbench with parametric objects For FreeCAD  <br>
-<img src="./Images/Title02.png?1"></center>
+
+![alt](./Images/Title02.png)
 
 # <center>How to create "Center Line Point(s)"</center>
 
 
-Updated in Jnauary 2019
+Updated in August 2019
  
  
 github : https://github.com/Rentlau/WorkFeature-WB
@@ -21,8 +22,8 @@ See the usage of the <b>"CenterLinePoint"</b> Button : <img src="./Images/WF_cen
 
 | Object(s) Selected                          | Object(s) created  |
 |:------|:------|
-| **1 Edge**  <img src="./Images/CenterLinePoint_001.png" alt="Drawing" style="width: 300px;"/>| **1 Point** in the middle <img src="./Images/CenterLinePoint_002.png" alt="Drawing" style="width: 300px;"/> |
-| **1 Edge**  <img src="./Images/CenterLinePoint_001.png" alt="Drawing" style="width: 300px;"/>| **3 Points** <img src="./Images/CenterLinePoint_004.png" alt="Drawing" style="width: 300px;"/> |
+| **1 Edge**  ![alt](./Images/CenterLinePoint_001.png)| **1 Point** in the middle ![alt](./Images/CenterLinePoint_002.png)|
+| **1 Edge**  ![alt](./Images/CenterLinePoint_001.png)| **3 Points** ![alt](./Images/CenterLinePoint_004.png)|
 
 # How to
 
@@ -31,7 +32,7 @@ A - First open FeeCAD application         | B -Select the FreeCAD File | C - And
 ![alt](./Images/init01.png) | ![alt](./Images/init02.png)| ![alt](./Images/init03.png)
 
 - Click on the **Create Point(s)** button without any object selection will end up with a **Macro CenterLinePoint** Popup window message and a Parameter window in **Tasks Tab** Panel where you can define parameters for the **"CenterLinePoint"** function :<br>
-<center><img src="./Images/CenterLinePoint_003.png?1" alt="Drawing" style="width: 700px;"></center>
+![alt](./Images/CenterLinePoint_003.png)
 
 - Click "OK button" on **Macro CenterLinePoint** Popup window message and go to **Tasks Tab** panel to define parameters.<br><br>
 - Three parameters can be defined :<br>
@@ -39,7 +40,7 @@ A - First open FeeCAD application         | B -Select the FreeCAD File | C - And
         The selected line(s) can be cut in 2 parts if you want to get the middle point of the line(s).<br>
         The number (n) indicates in how many Parts each selected parent Line/Edge(s) will be cut in.<br>
         Limits : (Min: 2, Max: 100).<br>
-    - **<u>Point's location**</u>:
+    - **<u>Point's location</u>**:
         - If **Check box** checked then points will be created at each ends of Parts. Even at extrema!
             Ie : if Number of Parts is 3 then 5 points will be created!
         - **Part's end number**
@@ -73,9 +74,9 @@ Note that you need to open again this panel in order to change these parameters 
 
 A - Parameters        | B - Results | C - Objects
 :-------------------------:|:-------------------------:|:-------------------------:
-<img src="./Images/CenterLinePoint_005.png" alt="Drawing" style="width: 300px;"/>| <img src="./Images/CenterLinePoint_002.png" alt="Drawing" style="width: 300px;"/>| <img src="./Images/CenterLinePoint_011.png" alt="Drawing" style="width: 300px;"/>
-<img src="./Images/CenterLinePoint_006.png" alt="Drawing" style="width: 300px;"/>| <img src="./Images/CenterLinePoint_007.png" alt="Drawing" style="width: 300px;"/>| <img src="./Images/CenterLinePoint_010.png" alt="Drawing" style="width: 300px;"/>
-<img src="./Images/CenterLinePoint_008.png" alt="Drawing" style="width: 300px;"/>| <img src="./Images/CenterLinePoint_009.png" alt="Drawing" style="width: 300px;"/>| <img src="./Images/CenterLinePoint_012.png" alt="Drawing" style="width: 300px;"/>
+![alt](./Images/CenterLinePoint_005.png)| ![alt](./Images/CenterLinePoint_002.png)| ![alt](./Images/CenterLinePoint_011.png)
+![alt](./Images/CenterLinePoint_006.png)| ![alt](./Images/CenterLinePoint_007.png)| ![alt](./Images/CenterLinePoint_010.png)
+![alt](./Images/CenterLinePoint_008.png)| ![alt](./Images/CenterLinePoint_009.png)| ![alt](./Images/CenterLinePoint_012.png)
 
 - You can now play with **Parametric** Parameters of the new Point :<br><br>
-<center><img src="./Images/CenterLinePoint_013.png?1" alt="Drawing" style="width: 1000px;"></center>
+![alt](./Images/CenterLinePoint_013.png)

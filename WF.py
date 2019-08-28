@@ -77,9 +77,11 @@ def getParamType(param):
         return "bool"
     elif param in ["release", ]:
         return "string"
-    elif param in ["parametric", ]:
+    elif param in ["parametric",
+                   ]:
         return "int"
-    elif param in ["pointSize",
+    elif param in ["timeout",
+                   "pointSize",
                    "lineThickness",
                    "linePointSize",
                    "tolerance", ]:
@@ -139,6 +141,18 @@ def verbose():
     """ Returns the verbose value from WF user settings
     """
     return getParam("verbose", False)
+
+
+def timeout():
+    """ Returns the timeout from WF user settings
+    """
+    return int(getParam("timeout", "5"))
+
+
+def set_timeout(value):
+    """ Sets the timout to WF user settings
+    """
+    setParam("timeout", value)
 
 
 def release():

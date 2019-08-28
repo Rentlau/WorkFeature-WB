@@ -56,6 +56,9 @@ class WF_Object():
     def __init__(self, selfobj):
         # if m_debug:
         #     print("running WF_Object.__init__ !")
+        self.name = "Parametric"
+        self.color = None
+        self.created = False
         if self.__class__ is WF_Object:
             m_msg = "Creation not allowed, MUST derive this class first !"
             raise Exception(m_msg)
@@ -65,8 +68,6 @@ class WF_Object():
     def initiate(self, selfobj):
         # if m_debug:
         #     print("running WF_Object.initiate !")
-        self.name = "Parametric"
-        self.created = False
         m_tooltip = """Choose the parametric behavior of the Feature
 regarding parent changes.
   Not : For Static behavior (no update when original parent(s) change)

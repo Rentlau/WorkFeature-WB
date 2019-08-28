@@ -34,8 +34,8 @@
 import os
 import sys
 import WF
-import FreeCAD
-import FreeCADGui
+import FreeCAD as App
+import FreeCADGui as Gui
 from _version import __version__
 
 __title__ = "WorkFeature  workbench"
@@ -102,10 +102,10 @@ class WorkFeatureWorkbenchDev(Workbench):
         except ImportError:
             m_error = "Error: One of WF_ module not found,"
             m_error += "WorkFeature workbench will be disabled.\n"
-            FreeCAD.Console.PrintWarning(m_error)
+            App.Console.PrintWarning(m_error)
             m_error = "Error: Unknown error while trying"
             m_error += "to load one of WF_ module !\n"
-            FreeCAD.Console.PrintWarning(m_error)
+            App.Console.PrintWarning(m_error)
 
         # Set menu and commands for Points
         self.General_menu = ["Work Feature",
@@ -160,9 +160,9 @@ class WorkFeatureWorkbenchDev(Workbench):
         # m_submenu = ['WorkFeature.pdf']
         # self.appendMenu(["Work Feature", "Help"], m_submenu)
 
-        FreeCADGui.addIconPath(path_WF_icons)
-        FreeCADGui.addResourcePath(path_WF_icons)
-        FreeCADGui.addPreferencePage(path_WF_ui + "/WorkFeature_prefs.ui",
+        Gui.addIconPath(path_WF_icons)
+        Gui.addResourcePath(path_WF_icons)
+        Gui.addPreferencePage(path_WF_ui + "/WorkFeature_prefs.ui",
                                      "Work Feature")
 
         WF.set_release(WF_Release)
@@ -173,36 +173,36 @@ class WorkFeatureWorkbenchDev(Workbench):
     def Activated(self):
         # do something here if needed...
         m_msg = "WorkFeature workbench loaded !"
-        FreeCAD.Console.PrintMessage(m_msg + "\n")
+        App.Console.PrintMessage(m_msg + "\n")
         m_msg = "WorkFeature Release is : {0:s}".format(str(WF_Release))
-        FreeCAD.Console.PrintMessage(m_msg + "\n")
+        App.Console.PrintMessage(m_msg + "\n")
 
     def Deactivated(self):
         # do something here if needed...
         m_msg = "WorkFeature workbench Deactivated !"
-        FreeCAD.Console.PrintMessage(m_msg + "\n")
+        App.Console.PrintMessage(m_msg + "\n")
 
     def ContextMenu(self, recipient):
         if (recipient == "View"):
             self.appendContextMenu("Points", self.Point_list)
-#             if (FreeCAD.activeDraftCommand == None):
-#                 if (FreeCADGui.Selection.getSelection()):
+#             if (App.activeDraftCommand == None):
+#                 if (Gui.Selection.getSelection()):
 #                     self.appendContextMenu("Draft",self.cmdList+self.modList)
 #                     self.appendContextMenu("Utilities",self.treecmdList)
 #                 else:
 #                     self.appendContextMenu("Draft",self.cmdList)
 #             else:
-#                 if (FreeCAD.activeDraftCommand.featureName == "Line"):
+#                 if (App.activeDraftCommand.featureName == "Line"):
 #                     self.appendContextMenu("",self.lineList)
 #         else:
-#             if (FreeCADGui.Selection.getSelection()):
+#             if (Gui.Selection.getSelection()):
 #                 self.appendContextMenu("Utilities",self.treecmdList)
 
     def GetClassName(self):
         return "Gui::PythonWorkbench"
 
 
-FreeCADGui.addWorkbench(WorkFeatureWorkbenchDev)
+Gui.addWorkbench(WorkFeatureWorkbenchDev)
 
 if __name__ == '__main__':
     pass

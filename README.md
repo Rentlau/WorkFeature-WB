@@ -30,9 +30,9 @@ A FreeCAD Workbench utility to create:
 - Lines (From 2 points),
 - Planes (From 1 point and 1 Line, From 3 points)
 
-<img src="./Doc/Images/Title02.png?1">
+![alt](./Doc/Images/Title02.png?1)
 
-**Version 2019-03-13-dev**
+**Version 2019-08-28-dev**
 
 [[back to top](#Sections)]
 
@@ -128,17 +128,16 @@ The **"Parametric"** property can be changed for each single object in it's own 
 |:------|:------|
 |In General menu click the **`Update`** Button to update all **WorkFeature-WB Interactive** objects | ![alt](./Resources/Icons/WF_refresh.svg) |
 
-General preferences can be set in `Edit/Preferences` menu.
+After **activation** of the workbench, general preferences can be set in `Edit/Preferences` menu.
 
 In this panel you can choose by example to set the **Parametric behavior**:
 
-![alt](./Doc/Images/Preferences.png?1)
+![alt](./Doc/Images/Preferences.png?2)
 
 Hereafter the Graph of relationship shows that the parametric **WorkFeature-WB** Object **CenterLinePoint_P001** is depending on 
 **Line002** object, but not the **MidPoint001**!
 
-
-<img src="./Doc/Images/Graph.png" alt="drawing" style="width:500px;"/>
+![alt](./Doc/Images/Graph.png?2)
 
 [[back to top](#Sections)]
 

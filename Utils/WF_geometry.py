@@ -84,6 +84,8 @@ def alongLinePoint(edge, index, number):
     """
     Vector_A = edge.Vertexes[0].Point
     Vector_B = edge.Vertexes[-1].Point
+    if isEqualVectors(Vector_A, Vector_B):
+        return None
     distance = Vector_B.sub(Vector_A).Length / 2
 
     if number != 0:

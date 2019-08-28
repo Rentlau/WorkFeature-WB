@@ -29,7 +29,6 @@
 *   If not, see <https://www.gnu.org/licenses/>                           *
 ***************************************************************************
 """
-
 import sys
 import os.path
 import FreeCAD as App
@@ -64,9 +63,10 @@ if not sys.path.__contains__(str(path_WF_utils)):
     sys.path.append(str(path_WF_ui))
 
 try:
+    from WF_gui import raiseComboView
     from WF_selection import Selection, getSel
-    from WF_print import printError_msg, print_msg
-    from WF_directory import createFolders, addObjectToGrp
+    from WF_print import printError_msg, print_msg, printError_msgWithTimer
+    from WF_directory import createFolders, addObjectToGrp, rmObjectFromGrp
     from WF_geometry import *
 except ImportError:
     print("ERROR: Cannot load WF modules !")
@@ -119,11 +119,9 @@ class CenterLinePointPanel:
         self.form.UI_CenterLinePoint_spin_numberLinePart.setValue(
             m_numberLinePart)
         self.form.UI_CenterLinePoint_spin_indexPart.setValue(m_indexPart)
-        self.form.UI_CenterLinePoint_checkBox.setCheckState(
-            QtCore.Qt.Unchecked)
+        self.form.UI_CenterLinePoint_checkBox.setCheckState(QtCore.Qt.Unchecked)
         if m_location == "All":
-            self.form.UI_CenterLinePoint_checkBox.setCheckState(
-                QtCore.Qt.Checked)
+            self.form.UI_CenterLinePoint_checkBox.setCheckState(QtCore.Qt.Checked)
 
     def accept(self):
         global m_location
@@ -165,10 +163,11 @@ def makeCenterLinePointFeature(group):
     m_name = "CenterLinePoint_P"
     m_part = "Part::FeaturePython"
 
+    if group is None:
+        return None
     try:
         m_obj = App.ActiveDocument.addObject(str(m_part), str(m_name))
-        if group is not None:
-            addObjectToGrp(m_obj, group, info=1)
+        addObjectToGrp(m_obj, group, info=1)
         CenterLinePoint(m_obj)
         ViewProviderCenterLinePoint(m_obj.ViewObject)
     except Exception as err:
@@ -422,7 +421,7 @@ class CommandCenterLinePoint:
         if m_actDoc is not None:
             if len(Gui.Selection.getSelectionEx(m_actDoc.Name)) == 0:
                 Gui.Control.showDialog(CenterLinePointPanel())
-
+                raiseComboView()
         run()
 
     def IsActive(self):
@@ -453,12 +452,38 @@ def run():
 
         if Number_of_Edges == 0 and Number_of_Vertexes < 2:
             raise Exception(m_exception_msg)
+
+        def buildObjectFromEdge(macro, group, edge, numberLinePart, indexPart):
+            App.ActiveDocument.openTransaction(macro)
+            selfobj = makeCenterLinePointFeature(group)
+            selfobj.Edge = edge
+            selfobj.Point1 = None
+            selfobj.Point2 = None
+            selfobj.NumberLinePart = numberLinePart
+            selfobj.IndexPart = indexPart
+            selfobj.Proxy.execute(selfobj)
+            WF.touch(selfobj)
+
+        def buildObjectFromPoints(macro, group, vertex1, vertex2, numberLinePart, indexPart):
+            App.ActiveDocument.openTransaction(macro)
+            selfobj = makeCenterLinePointFeature(group)
+            selfobj.Edge = None
+            selfobj.Point1 = vertex1
+            selfobj.Point2 = vertex2
+            selfobj.NumberLinePart = numberLinePart
+            selfobj.IndexPart = indexPart
+            selfobj.Proxy.execute(selfobj)
+            WF.touch(selfobj)
+
         try:
             m_main_dir = "WorkPoints_P"
-            m_sub_dir = "Set001"
+            m_sub_dir = "Set000"
             m_group = createFolders(str(m_main_dir))
             m_error_msg = "Could not Create '"
             m_error_msg += str(m_sub_dir) + "' Objects Group!"
+
+            if WF.verbose():
+                print_msg("Location = " + str(m_location))
 
             # From Edges
             if Number_of_Edges != 0:
@@ -473,36 +498,24 @@ def run():
                         printError_msg(err.args[0], title=m_macro)
                         printError_msg(m_error_msg)
 
-                if WF.verbose():
-                    print_msg("Group = " + str(m_group.Label))
-
                 for i in range(Number_of_Edges):
                     edge = Edge_List[i]
 
-                    if WF.verbose():
-                        print_msg("Location = " + str(m_location))
+                    # Check if first point and last point of edge is not the same
+                    Vector_A = edge[0].Shape.Edges[i].Vertexes[0].Point
+                    Vector_B = edge[0].Shape.Edges[i].Vertexes[-1].Point
+                    if isEqualVectors(Vector_A, Vector_B):
+                        continue
 
                     if m_location == "Single":
-                        App.ActiveDocument.openTransaction(m_macro)
-                        selfobj = makeCenterLinePointFeature(m_group)
-                        selfobj.Edge = edge
-                        selfobj.Point1 = None
-                        selfobj.Point2 = None
-                        selfobj.NumberLinePart = m_numberLinePart
-                        selfobj.IndexPart = m_indexPart
-                        selfobj.Proxy.execute(selfobj)
-                        WF.touch(selfobj)
+                        buildObjectFromEdge(m_macro,
+                                            m_group,
+                                            edge, m_numberLinePart, m_indexPart)
                     else:
                         for m_iPart in range(m_numberLinePart + 1):
-                            App.ActiveDocument.openTransaction(m_macro)
-                            selfobj = makeCenterLinePointFeature(m_group)
-                            selfobj.Edge = edge
-                            selfobj.Point1 = None
-                            selfobj.Point2 = None
-                            selfobj.NumberLinePart = m_numberLinePart
-                            selfobj.IndexPart = m_iPart
-                            selfobj.Proxy.execute(selfobj)
-                            WF.touch(selfobj)
+                            buildObjectFromEdge(m_macro,
+                                                m_group,
+                                                edge, m_numberLinePart, m_iPart)
 
             # From Vertexes
             else:
@@ -525,58 +538,46 @@ def run():
                         vertex1 = Vertex_List[0]
                         vertex2 = Vertex_List[1]
 
+    #                     point1 = vertex1[0].Shape.Vertexes[0].Point
+    #                     point2 = vertex2[0].Shape.Vertexes[0].Point
+    #                     if isEqualVectors(point1, point2):
+    #                         return
                         if WF.verbose():
                             print_msg("vertex1 = " + str(vertex1))
                             print_msg("vertex2 = " + str(vertex2))
 
                         if m_location == "Single":
-                            App.ActiveDocument.openTransaction(m_macro)
-                            selfobj = makeCenterLinePointFeature(m_group)
-                            selfobj.Edge = None
-                            selfobj.Point1 = vertex1
-                            selfobj.Point2 = vertex2
-                            selfobj.NumberLinePart = m_numberLinePart
-                            selfobj.IndexPart = m_indexPart
-                            selfobj.Proxy.execute(selfobj)
+                            buildObjectFromPoints(m_macro,
+                                                  m_group,
+                                                  vertex1, vertex2, m_numberLinePart, m_indexPart)
                         else:
                             for m_iPart in range(m_numberLinePart + 1):
-                                App.ActiveDocument.openTransaction(m_macro)
-                                selfobj = makeCenterLinePointFeature(m_group)
-                                selfobj.Edge = None
-                                selfobj.Point1 = vertex1
-                                selfobj.Point2 = vertex2
-                                selfobj.NumberLinePart = m_numberLinePart
-                                selfobj.IndexPart = m_iPart
-                                selfobj.Proxy.execute(selfobj)
+                                buildObjectFromPoints(m_macro,
+                                                      m_group,
+                                                      vertex1, vertex2, m_numberLinePart, m_iPart)
                     else:
                         for i in range(0, Number_of_Vertexes - 2, 2):
                             vertex1 = Vertex_List[i]
                             vertex2 = Vertex_List[i + 1]
+
+    #                         point1 = vertex1[0].Shape.Vertexes[0].Point
+    #                         point2 = vertex2[0].Shape.Vertexes[0].Point
+    #                         if isEqualVectors(point1, point2):
+    #                             continue
 
                             if WF.verbose():
                                 print_msg("vertex1 = " + str(vertex1))
                                 print_msg("vertex2 = " + str(vertex2))
 
                             if m_location == "Single":
-                                App.ActiveDocument.openTransaction(m_macro)
-                                selfobj = makeCenterLinePointFeature(m_group)
-                                selfobj.Edge = None
-                                selfobj.Point1 = vertex1
-                                selfobj.Point2 = vertex2
-                                selfobj.NumberLinePart = m_numberLinePart
-                                selfobj.IndexPart = m_indexPart
-                                selfobj.Proxy.execute(selfobj)
+                                buildObjectFromPoints(m_macro,
+                                                      m_group,
+                                                      vertex1, vertex2, m_numberLinePart, m_indexPart)
                             else:
                                 for m_iPart in range(m_numberLinePart + 1):
-                                    App.ActiveDocument.openTransaction(m_macro)
-                                    selfobj = makeCenterLinePointFeature(
-                                        m_group)
-                                    selfobj.Edge = None
-                                    selfobj.Point1 = vertex1
-                                    selfobj.Point2 = vertex2
-                                    selfobj.NumberLinePart = m_numberLinePart
-                                    selfobj.IndexPart = m_iPart
-                                    selfobj.Proxy.execute(selfobj)
+                                    buildObjectFromPoints(m_macro,
+                                                          m_group,
+                                                          vertex1, vertex2, m_numberLinePart, m_iPart)
                 # Odd number of vertexes
                 else:
                     if WF.verbose():
@@ -590,32 +591,22 @@ def run():
                             print_msg("vertex2 = " + str(vertex2))
 
                         if m_location == "Single":
-                            App.ActiveDocument.openTransaction(m_macro)
-                            selfobj = makeCenterLinePointFeature(m_group)
-                            selfobj.Edge = None
-                            selfobj.Point1 = vertex1
-                            selfobj.Point2 = vertex2
-                            selfobj.NumberLinePart = m_numberLinePart
-                            selfobj.IndexPart = m_indexPart
-                            selfobj.Proxy.execute(selfobj)
+                            buildObjectFromPoints(m_macro,
+                                                  m_group,
+                                                  vertex1, vertex2, m_numberLinePart, m_indexPart)
                         else:
                             for m_iPart in range(m_numberLinePart + 1):
-                                App.ActiveDocument.openTransaction(m_macro)
-                                selfobj = makeCenterLinePointFeature(m_group)
-                                selfobj.Edge = None
-                                selfobj.Point1 = vertex1
-                                selfobj.Point2 = vertex2
-                                selfobj.NumberLinePart = m_numberLinePart
-                                selfobj.IndexPart = m_iPart
-                                selfobj.Proxy.execute(selfobj)
+                                buildObjectFromPoints(m_macro,
+                                                      m_group,
+                                                      vertex1, vertex2, m_numberLinePart, m_iPart)
 
         except Exception as err:
             printError_msg(err.args[0], title=m_macro)
 
-        App.ActiveDocument.commitTransaction()
-
     except Exception as err:
-        printError_msg(err.args[0], title=m_macro)
+        printError_msgWithTimer(err.args[0], title=m_macro)
+
+    App.ActiveDocument.commitTransaction()
 
 
 if __name__ == '__main__':

@@ -590,6 +590,24 @@ class Selection():
                     m_i += 1
             return m_i
 
+        def findEdge(anEdge, inObject):
+            if hasattr(inObject, 'Edges'):
+                m_i = 0
+                for e in inObject.Edges:
+                    # We return the index + 1  of the edge in the edges list
+                    # when extrema points match
+                    if geom.isEqualVectors(e.Vertexes[0].Point,
+                                           anEdge.Vertexes[0].Point,
+                                           tolerance=1e-12):
+                        if geom.isEqualVectors(e.Vertexes[-1].Point,
+                                               anEdge.Vertexes[-1].Point,
+                                               tolerance=1e-12):
+                            # Needs to add 1 as for Edge1 corresponds to
+                            # first 0 index in the list
+                            return (m_i + 1)
+                    m_i += 1
+            return None
+
         def addSubEdges(Sel_Edges, m_parent, m_name, m_shape, m_i):
             m_type = type(m_shape)
             if WF.verbose():
@@ -603,7 +621,10 @@ class Selection():
             elif issubclass(m_type, Part.Wire) and "Curves" in getfrom:
                 m_i = addSubEdge(Sel_Edges, m_parent, m_name, m_i)
             elif issubclass(m_type, Part.Face) and "Planes" in getfrom:
-                m_i = addSubEdge(Sel_Edges, m_parent, m_name, m_i)
+                for m_e in m_subobj.Edges:
+                    m_i_in_list = findEdge(m_e, m_obj.Object.Shape)
+                    Sel_Edges.append([m_parent, "Edge" + str(m_i_in_list)])
+                    m_i += 1
             elif issubclass(m_type, Part.Solid) and "Objects" in getfrom:
                 m_i = addSubEdge(Sel_Edges, m_parent, m_name, m_i)
             elif issubclass(m_type, Part.Compound) and "Sets" in getfrom:
