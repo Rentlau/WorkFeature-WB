@@ -6,7 +6,7 @@ Author: [@Rentlau_64](https://github.com/Rentlau)
 GitHub Repo: https://github.com/Rentlau/WorkFeature-WB  
 FreeCAD Forum thread discussion: https://forum.freecadweb.org/viewtopic.php?f=9&t=27195  
 
-**Updated**: March 2019
+**Updated**: August 2019
 
 
 [![forthebadge made-with-python](http://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/)
