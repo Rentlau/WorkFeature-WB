@@ -1,9 +1,7 @@
 
 #### <center>WorkFeature-WB :<br></center>
 #### <center>Work Feature workbench with parametric objects For FreeCAD  <br>
-
 ![alt](./Images/Title02.png)
-
 # <center>How to create "Center Line Point(s)"</center>
 
 
@@ -14,9 +12,9 @@ github : https://github.com/Rentlau/WorkFeature-WB
 
 # Objective
 
-See the usage of the <b>"CenterLinePoint"</b> Button : <img src="./Images/WF_centerLinePoint.svg?1">
+See the usage of the <b>"CenterLinePoint"</b> Button : ![alt](./Images/WF_centerLinePoint.svg)
 
-<img src="./Images/Tooltip.png?2">
+![alt](./Images/Tooltip.png)
 
 # Summary
 
@@ -31,7 +29,12 @@ A - First open FeeCAD application         | B -Select the FreeCAD File | C - And
 :-------------------------:|:-------------------------:|:-------------------------:
 ![alt](./Images/init01.png) | ![alt](./Images/init02.png)| ![alt](./Images/init03.png)
 
-- Click on the **Create Point(s)** button without any object selection will end up with a **Macro CenterLinePoint** Popup window message and a Parameter window in **Tasks Tab** Panel where you can define parameters for the **"CenterLinePoint"** function :<br>
+- Click on the **Create Point(s)** button without any object selection will end up 
+with a **Macro CenterLinePoint** Popup window message (depending of *Time Out* value 
+chosen in General Preference Panel)
+and a Parameter window in **Tasks Tab** Panel.
+ 
+In **Tasks Tab** Panel you can define parameters for the **"CenterLinePoint"** function :<br>
 ![alt](./Images/CenterLinePoint_003.png)
 
 - Click "OK button" on **Macro CenterLinePoint** Popup window message and go to **Tasks Tab** panel to define parameters.<br><br>

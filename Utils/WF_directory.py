@@ -57,15 +57,36 @@ def createFolders(folder=None):
     m_group = None
     for m_dir in m_list_dirs:
         if folder == m_dir:
-            m_group = App.ActiveDocument.getObject(m_main_dir).getObject(str(m_dir))
+            m_group = App.ActiveDocument.getObject(
+                m_main_dir).getObject(str(m_dir))
             if not(m_group):
                 try:
-                    m_group = App.ActiveDocument.getObject(m_main_dir).newObject("App::DocumentObjectGroup", str(m_dir))
+                    m_group = App.ActiveDocument.getObject(m_main_dir).newObject(
+                        "App::DocumentObjectGroup", str(m_dir))
                 except Exception as err:
                     printError_msg(err.args[0], title="createFolders")
                     m_msg = "Could not Create '" + str(m_dir)
                     m_msg += "' Objects Group!"
                     printError_msg(m_msg)
+
+    if WF.verbose():
+        print_msg("Group = " + str(m_group.Label) + " created!")
+
+    return m_group
+
+
+def createSubGroupV1(actDoc, main_dir, sub_dir):
+    """ Create a sub directory group into main directory if needed
+    """
+    m_error_msg = "Could not Create '"
+    m_error_msg += str(sub_dir) + "' Objects Group!"
+    try:
+        m_ob_dir = App.ActiveDocument.getObject(str(main_dir))
+        m_ob = m_ob_dir.newObject("App::DocumentObjectGroup", str(sub_dir))
+        m_group = actDoc.getObject(str(m_ob.Label))
+    except Exception as err:
+        printError_msg(err.args[0], title="createSubGroup")
+        printError_msg(m_error_msg)
 
     if WF.verbose():
         print_msg("Group = " + str(m_group.Label))
@@ -87,6 +108,6 @@ def createSubGroup(m_actDoc,
         printError_msg(error_msg)
 
     if WF.verbose():
-        print_msg("Group = " + str(m_group.Label))
+        print_msg("Sub Group = " + str(m_group.Label) + " created!")
 
     return m_group

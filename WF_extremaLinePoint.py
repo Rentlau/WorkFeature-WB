@@ -39,7 +39,7 @@ from WF_Objects_base import WF_Point
 if App.GuiUp:
     import FreeCADGui as Gui
 
-__title__= "Macro ExtremaLinePoint"
+__title__ = "Macro ExtremaLinePoint"
 __author__ = "Rentlau_64"
 __brief__ = '''
 Macro ExtremaLinePoint.
@@ -63,7 +63,7 @@ if not sys.path.__contains__(str(path_WF_utils)):
 
 try:
     from WF_selection import Selection, getSel
-    from WF_print import printError_msg, print_msg
+    from WF_print import printError_msg, print_msg, printError_msgWithTimer
     from WF_directory import createFolders, addObjectToGrp
     from WF_geometry import *
 except ImportError:
@@ -114,7 +114,8 @@ class ExtremaLinePointPanel:
         self.form = Gui.PySideUic.loadUi(path_WF_ui + m_dialog)
         self.form.setWindowTitle(m_dialog_title)
 
-        self.form.UI_ExtremaLinePoint_comboBox.setCurrentIndex(self.form.UI_ExtremaLinePoint_comboBox.findText(m_location))
+        self.form.UI_ExtremaLinePoint_comboBox.setCurrentIndex(
+            self.form.UI_ExtremaLinePoint_comboBox.findText(m_location))
 
     def accept(self):
         global m_location
@@ -160,6 +161,7 @@ def makeExtremaLinePointFeature(group):
 class ExtremaLinePoint(WF_Point):
     """ The ExtremaLinePoint feature object. """
     # this method is mandatory
+
     def __init__(self, selfobj):
         if m_debug:
             print("running ExtremaLinePoint.__init__ !")
@@ -180,7 +182,8 @@ relative to the parent Line.
                             m_tooltip)
         if (sys.version_info > (3, 0)):
             # Python 3 code in this block
-            selfobj.At = [v.encode('utf8').decode('utf-8') for v in m_locationList]
+            selfobj.At = [v.encode('utf8').decode('utf-8')
+                          for v in m_locationList]
             selfobj.At = 'Begin'.encode('utf8').decode('utf-8')
         else:
             # Python 2 code in this block
@@ -227,12 +230,14 @@ relative to the parent Line.
                 print_msg(str(selfobj.Edge[0].Shape.Edges))
 
             if len(selfobj.Edge[0].Shape.Edges) == 0:
-                    return
+                return
 
             if selfobj.At == "Begin":
-                Vector_point = selfobj.Edge[0].Shape.Edges[n - 1].Vertexes[0].Point
+                Vector_point = selfobj.Edge[0].Shape.Edges[n -
+                                                           1].Vertexes[0].Point
             else:
-                Vector_point = selfobj.Edge[0].Shape.Edges[n - 1].Vertexes[-1].Point
+                Vector_point = selfobj.Edge[0].Shape.Edges[n -
+                                                           1].Vertexes[-1].Point
 
             if Vector_point is not None:
                 point = Part.Point(Vector_point)
@@ -308,6 +313,7 @@ class ViewProviderExtremaLinePoint:
 
 class CommandExtremaLinePoint:
     """ Command to create ExtremaLinePoint feature object. """
+
     def GetResources(self):
         return {'Pixmap': path_WF_icons + m_icon,
                 'MenuText': m_menu_text,
@@ -342,23 +348,26 @@ def run():
                      "Curves",
                      "Planes",
                      "Objects"])
-        if WF.verbose():
-            print_msg("Number_of_Edges = " + str(Number_of_Edges))
-            print_msg("Edge_List = " + str(Edge_List))
 
         if Number_of_Edges == 0:
             raise Exception(m_exception_msg)
+
         try:
             m_main_dir = "WorkPoints_P"
-            m_sub_dir = "Set001"
+            m_sub_dir = "Set000"
             m_group = createFolders(str(m_main_dir))
             m_error_msg = "Could not Create '"
             m_error_msg += str(m_sub_dir) + "' Objects Group!"
 
+            if WF.verbose():
+                print_msg("Location = " + str(m_location))
+
             # Create a sub group if needed
             if Number_of_Edges > 1 or m_location == "Both ends":
                 try:
-                    m_ob = App.ActiveDocument.getObject(str(m_main_dir)).newObject("App::DocumentObjectGroup", str(m_sub_dir))
+                    m_ob = App.ActiveDocument.getObject(
+                        str(m_main_dir)).newObject(
+                        "App::DocumentObjectGroup", str(m_sub_dir))
                     m_group = m_actDoc.getObject(str(m_ob.Label))
                 except Exception as err:
                     printError_msg(err.args[0], title=m_macro)
@@ -369,9 +378,6 @@ def run():
 
             for i in range(Number_of_Edges):
                 edge = Edge_List[i]
-
-                if WF.verbose():
-                    print_msg("Location = " + str(m_location))
 
                 if m_location in ["Begin", "Both ends"]:
                     App.ActiveDocument.openTransaction(m_macro)
@@ -405,10 +411,10 @@ def run():
         except Exception as err:
             printError_msg(err.args[0], title=m_macro)
 
-        App.ActiveDocument.commitTransaction()
-
     except Exception as err:
-        printError_msg(err.args[0], title=m_macro)
+        printError_msgWithTimer(err.args[0], title=m_macro)
+
+    App.ActiveDocument.commitTransaction()
 
 
 if __name__ == '__main__':

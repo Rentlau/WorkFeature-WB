@@ -143,14 +143,14 @@ Hereafter the Graph of relationship shows that the parametric **WorkFeature-WB**
 
 ## List of available functions
 
-Functions are organised by submenus:
+Functions are organised by categories in submenus:
 
 | Name                           | Icons  |
 |:------|:------|
 | **WF General** | ![alt](./Doc/Images/WF_General.png) |
-| **WF Points** | ![alt](./Doc/Images/WF_Points.png?1) |
-| **WF Lines** | ![alt](./Doc/Images/WF_Lines.png) |
-| **WF Planes** | ![alt](./Doc/Images/WF_Planes.png) |
+| **WF Points** to create Points entities| ![alt](./Doc/Images/WF_Points.png) |
+| **WF Lines** to create Lines entities| ![alt](./Doc/Images/WF_Lines.png) |
+| **WF Planes** to create Planes entities| ![alt](./Doc/Images/WF_Planes.png) |
 
 ### WF_General
 
@@ -187,6 +187,15 @@ Functions are organised by submenus:
 |![alt](./Resources/Icons/WF_threePointsPlane.svg)  | Create a Plane from three selected Points.|
 |![alt](./Resources/Icons/WF_linePointPlane.svg)  | Create Plane(s) crossing a Point and a Line.|
 |![alt](./Resources/Icons/WF_perpendicularLinePointPlane.svg)  | Create Planes(s) crossing a Point and perpendicular to a Line. **<span style="color:red">Unsuppported as of 2019 release</span>**|
+
+Most of the time a click on a button without any a prior selection will end up with a
+Popup window message:
+
+![alt](./Doc/Images/Message.png) 
+
+This Window by default will close after a few seconds.
+
+This behavior can be changed or deactivated (with Time Out=0) in **general preferences Menu**.
 
 [[back to top](#Sections)]
 

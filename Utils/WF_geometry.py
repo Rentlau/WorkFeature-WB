@@ -24,12 +24,13 @@ def init_min_max():
     return min_val, max_val
 
 
-def isColinearVectors(A, B, C, tolerance=1e-12):
+def isColinearVectors(A, B, C):
     """ Return true if the 3 points are aligned.
     """
     Vector_1 = B - A
     Vector_2 = C - B
     Vector_3 = Vector_1.cross(Vector_2)
+    tolerance = WF.tolerance()
 
     if abs(Vector_3.x) <= tolerance and abs(
             Vector_3.y) <= tolerance and abs(Vector_3.z) <= tolerance:
@@ -38,11 +39,11 @@ def isColinearVectors(A, B, C, tolerance=1e-12):
     return False
 
 
-def isEqualVectors(A, B, tolerance=1e-12):
+def isEqualVectors(A, B):
     """ Return true if the 2 points are equal.
     """
     Vector = B - A
-
+    tolerance = WF.tolerance()
     if abs(Vector.x) <= tolerance and abs(
             Vector.y) <= tolerance and abs(Vector.z) <= tolerance:
         return True

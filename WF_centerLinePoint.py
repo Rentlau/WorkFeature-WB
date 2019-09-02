@@ -36,7 +36,6 @@ import Part
 from PySide import QtGui, QtCore
 import WF
 from WF_Objects_base import WF_Point
-# from InitGui import m_debug
 if App.GuiUp:
     import FreeCADGui as Gui
 
@@ -66,7 +65,7 @@ try:
     from WF_gui import raiseComboView
     from WF_selection import Selection, getSel
     from WF_print import printError_msg, print_msg, printError_msgWithTimer
-    from WF_directory import createFolders, addObjectToGrp, rmObjectFromGrp
+    from WF_directory import *
     from WF_geometry import *
 except ImportError:
     print("ERROR: Cannot load WF modules !")
@@ -119,9 +118,11 @@ class CenterLinePointPanel:
         self.form.UI_CenterLinePoint_spin_numberLinePart.setValue(
             m_numberLinePart)
         self.form.UI_CenterLinePoint_spin_indexPart.setValue(m_indexPart)
-        self.form.UI_CenterLinePoint_checkBox.setCheckState(QtCore.Qt.Unchecked)
+        self.form.UI_CenterLinePoint_checkBox.setCheckState(
+            QtCore.Qt.Unchecked)
         if m_location == "All":
-            self.form.UI_CenterLinePoint_checkBox.setCheckState(QtCore.Qt.Checked)
+            self.form.UI_CenterLinePoint_checkBox.setCheckState(
+                QtCore.Qt.Checked)
 
     def accept(self):
         global m_location
@@ -464,7 +465,8 @@ def run():
             selfobj.Proxy.execute(selfobj)
             WF.touch(selfobj)
 
-        def buildObjectFromPoints(macro, group, vertex1, vertex2, numberLinePart, indexPart):
+        def buildObjectFromPoints(
+                macro, group, vertex1, vertex2, numberLinePart, indexPart):
             App.ActiveDocument.openTransaction(macro)
             selfobj = makeCenterLinePointFeature(group)
             selfobj.Edge = None
@@ -476,34 +478,26 @@ def run():
             WF.touch(selfobj)
 
         try:
+            if WF.verbose():
+                print_msg("Location = " + str(m_location))
+
             m_main_dir = "WorkPoints_P"
             m_sub_dir = "Set000"
             m_group = createFolders(str(m_main_dir))
-            m_error_msg = "Could not Create '"
-            m_error_msg += str(m_sub_dir) + "' Objects Group!"
-
-            if WF.verbose():
-                print_msg("Location = " + str(m_location))
 
             # From Edges
             if Number_of_Edges != 0:
                 # Create a sub group if needed
                 if Number_of_Edges > 1 or m_location != "Single":
-                    try:
-                        m_ob = App.ActiveDocument.getObject(
-                            str(m_main_dir)).newObject(
-                            "App::DocumentObjectGroup", str(m_sub_dir))
-                        m_group = m_actDoc.getObject(str(m_ob.Label))
-                    except Exception as err:
-                        printError_msg(err.args[0], title=m_macro)
-                        printError_msg(m_error_msg)
+                    m_group = createSubGroupV1(m_actDoc, m_main_dir, m_sub_dir)
 
                 for i in range(Number_of_Edges):
                     edge = Edge_List[i]
 
-                    # Check if first point and last point of edge is not the same
-                    Vector_A = edge[0].Shape.Edges[i].Vertexes[0].Point
-                    Vector_B = edge[0].Shape.Edges[i].Vertexes[-1].Point
+                    # Check if first point and last point of edge is not the
+                    # same
+                    Vector_A = edge[0].Shape.Edges[0].Vertexes[0].Point
+                    Vector_B = edge[0].Shape.Edges[0].Vertexes[-1].Point
                     if isEqualVectors(Vector_A, Vector_B):
                         continue
 
@@ -520,14 +514,7 @@ def run():
             # From Vertexes
             else:
                 if Number_of_Vertexes > 2:
-                    try:
-                        m_ob = App.ActiveDocument.getObject(
-                            str(m_main_dir)).newObject(
-                            "App::DocumentObjectGroup", str(m_sub_dir))
-                        m_group = m_actDoc.getObject(str(m_ob.Label))
-                    except Exception as err:
-                        printError_msg(err.args[0], title=m_macro)
-                        printError_msg(m_error_msg)
+                    m_group = createSubGroupV1(m_actDoc, m_main_dir, m_sub_dir)
 
                 # Even number of vertexes
                 if (Number_of_Vertexes % 2 == 0):

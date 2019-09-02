@@ -322,11 +322,13 @@ class Selection():
                 print("   m_obj = " + str(m_obj))
                 print("   m_obj.Object = " + str(m_obj.Object))
                 print("   m_obj.Object.Shape = " + str(m_obj.Object.Shape))
-                print("   type(m_obj.Object.Shape) = " + str(type(m_obj.Object.Shape)))
+                print("   type(m_obj.Object.Shape) = " +
+                      str(type(m_obj.Object.Shape)))
                 print("   m_obj.HasSubObjects = " + str(m_obj.HasSubObjects))
 
             if m_obj.HasSubObjects:
-                for m_obj_name, m_subobj in zip(m_obj.SubElementNames, m_obj.SubObjects):
+                for m_obj_name, m_subobj in zip(
+                        m_obj.SubElementNames, m_obj.SubObjects):
 
                     if m_debug:
                         print("      m_obj_name = " + str(m_obj_name))
@@ -334,8 +336,10 @@ class Selection():
                         print("      type(m_subobj) = " + str(type(m_subobj)))
 
                     # Object of type Plane
-                    if issubclass(type(m_subobj), Part.Face) and "Planes" in getfrom:
-                        self.get_vertexesFromPlane(m_subobj, m_obj.Object, Selected_Entities)
+                    if issubclass(type(m_subobj),
+                                  Part.Face) and "Planes" in getfrom:
+                        self.get_vertexesFromPlane(
+                            m_subobj, m_obj.Object, Selected_Entities)
                         m_i = 0
                         for m_v in m_subobj.Vertexes:
                             m_i_in_list = find(m_v, m_obj.Object.Shape)
@@ -344,7 +348,8 @@ class Selection():
                             m_i += 1
 
                     # Object of type Edge
-                    if issubclass(type(m_subobj), Part.Edge) and "Segments" in getfrom:
+                    if issubclass(type(m_subobj),
+                                  Part.Edge) and "Segments" in getfrom:
                         m_i = 0
                         for m_v in m_subobj.Vertexes:
                             m_i_in_list = find(m_v, m_obj.Object.Shape)
@@ -421,7 +426,8 @@ class Selection():
                         print("type(m_subobj) = " + str(type(m_subobj)))
 
                     # Object of type Plane
-                    if issubclass(type(m_subobj), Part.Face) and "Planes" in getfrom:
+                    if issubclass(type(m_subobj),
+                                  Part.Face) and "Planes" in getfrom:
                         m_i = 0
                         for m_v in m_subobj.Vertexes:
                             m_i_in_list = find(m_v, m_obj.Object.Shape)
@@ -452,7 +458,8 @@ class Selection():
             else:
                 m_i = 0
 
-                if issubclass(type(m_shape), Part.Vertex) and "Points" in getfrom:
+                if issubclass(type(m_shape),
+                              Part.Vertex) and "Points" in getfrom:
                     if hasattr(m_shape, 'Vertexes'):
                         for m_v in m_shape.Vertexes:
                             Selected_Entities.append([m_obj.Object,
@@ -615,14 +622,15 @@ class Selection():
                 print_msg("   m_obj.SubElementNames = " + str(m_name))
                 print_msg("   type(m_obj.Object.Shape) = " + str(m_type))
                 print_msg("   m_obj.Object.Shape = " + str(m_shape))
+                print_msg("   m_i = " + str(m_i))
 
             if issubclass(m_type, Part.Edge) and "Segments" in getfrom:
                 m_i = addSubEdge(Sel_Edges, m_parent, m_name, m_i)
             elif issubclass(m_type, Part.Wire) and "Curves" in getfrom:
                 m_i = addSubEdge(Sel_Edges, m_parent, m_name, m_i)
             elif issubclass(m_type, Part.Face) and "Planes" in getfrom:
-                for m_e in m_subobj.Edges:
-                    m_i_in_list = findEdge(m_e, m_obj.Object.Shape)
+                for m_e in m_shape.Edges:
+                    m_i_in_list = findEdge(m_e, m_parent.Shape)
                     Sel_Edges.append([m_parent, "Edge" + str(m_i_in_list)])
                     m_i += 1
             elif issubclass(m_type, Part.Solid) and "Objects" in getfrom:
@@ -637,6 +645,7 @@ class Selection():
                 print_msg("   m_obj.SubElementNames = " + str(m_name))
                 print_msg("   type(m_obj.Object.Shape) = " + str(m_type))
                 print_msg("   m_obj.Object.Shape = " + str(m_shape))
+                print_msg("   m_i = " + str(m_i))
 
             if issubclass(m_type, Part.Edge) and "Segments" in getfrom:
                 m_i = addEdge(Sel_Edges, m_parent, m_shape, m_i)
@@ -745,7 +754,8 @@ class Selection():
                 print("   m_obj = " + str(m_obj))
                 print("   m_obj.Object = " + str(m_obj.Object))
                 print("   m_obj.Object.Shape = " + str(m_obj.Object.Shape))
-                print("   type(m_obj.Object.Shape) = " + str(type(m_obj.Object.Shape)))
+                print("   type(m_obj.Object.Shape) = " +
+                      str(type(m_obj.Object.Shape)))
                 print("   m_obj.HasSubObjects = " + str(m_obj.HasSubObjects))
 
             if m_obj.HasSubObjects:
