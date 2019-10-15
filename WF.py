@@ -32,7 +32,6 @@
 import sys
 import os.path
 import FreeCAD
-from PySide import QtCore, QtGui
 
 __title__ = "WorkFeature  workbench"
 __author__ = "Rentlau_64"
@@ -42,33 +41,20 @@ __brief__ = '''
 '''
 
 ###############
-m_debug = False
+M_DEBUG = False
 ###############
 
 # Get the path of the current python script
 path_WF = os.path.dirname(__file__)
 
-path_WF_icons = os.path.join(path_WF, 'Resources', 'Icons')
-path_WF_utils = os.path.join(path_WF, 'Utils')
+PATH_WF_ICONS = os.path.join(path_WF, 'Resources', 'Icons')
+PATH_WF_UTILS = os.path.join(path_WF, 'Utils')
 path_WF_resources = os.path.join(path_WF, 'Resources')
-path_WF_ui = os.path.join(path_WF, 'Resources', 'Ui')
+PATH_WF_UI = os.path.join(path_WF, 'Resources', 'Ui')
 
-if not sys.path.__contains__(str(path_WF_utils)):
-    sys.path.append(str(path_WF_utils))
-    sys.path.append(str(path_WF_ui))
-
-
-def typecheck(args_and_types, name="?"):
-    """ Checks arguments types.
-
-    typecheck([arg1,type),(arg2,type),...])
-    """
-    for v, t in args_and_types:
-        if not isinstance(v, t):
-            w = "typecheck[" + str(name) + "]: "
-            w += str(v) + " is not " + str(t) + "\n"
-            FreeCAD.Console.PrintWarning(w)
-            raise TypeError("WF." + str(name))
+if not sys.path.__contains__(str(PATH_WF_UTILS)):
+    sys.path.append(str(PATH_WF_UTILS))
+    sys.path.append(str(PATH_WF_UI))
 
 
 def getParamType(param):
@@ -91,7 +77,7 @@ def getParamType(param):
 
 
 def getParam(param, default=None):
-    """ Returns a WorkFeature parameter value from the current config.
+    """ Returns a WorkFeature parameter value from the current WF_config.
     """
     p = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/WF")
     t = getParamType(param)
@@ -233,6 +219,19 @@ def set_tolerance(value):
     """ Sets the tolerance to WF user settings
     """
     setParam("tolerance", value)
+
+
+def typecheck(args_and_types, name="?"):
+    """ Checks arguments types.
+
+    typecheck([arg1,type),(arg2,type),...])
+    """
+    for v, t in args_and_types:
+        if not isinstance(v, t):
+            w = "typecheck[" + str(name) + "]: "
+            w += str(v) + " is not " + str(t) + "\n"
+            FreeCAD.Console.PrintWarning(w)
+            raise TypeError("WF." + str(name))
 
 
 def touch(selfobj):

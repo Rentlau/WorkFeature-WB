@@ -4,43 +4,35 @@
 *   This file is part of Work Feature workbench                           *
 *                                                                         *
 *   Copyright (c) 2017-2019 <rentlau_64>                                  *
-*   https://github.com/Rentlau/WorkFeature-WB                             *
-*                                                                         *
-*   Code rewrite by <rentlau_64> from Work Features macro:                *
-*   https://github.com/Rentlau/WorkFeature                                *
-*                                                                         *
-*   This workbench is a supplement to the FreeCAD CAx development system. *
-*   http://www.freecadweb.org                                             *
-*                                                                         *
-*   This workbench is free software; you can redistribute it and/or modify*
-*   it under the terms of the GNU General Public License as published by  *
-*   the Free Software Foundation, either version 3 of the License, or     *
-*   (at your option) any later version.                                   *
-*   for detail see the LICENSE text file or:                              *
-*   https://www.gnu.org/licenses/gpl-3.0.html                             *
-*                                                                         *
-*   This workbench is distributed in the hope that it will be useful,     *
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the          *
-*   GNU Library General Public License for more details.                  *
-*                                                                         *
-*   You should have received a copy of the GNU Library General Public     *
-*   License along with this workbench;                                    *
-*   If not, see <https://www.gnu.org/licenses/>                           *
 ***************************************************************************
+Create projected point(s) on the chosen (main) Plane(s).
+
+Projected Plane(s):
+You can either select one or several of the MAIN plane(s) : XY, XZ, YZ
+
+Options:
+You can choose to generated projection dashed lines.
+You can choose to generate several symmetrical point(s).
+
+How to
+- Select one or several Points and/or
+- Select several Line/Edge(s) to process 2 ends points
+- Then Click on the icon
 """
 import sys
 import os.path
+import re
 import FreeCAD as App
 import Part
 from FreeCAD import Base
-from PySide import QtGui, QtCore
+from PySide import QtCore
+from WF_config import PATH_WF_ICONS, PATH_WF_UTILS, PATH_WF_UI
 import WF
 from WF_Objects_base import WF_Point
 from WF_Objects_base import WF_Line
 import WF_twoPointsLine as twoPL
 import WF_alongLinePoint as aLP
-# from InitGui import m_debug
+
 if App.GuiUp:
     import FreeCADGui as Gui
 
@@ -51,46 +43,39 @@ Macro ProjectedPoint.
 Creates a parametric ProjectedPoint from a list of Points
 '''
 ###############
-m_debug = True
+M_DEBUG = True
 ###############
-
-# get the path of the current python script
-path_WF = os.path.dirname(__file__)
-
-path_WF_icons = os.path.join(path_WF, 'Resources', 'Icons')
-path_WF_utils = os.path.join(path_WF, 'Utils')
-path_WF_resources = os.path.join(path_WF, 'Resources')
-path_WF_ui = os.path.join(path_WF, 'Resources', 'Ui')
-
-if not sys.path.__contains__(str(path_WF_utils)):
-    sys.path.append(str(path_WF_utils))
-    sys.path.append(str(path_WF_ui))
+if not sys.path.__contains__(str(PATH_WF_UTILS)):
+    sys.path.append(str(PATH_WF_UTILS))
+    sys.path.append(str(PATH_WF_UI))
 
 try:
-    from WF_selection import Selection, getSel
-    from WF_print import printError_msg, print_msg
-    from WF_directory import createFolders, addObjectToGrp
+    from WF_selection import getSel
+    from WF_print import printError_msg, print_msg, printError_msgWithTimer
+    from WF_directory import createFolders, addObjectToGrp, createSubGroup
     from WF_geometry import *
+    from WF_command import Command
 except ImportError:
     print("ERROR: Cannot load WF modules !")
     sys.exit(1)
 
 ###############
-m_icon = "/WF_projectedPoint.svg"
-m_dialog = "/WF_UI_projectedPoint.ui"
-m_dialog_title = ""
-m_exception_msg = """
+M_ICON_NAME = "/WF_projectedPoint.svg"
+M_ICON_NAME_FILE = os.path.join(PATH_WF_ICONS, M_ICON_NAME)
+M_DIALOG = "/WF_UI_projectedPoint.ui"
+M_DIALOG_TITLE = ""
+M_EXCEPTION_MSG = """
 Unable to create a Projected Point(s) :
  - Select one or several Points(s) and/or
- - Select one or several Line/Edge(s) to process 2 ends points and/or
+ - Select one or several Line/Edge(s) to process 2 ends points
 
 and go to Parameter(s) Window in Task Panel!"""
 # - Select one or several Plane/Face(s) to process all Points at once and/or
 # - Select one or several Object(s) to process all Points at once;
-m_result_msg = " : Projected Point(s) created !"
-m_menu_text = "Point = projected(Points)"
-m_accel = ""
-m_tool_tip = """<b>Create projected point(s)</b> on chosen or main Planes.<br>
+M_RESULT_MSG = " : Projected Point(s) created !"
+M_MENU_TEXT = "Point = projected(Points)"
+M_ACCEL = ""
+M_TOOL_TIP = """<b>Create projected point(s)</b> on chosen or main Planes.<br>
 
 <br>
 - Select one or several Points and/or<br>
@@ -105,67 +90,150 @@ m_tool_tip = """<b>Create projected point(s)</b> on chosen or main Planes.<br>
 # - Select one Plane/Face to process all Points at once and/or<br>
 # - Select one Object to process all Points at once;<br>
 ###############
-m_macro = "Macro ProjectedPoint"
-m_sel_plane = "XY plane"
-m_sel_multi = ["XY, YZ planes",
+M_MACRO = "Macro ProjectedPoint"
+M_SEL_PLANE = "XY plane"
+M_SEL_MULTI = ["XY, YZ planes",
                "XY, XZ planes",
                "YZ, XZ planes",
                "XY, YZ, XZ planes"
                # "Already Selected planes",
                ]
-m_sel_planeList = ["Defined plane",
-                   "XY plane",
-                   "YZ plane",
-                   "XZ plane",
-                   # "XY, YZ planes",
-                   # "XY, XZ planes",
-                   # "YZ, XZ planes",
-                   # "XY, YZ, XZ planes"
-                   # "Already Selected planes",
-                   ]
-m_proj_line = False
-m_group = None
-m_numberSymPoint = 0
+M_SEL_PLANE_LIST = ["Defined plane",
+                    "XY plane",
+                    "YZ plane",
+                    "XZ plane",
+                    # "XY, YZ planes",
+                    # "XY, XZ planes",
+                    # "YZ, XZ planes",
+                    # "XY, YZ, XZ planes"
+                    # "Already Selected planes",
+                    ]
+M_PROJ_LINE = False
+M_GROUP = None
+M_NUMBER_SYM_POINTS = 0
 ###############
 
 
-class ProjectedPointPanel:
-    def __init__(self):
-        self.form = Gui.PySideUic.loadUi(path_WF_ui + m_dialog)
-        self.form.setWindowTitle(m_dialog_title)
-        self.form.UI_ProjectePoint_comboBox.setCurrentIndex(self.form.UI_ProjectePoint_comboBox.findText(m_sel_plane))
-        self.form.UI_ProjectePoint_checkBox.setCheckState(QtCore.Qt.Unchecked)
-        if m_proj_line:
-            self.form.UI_ProjectePoint_checkBox.setCheckState(QtCore.Qt.Checked)
+def setSelectedPlane(selected_plane):
+    """ Set projection plane of the point.
 
-        self.form.UI_ProjectePoint_spin_numberSymPoint.setValue(m_numberSymPoint)
+    Parameters
+    -------
+    *selected_plane* : (String, Mandatory)
+            either "XY plane", "YZ plane" or "XZ plane".
+    """
+    global M_SEL_PLANE
+    if selected_plane in M_SEL_PLANE_LIST:
+        M_SEL_PLANE = selected_plane
+    else:
+        raise Exception(
+            "Not valid 'selected_plane' option : must be either 'XY plane', 'YZ plane' or 'XZ plane'")
+
+
+def getSelectedPlane():
+    """ Get projection plane  of the point.
+
+    Return
+    -------
+    either "XY plane", "YZ plane" or "XZ plane".
+
+    """
+    return M_SEL_PLANE
+
+
+def setProjectionLine(flag):
+    """ Set if projection line from point to plane is generated.
+
+    Parameters
+    -------
+    *flag*      : (Boolean, mandatory)
+
+    """
+    global M_PROJ_LINE
+    M_PROJ_LINE = flag
+
+
+def isProjectionLine():
+    """ Get if projection line from point to plane is generated.
+
+    Return
+    -------
+    A Boolean
+    """
+    return M_PROJ_LINE
+
+
+def setNumberSymmetrics(number_of_symmetric):
+    """ Set the number of symmetric points to generate.
+
+    Parameters
+    -------
+    *number_of_symmetric* : (Integer, Mandatory)
+    """
+    global M_NUMBER_SYM_POINTS
+    M_NUMBER_SYM_POINTS = int(number_of_symmetric)
+
+
+def getNumberSymmetrics():
+    """ Get the number of symmetric points.
+
+    Return
+    -------
+    An integer.
+    """
+    return M_NUMBER_SYM_POINTS
+
+
+class ProjectedPointPanel:
+    """ The ProjectedPointPanel (GUI).
+    """
+
+    def __init__(self):
+        self.form = Gui.PySideUic.loadUi(PATH_WF_UI + M_DIALOG)
+        self.form.setWindowTitle(M_DIALOG_TITLE)
+        self.form.UI_ProjectePoint_comboBox.setCurrentIndex(
+            self.form.UI_ProjectePoint_comboBox.findText(M_SEL_PLANE))
+        self.form.UI_ProjectePoint_checkBox.setCheckState(QtCore.Qt.Unchecked)
+        if M_PROJ_LINE:
+            self.form.UI_ProjectePoint_checkBox.setCheckState(
+                QtCore.Qt.Checked)
+
+        self.form.UI_ProjectePoint_spin_numberSymPoint.setValue(
+            M_NUMBER_SYM_POINTS)
 
     def accept(self):
-        global m_sel_plane
-        global m_proj_line
-        global m_numberSymPoint
-        m_sel_plane = self.form.UI_ProjectePoint_comboBox.currentText()
-        m_proj_line = self.form.UI_ProjectePoint_checkBox.isChecked()
-        m_numberSymPoint = self.form.UI_ProjectePoint_spin_numberSymPoint.value()
+        """ Run when click on OK button.
+        """
+        global M_SEL_PLANE
+        global M_PROJ_LINE
+        global M_NUMBER_SYM_POINTS
+        M_SEL_PLANE = self.form.UI_ProjectePoint_comboBox.currentText()
+        M_PROJ_LINE = self.form.UI_ProjectePoint_checkBox.isChecked()
+        M_NUMBER_SYM_POINTS = self.form.UI_ProjectePoint_spin_numberSymPoint.value()
 
         if WF.verbose():
-            print_msg("m_sel_plane = " + str(m_sel_plane))
-            print_msg("m_proj_line = " + str(m_proj_line))
-            print_msg("m_numberSymPoint = " + str(m_numberSymPoint))
+            print_msg("M_SEL_PLANE = " + str(M_SEL_PLANE))
+            print_msg("M_PROJ_LINE = " + str(M_PROJ_LINE))
+            print_msg("M_NUMBER_SYM_POINTS = " + str(M_NUMBER_SYM_POINTS))
 
         Gui.Control.closeDialog()
-        m_actDoc = App.activeDocument()
-        if m_actDoc is not None:
-            if len(Gui.Selection.getSelectionEx(m_actDoc.Name)) != 0:
-                run()
+        m_act_doc = App.activeDocument()
+        if m_act_doc is not None:
+            if Gui.Selection.getSelectionEx(m_act_doc.Name):
+                projected_point_command()
         return True
 
     def reject(self):
+        """ Run when click on CANCEL button.
+        """
         Gui.Control.closeDialog()
         return False
 
     def shouldShow(self):
-        return (len(Gui.Selection.getSelectionEx(App.activeDocument().Name)) == 0)
+        """ Must show when nothing selected.
+        """
+        return len(Gui.Selection.getSelectionEx(
+            App.activeDocument().Name)) == 0
 
 
 def makeProjectedPointFeature(group):
@@ -176,6 +244,8 @@ def makeProjectedPointFeature(group):
     m_name = "ProjectedPoint_P"
     m_part = "Part::FeaturePython"
 
+    if group is None:
+        return None
     try:
         m_obj = App.ActiveDocument.addObject(str(m_part), str(m_name))
         if group is not None:
@@ -184,17 +254,18 @@ def makeProjectedPointFeature(group):
         ViewProviderProjectedPoint(m_obj.ViewObject)
     except Exception as err:
         printError_msg("Not able to add an object to Model!")
-        printError_msg(err.args[0], title=m_macro)
+        printError_msg(err.args[0], title=M_MACRO)
         return None
 
     return m_obj
 
 
 class ProjectedPoint(WF_Point):
-    """ The ProjectedPoint feature object. """
-    # this method is mandatory
+    """ The ProjectedPoint feature object.
+    """
+
     def __init__(self, selfobj):
-        if m_debug:
+        if M_DEBUG:
             print("running ProjectedPoint.__init__ !")
 
         self.name = "ProjectedPoint"
@@ -216,11 +287,12 @@ class ProjectedPoint(WF_Point):
                             m_tooltip)
         if (sys.version_info > (3, 0)):
             # Python 3 code in this block
-            selfobj.At = [v.encode('utf8').decode('utf-8') for v in m_sel_planeList]
+            selfobj.At = [v.encode('utf8').decode('utf-8')
+                          for v in M_SEL_PLANE_LIST]
             selfobj.At = 'XY plane'.encode('utf8').decode('utf-8')
         else:
             # Python 2 code in this block
-            selfobj.At = [v.encode('utf8') for v in m_sel_planeList]
+            selfobj.At = [v.encode('utf8') for v in M_SEL_PLANE_LIST]
             selfobj.At = 'XY plane'.encode('utf8')
 
         selfobj.setEditorMode("Point", 1)
@@ -228,11 +300,19 @@ class ProjectedPoint(WF_Point):
 
         selfobj.Proxy = self
 
-    # this method is mandatory
     def execute(self, selfobj):
         """ Doing a recomputation.
         """
-        if m_debug:
+        m_properties_list = ['Point',
+                             "Plane",
+                             "At",
+                             # "Show",
+                             ]
+        for m_property in m_properties_list:
+            if m_property not in selfobj.PropertiesList:
+                return
+
+        if M_DEBUG:
             print("running ProjectedPoint.execute !")
 
         # To be compatible with previous version > 2019
@@ -244,95 +324,81 @@ class ProjectedPoint(WF_Point):
             if selfobj.Parametric == 'Interactive' and self.created:
                 return
 
-        if WF.verbose():
-            m_msg = "Recompute Python ProjectedPoint feature\n"
-            App.Console.PrintMessage(m_msg)
-
-        if m_debug:
-            print("selfobj.PropertiesList = " + str(selfobj.PropertiesList))
-
-        m_PropertiesList = ['Point',
-                            "Plane",
-                            "At",
-                            # "Show",
-                            ]
-        for m_Property in m_PropertiesList:
-            if m_Property not in selfobj.PropertiesList:
-                return
-
         try:
-            Vector_point = None
-            if m_debug:
-                print_msg("selfobj.Point = " + str(selfobj.Point))
-                print_msg("selfobj.Plane = " + str(selfobj.Plane))
-
+            vector_point = None
             if selfobj.Point is not None:
-                n = eval(selfobj.Point[1][0].lstrip('Vertex'))
-                if m_debug:
-                    print_msg("n = " + str(n))
+                # n = eval(selfobj.Point[1][0].lstrip('Vertex'))
+                m_n = re.sub('[^0-9]', '', selfobj.Point1[1][0])
+                m_n = int(m_n)
+                if M_DEBUG:
+                    print_msg(str(selfobj.Point1))
+                    print_msg("m_n = " + str(m_n))
 
-                point_A = selfobj.Point[0].Shape.Vertexes[n - 1].Point
-                x = point_A.x
-                y = point_A.y
-                z = point_A.z
-                # No selected plane so projection on one of MAIN planes
+                point1 = selfobj.Point[0].Shape.Vertexes[m_n - 1].Point
+                x = point1.x
+                y = point1.y
+                z = point1.z
+
                 if selfobj.Plane is None:
+                    # No selected plane so projection on one of MAIN planes
                     if selfobj.At == "XY plane":
-                        Vector_point = Base.Vector(x, y, 0.0)
+                        vector_point = Base.Vector(x, y, 0.0)
                     elif selfobj.At == "YZ plane":
-                        Vector_point = Base.Vector(0.0, y, z)
+                        vector_point = Base.Vector(0.0, y, z)
                     elif selfobj.At == "XZ plane":
-                        Vector_point = Base.Vector(x, 0.0, z)
+                        vector_point = Base.Vector(x, 0.0, z)
                     else:
-                        printError_msg("Not valid plane option!", title=m_macro)
-
-                # A selected plane
+                        printError_msg(
+                            "Not valid plane option!", title=M_MACRO)
                 else:
+                    # A selected plane
                     pass
 #                     p=App.Vector(1,1,1)
 #                     p.projectToPlane(App.Vector(0,0,0),App.Vector(1,0,1))
-#                     projectToPlane parameters are (point on plane,normal direction)
+# projectToPlane parameters are (point on plane,normal direction)
 
-            if Vector_point is not None:
-                point = Part.Point(Vector_point)
+            if vector_point is not None:
+                point = Part.Point(vector_point)
                 selfobj.Shape = point.toShape()
                 propertiesPoint(selfobj.Label, self.color)
-                selfobj.X = float(Vector_point.x)
-                selfobj.Y = float(Vector_point.y)
-                selfobj.Z = float(Vector_point.z)
+                selfobj.X = float(vector_point.x)
+                selfobj.Y = float(vector_point.y)
+                selfobj.Z = float(vector_point.z)
 
-                if m_debug:
-                    print("m_proj_line = " + str(m_proj_line))
-                    print("m_numberSymPoint = " + str(m_numberSymPoint))
+                if M_DEBUG:
+                    print("M_PROJ_LINE = " + str(M_PROJ_LINE))
+                    print("M_NUMBER_SYM_POINTS = " + str(M_NUMBER_SYM_POINTS))
 
-                if m_proj_line and not self.created:
+                if M_PROJ_LINE and not self.created:
                     point_1 = selfobj.Point
                     object_1 = selfobj
                     twoPL.buildFromOnePointAndOneObject(point_1,
                                                         object_1,
-                                                        m_group)
+                                                        M_GROUP)
 
-                if m_numberSymPoint > 0 and not self.created:
-                    for m_i in range(m_numberSymPoint):
+                if M_NUMBER_SYM_POINTS > 0 and not self.created:
+                    for m_i in range(M_NUMBER_SYM_POINTS):
                         index = m_i + 2
-                        aLP.buildFromTwoPoints(point_A,
-                                               Vector_point,
+                        aLP.buildFromTwoPoints(point1,
+                                               vector_point,
                                                index,
                                                object_1,
-                                               m_group)
+                                               M_GROUP)
 
                 # To be compatible with previous version 2018
                 if 'Parametric' in selfobj.PropertiesList:
                     self.created = True
+        except AttributeError as err:
+            print("AttributeError" + str(err))
         except Exception as err:
-            printError_msg(err.args[0], title=m_macro)
+            printError_msg(err.args[0], title=M_MACRO)
 
     def onChanged(self, selfobj, prop):
-        if WF.verbose():
-            App.Console.PrintMessage("Change property : " + str(prop) + "\n")
-
-        if m_debug:
+        """ Run when a proterty change.
+        """
+        if M_DEBUG:
             print("running ProjectedPoint.onChanged !")
+            print("Change property : " + str(prop))
 
         WF_Point.onChanged(self, selfobj, prop)
 
@@ -346,7 +412,7 @@ class ProjectedPoint(WF_Point):
 
         if prop == "At":
             selfobj.Proxy.execute(selfobj)
-        if m_debug:
+        if M_DEBUG:
             print("running ProjectedPoint.onChanged done!")
 
     def addSubobjects(self, selfobj, points_list=[]):
@@ -370,7 +436,7 @@ class ProjectedPoint(WF_Point):
 
 
 class ViewProviderProjectedPoint:
-    global path_WF_icons
+    global PATH_WF_ICONS
     icon = '/WF_projectedPoint.svg'
 
     def __init__(self, vobj):
@@ -401,7 +467,7 @@ class ViewProviderProjectedPoint:
     # This method is optional and if not defined a default icon is shown.
     def getIcon(self):
         """ Return the icon which will appear in the tree view. """
-        return (path_WF_icons + ViewProviderProjectedPoint.icon)
+        return (PATH_WF_ICONS + ViewProviderProjectedPoint.icon)
 
     def setIcon(self, icon='/WF_projectedPoint.svg'):
         ViewProviderProjectedPoint.icon = icon
@@ -409,19 +475,20 @@ class ViewProviderProjectedPoint:
 
 class CommandProjectedPoint:
     """ Command to create ProjectedPoint feature object. """
+
     def GetResources(self):
-        return {'Pixmap': path_WF_icons + m_icon,
-                'MenuText': m_menu_text,
-                'Accel': m_accel,
-                'ToolTip': m_tool_tip}
+        return {'Pixmap': PATH_WF_ICONS + M_ICON_NAME,
+                'MenuText': M_MENU_TEXT,
+                'Accel': M_ACCEL,
+                'ToolTip': M_TOOL_TIP}
 
     def Activated(self):
-        m_actDoc = App.activeDocument()
-        if m_actDoc is not None:
-            if len(Gui.Selection.getSelectionEx(m_actDoc.Name)) == 0:
+        m_act_doc = App.activeDocument()
+        if m_act_doc is not None:
+            if len(Gui.Selection.getSelectionEx(m_act_doc.Name)) == 0:
                 Gui.Control.showDialog(ProjectedPointPanel())
 
-        run()
+        projected_point_command()
 
     def IsActive(self):
         if App.ActiveDocument:
@@ -434,9 +501,9 @@ if App.GuiUp:
     Gui.addCommand("ProjectedPoint", CommandProjectedPoint())
 
 
-def run():
-    global m_group
-    m_sel, m_actDoc = getSel(WF.verbose())
+def projected_point_command():
+    global M_GROUP
+    m_sel, m_act_doc = getSel(WF.verbose())
 
     def touch(selfobj):
         if str(selfobj.Parametric) == 'Interactive':
@@ -449,7 +516,7 @@ def run():
             selfobj.Parametric = 'Not'
 
     try:
-        Number_of_Vertexes, Vertex_List = m_sel.get_pointsNames(
+        number_of_vertexes, vertex_list = m_sel.get_pointsNames(
             getfrom=["Points",
                      "Segments",
                      "Curves",
@@ -457,34 +524,36 @@ def run():
                      "Objects"
                      ])
         if WF.verbose():
-            print_msg("Number_of_Vertexes = " + str(Number_of_Vertexes))
-            print_msg("Vertex_List = " + str(Vertex_List))
+            print_msg("number_of_vertexes = " + str(number_of_vertexes))
+            print_msg("vertex_list = " + str(vertex_list))
 
-        if Number_of_Vertexes < 1:
-            raise Exception(m_exception_msg)
+        if number_of_vertexes < 1:
+            raise Exception(M_EXCEPTION_MSG)
 
         try:
             m_main_dir = "WorkPoints_P"
             m_sub_dir = "Set001"
-            m_group = createFolders(str(m_main_dir))
+            M_GROUP = createFolders(str(m_main_dir))
             m_error_msg = "Could not Create '"
             m_error_msg += str(m_sub_dir) + "' Objects Group!"
 
             # Create a sub group if needed
-            if Number_of_Vertexes > 1 or m_sel_plane in m_sel_multi or m_proj_line:
+            if number_of_vertexes > 1 or M_SEL_PLANE in M_SEL_MULTI or M_PROJ_LINE:
                 try:
-                    m_ob = App.ActiveDocument.getObject(str(m_main_dir)).newObject("App::DocumentObjectGroup", str(m_sub_dir))
-                    m_group = m_actDoc.getObject(str(m_ob.Label))
+                    m_ob = App.ActiveDocument.getObject(
+                        str(m_main_dir)).newObject(
+                        "App::DocumentObjectGroup", str(m_sub_dir))
+                    M_GROUP = m_act_doc.getObject(str(m_ob.Label))
                 except Exception as err:
-                    printError_msg(err.args[0], title=m_macro)
+                    printError_msg(err.args[0], title=M_MACRO)
                     printError_msg(m_error_msg)
 
             if WF.verbose():
-                print_msg("Group = " + str(m_group.Label))
+                print_msg("Group = " + str(M_GROUP.Label))
 
-            for point in Vertex_List:
+            for point in vertex_list:
                 if WF.verbose():
-                    print_msg("Selected plane" + str(m_sel_plane))
+                    print_msg("Selected plane" + str(M_SEL_PLANE))
 
                 # Possible selections
                 # "XY plane",
@@ -496,45 +565,45 @@ def run():
                 # "XY, YZ, XZ planes"
                 # "Already Selected planes",
 
-                if m_sel_plane in ["XY plane",
+                if M_SEL_PLANE in ["XY plane",
                                    "XY, YZ planes",
                                    "XY, XZ planes",
                                    "XY, YZ, XZ planes"]:
-                    App.ActiveDocument.openTransaction(m_macro)
-                    selfobj = makeProjectedPointFeature(m_group)
+                    App.ActiveDocument.openTransaction(M_MACRO)
+                    selfobj = makeProjectedPointFeature(M_GROUP)
                     selfobj.Point = point
                     selfobj.At = "XY plane"
                     selfobj.Proxy.execute(selfobj)
                     WF.touch(selfobj)
 
-                if m_sel_plane in ["YZ plane",
+                if M_SEL_PLANE in ["YZ plane",
                                    "XY, YZ planes",
                                    "YZ, XZ planes",
                                    "XY, YZ, XZ planes"]:
-                    App.ActiveDocument.openTransaction(m_macro)
-                    selfobj = makeProjectedPointFeature(m_group)
+                    App.ActiveDocument.openTransaction(M_MACRO)
+                    selfobj = makeProjectedPointFeature(M_GROUP)
                     selfobj.Point = point
                     selfobj.At = "YZ plane"
                     selfobj.Proxy.execute(selfobj)
                     WF.touch(selfobj)
-                if m_sel_plane in ["XZ plane",
+                if M_SEL_PLANE in ["XZ plane",
                                    "XY, XZ planes",
                                    "YZ, XZ planes",
                                    "XY, YZ, XZ planes"]:
-                    App.ActiveDocument.openTransaction(m_macro)
-                    selfobj = makeProjectedPointFeature(m_group)
+                    App.ActiveDocument.openTransaction(M_MACRO)
+                    selfobj = makeProjectedPointFeature(M_GROUP)
                     selfobj.Point = point
                     selfobj.At = "XZ plane"
                     selfobj.Proxy.execute(selfobj)
                     WF.touch(selfobj)
         except Exception as err:
-            printError_msg(err.args[0], title=m_macro)
+            printError_msg(err.args[0], title=M_MACRO)
 
         App.ActiveDocument.commitTransaction()
 
     except Exception as err:
-        printError_msg(err.args[0], title=m_macro)
+        printError_msg(err.args[0], title=M_MACRO)
 
 
 if __name__ == '__main__':
-    run()
+    projected_point_command()

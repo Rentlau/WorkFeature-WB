@@ -4,40 +4,26 @@
 *   This file is part of Work Feature workbench                           *
 *                                                                         *
 *   Copyright (c) 2017-2019 <rentlau_64>                                  *
-*   https://github.com/Rentlau/WorkFeature-WB                             *
-*                                                                         *
-*   Code rewrite by <rentlau_64> from Work Features macro:                *
-*   https://github.com/Rentlau/WorkFeature                                *
-*                                                                         *
-*   This workbench is a supplement to the FreeCAD CAx development system. *
-*   http://www.freecadweb.org                                             *
-*                                                                         *
-*   This workbench is free software; you can redistribute it and/or modify*
-*   it under the terms of the GNU General Public License as published by  *
-*   the Free Software Foundation, either version 3 of the License, or     *
-*   (at your option) any later version.                                   *
-*   for detail see the LICENSE text file or:                              *
-*   https://www.gnu.org/licenses/gpl-3.0.html                             *
-*                                                                         *
-*   This workbench is distributed in the hope that it will be useful,     *
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the          *
-*   GNU Library General Public License for more details.                  *
-*                                                                         *
-*   You should have received a copy of the GNU Library General Public     *
-*   License along with this workbench;                                    *
-*   If not, see <https://www.gnu.org/licenses/>                           *
 ***************************************************************************
+Create a Point at MEAN location of all selected  Points.
+
+How to
+- Select several Points and/or
+- Select several Line/Edge(s) to process 2 ends points and/or
+- Select one or several Plane/Face(s) to process all Points at once and/or
+- Select one or several Object(s) to process all Points at once;
+- Then Click on the icon
 """
 import sys
 import os.path
+import re
 import FreeCAD as App
 import Part
 from PySide import QtGui, QtCore
-
+from WF_config import PATH_WF_ICONS, PATH_WF_UTILS, PATH_WF_UI
 import WF
 from WF_Objects_base import WF_Point
-# from InitGui import m_debug
+
 if App.GuiUp:
     import FreeCADGui as Gui
 
@@ -48,36 +34,29 @@ Macro NPointsPoint.
 Creates a parametric NPointsPoint from a list of Points
 '''
 ###############
-m_debug = False
+M_DEBUG = True
 ###############
-
-# get the path of the current python script
-path_WF = os.path.dirname(__file__)
-
-path_WF_icons = os.path.join(path_WF, 'Resources', 'Icons')
-path_WF_utils = os.path.join(path_WF, 'Utils')
-path_WF_resources = os.path.join(path_WF, 'Resources')
-path_WF_ui = os.path.join(path_WF, 'Resources', 'Ui')
-
-if not sys.path.__contains__(str(path_WF_utils)):
-    sys.path.append(str(path_WF_utils))
-    sys.path.append(str(path_WF_ui))
+if not sys.path.__contains__(str(PATH_WF_UTILS)):
+    sys.path.append(str(PATH_WF_UTILS))
+    sys.path.append(str(PATH_WF_UI))
 
 try:
-    from WF_selection import Selection, getSel
-    from WF_print import printError_msg, print_msg
-    from WF_directory import createFolders, addObjectToGrp
-    from WF_geometry import *
-    from WF_utils import *
+    from WF_selection import getSel
+    from WF_print import printError_msg, print_msg, printError_msgWithTimer
+    from WF_directory import createFolders, addObjectToGrp, createSubGroup
+    from WF_geometry import meanVectorsPoint, propertiesPoint
+    from WF_utils import linkSubList_convertToOldStyle
+    from WF_command import Command
 except ImportError:
     print("ERROR: Cannot load WF modules !")
     sys.exit(1)
 
 ###############
-m_icon = "/WF_nPointsPoint.svg"
-m_dialog = "/WF_UI_nPointsPoint.ui"
-m_dialog_title = ""
-m_exception_msg = """
+M_ICON_NAME = "/WF_nPointsPoint.svg"
+M_ICON_NAME_FILE = os.path.join(PATH_WF_ICONS, M_ICON_NAME)
+M_DIALOG = "/WF_UI_nPointsPoint.ui"
+M_DIALOG_TITLE = ""
+M_EXCEPTION_MSG = """
 Unable to create a Mean Point :
 - Select several Points(s) and/or
 - Select several Line/Edge(s) to process 2 ends points and/or
@@ -85,10 +64,10 @@ Unable to create a Mean Point :
 - Select one or several Object(s) to process all Points at once;
 
 and go to Parameter(s) Window in Task Panel!"""
-m_result_msg = " : N Points Point created !"
-m_menu_text = "Point = center(Points)"
-m_accel = ""
-m_tool_tip = """<b>Create a Point</b> at MEAN location of all selected points.<br>
+M_RESULT_MSG = " : N Points Point created !"
+M_MENU_TEXT = "Point = center(Points)"
+M_ACCEL = ""
+M_TOOL_TIP = """<b>Create a Point</b> at MEAN location of all selected points.<br>
 
 <br>
 - Select several Points and/or<br>
@@ -102,45 +81,39 @@ m_tool_tip = """<b>Create a Point</b> at MEAN location of all selected points.<b
  - a Parameter(s) Window in Task Panel!</i>
 """
 ###############
-m_macro = "Macro NPointsPoint"
+M_MACRO = "Macro NPointsPoint"
 ###############
 
 
-# def linkSubList_convertToOldStyle(references):
-#     """("input: [(obj1, (sub1, sub2)), (obj2, (sub1, sub2))]\n"
-#     "output: [(obj1, sub1), (obj1, sub2), (obj2, sub1), (obj2, sub2)]")"""
-#     result = []
-#     for tup in references:
-#         if type(tup[1]) is tuple or type(tup[1]) is list:
-#             for subname in tup[1]:
-#                 result.append((tup[0], subname))
-#             if len(tup[1]) == 0:
-#                 result.append((tup[0], ''))
-#         else:
-#             # old style references, no conversion required
-#             result.append(tup)
-#     return result
-
-
 class NPointsPointPanel:
+    """ The NPointsLinePanel (GUI).
+    """
+
     def __init__(self):
-        self.form = Gui.PySideUic.loadUi(path_WF_ui + m_dialog)
-        self.form.setWindowTitle(m_dialog_title)
+        self.form = Gui.PySideUic.loadUi(PATH_WF_UI + M_DIALOG)
+        self.form.setWindowTitle(M_DIALOG_TITLE)
 
     def accept(self):
+        """ Run when click on OK button.
+        """
         Gui.Control.closeDialog()
-        m_actDoc = App.activeDocument()
-        if m_actDoc is not None:
-            if len(Gui.Selection.getSelectionEx(m_actDoc.Name)) != 0:
-                run()
+        m_act_doc = App.activeDocument()
+        if m_act_doc is not None:
+            if Gui.Selection.getSelectionEx(m_act_doc.Name):
+                n_points_point_comand()
         return True
 
     def reject(self):
+        """ Run when click on CANCEL button.
+        """
         Gui.Control.closeDialog()
         return False
 
     def shouldShow(self):
-        return (len(Gui.Selection.getSelectionEx(App.activeDocument().Name)) == 0)
+        """ Must show when nothing selected.
+        """
+        return len(Gui.Selection.getSelectionEx(
+            App.activeDocument().Name)) == 0
 
 
 def makeNPointsPointFeature(group):
@@ -151,6 +124,8 @@ def makeNPointsPointFeature(group):
     m_name = "NPointsPoint_P"
     m_part = "Part::FeaturePython"
 
+    if group is None:
+        return None
     try:
         m_obj = App.ActiveDocument.addObject(str(m_part), str(m_name))
         if group is not None:
@@ -159,22 +134,23 @@ def makeNPointsPointFeature(group):
         ViewProviderNPointsPoint(m_obj.ViewObject)
     except Exception as err:
         printError_msg("Not able to add an object to Model!")
-        printError_msg(err.args[0], title=m_macro)
+        printError_msg(err.args[0], title=M_MACRO)
         return None
 
     return m_obj, m_inst
 
 
 class NPointsPoint(WF_Point):
-    """ The NPointsPoint feature object. """
-    # this method is mandatory
+    """ The NPointsPoint feature object.
+    """
+
     def __init__(self, selfobj):
-        if m_debug:
+        if M_DEBUG:
             print("running NPointsPoint.__init__ !")
 
         self.name = "NPointsPoint"
         WF_Point.__init__(self, selfobj, self.name)
-        # Add some custom properties to our NPointsPoint feature object.
+        # Add some custom properties to our feature object.
         selfobj.addProperty("App::PropertyLinkSubList",
                             "Points",
                             self.name,
@@ -187,11 +163,16 @@ class NPointsPoint(WF_Point):
         # from within the class
         # self.Object = selfobj
 
-    # this method is mandatory
     def execute(self, selfobj):
         """ Doing a recomputation.
         """
-        if m_debug:
+        m_properties_list = ['Points',
+                             ]
+        for m_property in m_properties_list:
+            if m_property not in selfobj.PropertiesList:
+                return
+
+        if M_DEBUG:
             print("running NPointsPoint.execute !")
 
         # To be compatible with previous version > 2019
@@ -203,53 +184,43 @@ class NPointsPoint(WF_Point):
             if selfobj.Parametric == 'Interactive' and self.created:
                 return
 
-        if WF.verbose():
-            m_msg = "Recompute Python NPointsPoint feature\n"
-            App.Console.PrintMessage(m_msg)
-
-        if m_debug:
-            print("selfobj.PropertiesList = " + str(selfobj.PropertiesList))
-
-        m_PropertiesList = ['Points',
-                            ]
-        for m_Property in m_PropertiesList:
-            if m_Property not in selfobj.PropertiesList:
-                return
-
         try:
-            Vector_point = None
-            if m_debug:
-                print("selfobj.Points = " + str(selfobj.Points))
+            vector_point = None
             if selfobj.Points is not None:
                 m_points = []
                 for p in linkSubList_convertToOldStyle(selfobj.Points):
-                    n = eval(p[1].lstrip('Vertex'))
-                    if m_debug:
+                    # n = eval(p[1].lstrip('Vertex'))
+                    m_n = re.sub('[^0-9]', '', p[1])
+                    m_n = int(m_n)
+                    if M_DEBUG:
                         print("p " + str(p))
-                        print_msg("n = " + str(n))
-                    m_points.append(p[0].Shape.Vertexes[n - 1].Point)
+                        print_msg("m_n = " + str(m_n))
 
-            Vector_point = meanVectorsPoint(m_points)
+                    m_points.append(p[0].Shape.Vertexes[m_n - 1].Point)
 
-            if Vector_point is not None:
-                point = Part.Point(Vector_point)
+            vector_point = meanVectorsPoint(m_points)
+
+            if vector_point is not None:
+                point = Part.Point(vector_point)
                 selfobj.Shape = point.toShape()
                 propertiesPoint(selfobj.Label, self.color)
-                selfobj.X = float(Vector_point.x)
-                selfobj.Y = float(Vector_point.y)
-                selfobj.Z = float(Vector_point.z)
+                selfobj.X = float(vector_point.x)
+                selfobj.Y = float(vector_point.y)
+                selfobj.Z = float(vector_point.z)
                 # To be compatible with previous version 2018
                 if 'Parametric' in selfobj.PropertiesList:
                     self.created = True
+        except AttributeError as err:
+            print("AttributeError" + str(err))
         except Exception as err:
-            printError_msg(err.args[0], title=m_macro)
+            printError_msg(err.args[0], title=M_MACRO)
 
     def onChanged(self, selfobj, prop):
-        if WF.verbose():
-            App.Console.PrintMessage("Change property : " + str(prop) + "\n")
-
-        if m_debug:
+        """ Run when a proterty change.
+        """
+        if M_DEBUG:
             print("running NPointsPoint.onChanged !")
+            print("Change property : " + str(prop))
 
         WF_Point.onChanged(self, selfobj, prop)
 
@@ -269,7 +240,8 @@ class NPointsPoint(WF_Point):
             selfobj.Proxy.execute(selfobj)
 
     def addSubobjects(self, selfobj, points_list=[]):
-        "adds pointlinks to this TwoPointsLine object"
+        """ Add pointlinks to this TwoPointsLine object
+        """
         objs = selfobj.Points
         if points_list:
             s1 = []
@@ -289,8 +261,7 @@ class NPointsPoint(WF_Point):
 
 
 class ViewProviderNPointsPoint:
-    global path_WF_icons
-    icon = '/WF_nPointsPoint.svg'
+    icon = M_ICON_NAME
 
     def __init__(self, vobj):
         """ Set this object to the proxy object of the actual view provider """
@@ -320,105 +291,79 @@ class ViewProviderNPointsPoint:
     # This method is optional and if not defined a default icon is shown.
     def getIcon(self):
         """ Return the icon which will appear in the tree view. """
-        return (path_WF_icons + ViewProviderNPointsPoint.icon)
+        return PATH_WF_ICONS + ViewProviderNPointsPoint.icon
 
-    def setIcon(self, icon='/WF_nPointsPoint.svg'):
+    def setIcon(self, icon=M_ICON_NAME):
         ViewProviderNPointsPoint.icon = icon
 
 
-class CommandNPointsPoint:
-    """ Command to create NPointsPoint feature object. """
-    def GetResources(self):
-        return {'Pixmap': path_WF_icons + m_icon,
-                'MenuText': m_menu_text,
-                'Accel': m_accel,
-                'ToolTip': m_tool_tip}
-
-    def Activated(self):
-        m_actDoc = App.activeDocument()
-        if m_actDoc is not None:
-            if len(Gui.Selection.getSelectionEx(m_actDoc.Name)) == 0:
-                Gui.Control.showDialog(NPointsPointPanel())
-
-        run()
-
-    def IsActive(self):
-        if App.ActiveDocument:
-            return True
-        else:
-            return False
+def buildFromPoints(macro, group, vertexes):
+    """ Build a NPointsPoint feature object using a list of points.
+    """
+    if WF.verbose():
+        print_msg("vertexes = " + str(vertexes))
+    App.ActiveDocument.openTransaction(macro)
+    selfobj, m_inst = makeNPointsPointFeature(group)
+    m_inst.addSubobjects(selfobj, vertexes)
+    selfobj.Proxy.execute(selfobj)
+    WF.touch(selfobj)
 
 
-if App.GuiUp:
-    Gui.addCommand("NPointsPoint", CommandNPointsPoint())
-
-
-def run():
+def n_points_point_comand():
     m_sel, _ = getSel(WF.verbose())
 
+    points_from = ["Points", "Curves", "Planes", "Shells", "Objects"]
     try:
-        Number_of_Vertexes, Vertex_List = m_sel.get_pointsNames(
-            getfrom=["Points",
-                     "Curves",
-                     "Planes",
-                     "Objects"])
-        if WF.verbose():
-            print_msg("Number_of_Vertexes = " + str(Number_of_Vertexes))
-            print_msg("Vertex_List = " + str(Vertex_List))
+        number_of_vertexes, vertex_list = m_sel.get_pointsWithNames(
+            get_from=points_from)
 
-        if Number_of_Vertexes < 2:
-            raise Exception(m_exception_msg)
+        if number_of_vertexes < 2:
+            raise Exception(M_EXCEPTION_MSG)
 
         try:
             m_main_dir = "WorkPoints_P"
             m_sub_dir = "Set001"
             m_group = createFolders(str(m_main_dir))
-            m_error_msg = "Could not Create '"
-            m_error_msg += str(m_sub_dir) + "' Objects Group!"
 
             points = []
             # Case of only 2 points
-            if Number_of_Vertexes == 2:
+            if number_of_vertexes == 2:
                 if WF.verbose():
                     print_msg("Process only 2 points")
-                vertex1 = Vertex_List[0]
-                vertex2 = Vertex_List[1]
+                vertex1 = vertex_list[0]
+                vertex2 = vertex_list[1]
                 points.append(vertex1)
                 points.append(vertex2)
 
-                if WF.verbose():
-                    print_msg("vertex1 = " + str(vertex1))
-                    print_msg("vertex2 = " + str(vertex2))
+                buildFromPoints(M_MACRO, m_group, points)
 
-                App.ActiveDocument.openTransaction(m_macro)
-                selfobj, m_inst = makeNPointsPointFeature(m_group)
-                if m_debug:
-                    print("selfobj : " + str(selfobj))
-                m_inst.addSubobjects(selfobj, points)
-                selfobj.Proxy.execute(selfobj)
             # Case of more than 2 points
             else:
                 if WF.verbose():
                     print_msg("Process more than 2 points")
-                for i in range(Number_of_Vertexes):
-                    vertex1 = Vertex_List[i]
+                for i in range(number_of_vertexes):
+                    vertex1 = vertex_list[i]
                     points.append(vertex1)
-                    if WF.verbose():
-                        print_msg("vertex1 = " + str(vertex1))
 
-                App.ActiveDocument.openTransaction(m_macro)
-                selfobj, m_inst = makeNPointsPointFeature(m_group)
-                if m_debug:
-                    print("selfobj : " + str(selfobj))
-                m_inst.addSubobjects(selfobj, points)
+                buildFromPoints(M_MACRO, m_group, points)
+
         except Exception as err:
-            printError_msg(err.args[0], title=m_macro)
-
-        App.ActiveDocument.commitTransaction()
+            printError_msg(err.args[0], title=M_MACRO)
 
     except Exception as err:
-        printError_msg(err.args[0], title=m_macro)
+        printError_msgWithTimer(err.args[0], title=M_MACRO)
 
+    App.ActiveDocument.commitTransaction()
+    App.activeDocument().recompute()
+
+
+if App.GuiUp:
+    Gui.addCommand("NPointsPoint", Command(M_ICON_NAME_FILE,
+                                           M_MENU_TEXT,
+                                           M_ACCEL,
+                                           M_TOOL_TIP,
+                                           NPointsPointPanel,
+                                           n_points_point_comand))
 
 if __name__ == '__main__':
-    run()
+    n_points_point_comand()

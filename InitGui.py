@@ -42,44 +42,60 @@ __title__ = "WorkFeature  workbench"
 __author__ = "Rentlau_64"
 __url__ = "https://github.com/Rentlau/WorkFeature-WB.git"
 ###############
-m_debug = False
+M_DEBUG = False
 ###############
 global WF_Release
 WF_Release = __version__
 
-# get the path of the py python script
-path_WF = os.path.dirname(WF.__file__)
+# get the path of the current python script
+PATH_WF = os.path.dirname(WF.__file__)
 
-path_WF_icons = os.path.join(path_WF, 'Resources', 'Icons')
-path_WF_utils = os.path.join(path_WF, 'Utils')
-path_WF_resources = os.path.join(path_WF, 'Resources')
-path_WF_ui = os.path.join(path_WF, 'Resources', 'Ui')
+global PATH_WF_ICONS
+global PATH_WF_UTILS
+global PATH_WF_RESOURCES
+global PATH_WF_UI
 
-if not sys.path.__contains__(str(path_WF_utils)):
-    sys.path.append(str(path_WF_utils))
-    sys.path.append(str(path_WF_ui))
+PATH_WF_ICONS = os.path.join(PATH_WF, 'Resources', 'Icons')
+PATH_WF_UTILS = os.path.join(PATH_WF, 'Utils')
+PATH_WF_RESOURCES = os.path.join(PATH_WF, 'Resources')
+PATH_WF_UI = os.path.join(PATH_WF, 'Resources', 'Ui')
 
-if m_debug:
-    print("DEBUG : path_WF           is " + str(path_WF))
-    print("DEBUG : path_WF_icons     is " + str(path_WF_icons))
-    print("DEBUG : path_WF_utils     is " + str(path_WF_utils))
-    print("DEBUG : path_WF_resources is " + str(path_WF_resources))
-    print("DEBUG : path_WF_ui        is " + str(path_WF_ui))
+if not sys.path.__contains__(str(PATH_WF_UTILS)):
+    sys.path.append(str(PATH_WF_UTILS))
+    sys.path.append(str(PATH_WF_UI))
+
+if M_DEBUG:
+    print("DEBUG : PATH_WF           is " + str(PATH_WF))
+    print("DEBUG : PATH_WF_ICONS     is " + str(PATH_WF_ICONS))
+    print("DEBUG : PATH_WF_UTILS     is " + str(PATH_WF_UTILS))
+    print("DEBUG : PATH_WF_RESOURCES is " + str(PATH_WF_RESOURCES))
+    print("DEBUG : PATH_WF_UI        is " + str(PATH_WF_UI))
 
 
 class WorkFeatureWorkbenchDev(Workbench):
-    "WorkFeature workbench object"
-    global path_WF_icons
-    global path_WF_ui
-    global m_debug
+    """ WorkFeature workbench object
+    """
+    global PATH_WF_ICONS
+    global PATH_WF_UI
+    global M_DEBUG
 
     def __init__(self):
-        self.__class__.Icon = path_WF_icons + "/WF_wf16x16.svg"
+        self.__class__.Icon = PATH_WF_ICONS + "/WF_wf16x16.svg"
         self.__class__.MenuText = "WorkFeatureDev"
         m_tooltip = "WorkFeature workbench (allowing parametric objects)"
         self.__class__.ToolTip = m_tooltip
+        self.General_menu = None
+        self.General_commands_list = None
+        self.Point_menu = None
+        self.Point_commands_list = None
+        self.m_Line_menu = None
+        self.m_Line_commands_list = None
+        self.m_Plane_menu = None
+        self.m_Plane_commands_list = None
 
     def Initialize(self):
+        """ Run at start of FreeCAD.
+        """
         import WF
         try:
             import WF_general
@@ -122,10 +138,10 @@ class WorkFeatureWorkbenchDev(Workbench):
         # Set menu and commands for Points
         self.Point_menu = ["Work Feature",
                            "Points"]
-        self.Point_commands_list = ["CenterLinePoint",
-                                    "ExtremaLinePoint",
-                                    "AlongLinePoint",
-                                    "NPointsPoint",
+        self.Point_commands_list = ["CenterLinePoint",  # done but to test
+                                    "ExtremaLinePoint",  # done but to test
+                                    "AlongLinePoint",  # done but to test
+                                    "NPointsPoint",  # done but to test
                                     # "CenterCirclePoint",
                                     "CenterFacePoint",
                                     # "PointFacePoint",
@@ -139,8 +155,8 @@ class WorkFeatureWorkbenchDev(Workbench):
         # Set menu and commands for Lines
         self.m_Line_menu = ["Work Feature",
                             "Lines"]
-        self.m_Line_commands_list = ["TwoPointsLine",
-                                     "NPointsLine",
+        self.m_Line_commands_list = ["TwoPointsLine",  # done but to test
+                                     "NPointsLine",  # done but to test
                                      ]
         self.appendCommandbar("Lines", self.m_Line_commands_list)
         self.appendMenu(self.m_Line_menu, self.m_Line_commands_list)
@@ -149,8 +165,8 @@ class WorkFeatureWorkbenchDev(Workbench):
         # Set menu and commands for Planes
         self.m_Plane_menu = ["Work Feature",
                              "Planes"]
-        self.m_Plane_commands_list = ["ThreePointsPlane",
-                                      "LinePointPlane",
+        self.m_Plane_commands_list = ["ThreePointsPlane",   # done but to test
+                                      "LinePointPlane",  # done but to test
                                       # "PerpendicularLinePointPlane",
                                       ]
         self.appendCommandbar("Planes", self.m_Plane_commands_list)
@@ -160,17 +176,19 @@ class WorkFeatureWorkbenchDev(Workbench):
         # m_submenu = ['WorkFeature.pdf']
         # self.appendMenu(["Work Feature", "Help"], m_submenu)
 
-        Gui.addIconPath(path_WF_icons)
-        Gui.addResourcePath(path_WF_icons)
-        Gui.addPreferencePage(path_WF_ui + "/WorkFeature_prefs.ui",
-                                     "Work Feature")
+        Gui.addIconPath(PATH_WF_ICONS)
+        Gui.addResourcePath(PATH_WF_ICONS)
+        Gui.addPreferencePage(PATH_WF_UI + "/WorkFeature_prefs.ui",
+                              "Work Feature")
 
         WF.set_release(WF_Release)
         Log('Loading WorkFeature workbench...done\n')
-        if m_debug:
+        if M_DEBUG:
             print("DEBUG : WF_Release is " + str(WF_Release))
 
     def Activated(self):
+        """ Run when the workbench is activated.
+        """
         # do something here if needed...
         m_msg = "WorkFeature workbench loaded !"
         App.Console.PrintMessage(m_msg + "\n")
@@ -178,11 +196,15 @@ class WorkFeatureWorkbenchDev(Workbench):
         App.Console.PrintMessage(m_msg + "\n")
 
     def Deactivated(self):
+        """ Run when the workbench is deactivated.
+        """
         # do something here if needed...
         m_msg = "WorkFeature workbench Deactivated !"
         App.Console.PrintMessage(m_msg + "\n")
 
     def ContextMenu(self, recipient):
+        """ Define contextual menu.
+        """
         if (recipient == "View"):
             self.appendContextMenu("Points", self.Point_list)
 #             if (App.activeDraftCommand == None):
@@ -199,6 +221,8 @@ class WorkFeatureWorkbenchDev(Workbench):
 #                 self.appendContextMenu("Utilities",self.treecmdList)
 
     def GetClassName(self):
+        """ Return the class name.
+        """
         return "Gui::PythonWorkbench"
 
 

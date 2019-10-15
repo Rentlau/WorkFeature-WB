@@ -90,7 +90,7 @@ def printInfo_msg(message, title=None):
         gui_infoDialog(m_msg, title)
     except Exception as err:
         App.Console.PrintError("\nERROR: Not able to launch a QT dialog !")
-        App.Console.PrintError(err.message)
+        App.Console.PrintError(err.args[0])
         raise Exception
 
 
@@ -103,7 +103,7 @@ def printError_msg(message, title=None):
         gui_errorDialog(m_msg, title)
     except Exception as err:
         App.Console.PrintError("\nERROR: Not able to launch a QT dialog !")
-        App.Console.PrintError(err.message)
+        App.Console.PrintError(err.args[0])
         raise Exception
 
 
@@ -120,7 +120,7 @@ def printError_msgWithTimer(message, title=None):
         gui_errorDialogWithTimer(m_msg, title, timeout)
     except Exception as err:
         App.Console.PrintError("\nERROR: Not able to launch a QT dialog !")
-        App.Console.PrintError(err.message)
+        App.Console.PrintError(err.args[0])
         raise Exception
 
 

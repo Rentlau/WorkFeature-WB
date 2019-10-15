@@ -50,14 +50,14 @@ from WF_Objects_base import WF_Plane
 # get the path of the current python script 
 path_WF = os.path.dirname(__file__)
  
-path_WF_icons     = os.path.join(path_WF, 'Resources', 'Icons')
-path_WF_utils     = os.path.join(path_WF, 'Utils')
+PATH_WF_ICONS     = os.path.join(path_WF, 'Resources', 'Icons')
+PATH_WF_UTILS     = os.path.join(path_WF, 'Utils')
 path_WF_resources = os.path.join(path_WF, 'Resources')
-path_WF_ui        = os.path.join(path_WF, 'Resources', 'Ui')
+PATH_WF_UI        = os.path.join(path_WF, 'Resources', 'Ui')
  
-if not sys.path.__contains__(str(path_WF_utils)):
-    sys.path.append(str(path_WF_utils))
-    sys.path.append(str(path_WF_ui))
+if not sys.path.__contains__(str(PATH_WF_UTILS)):
+    sys.path.append(str(PATH_WF_UTILS))
+    sys.path.append(str(PATH_WF_UI))
      
 try:
     from WF_selection import Selection, getSel
@@ -70,19 +70,19 @@ except:
     sys.exit(1)
 
 ###############
-m_icon          = "/WF_perpendicularLinePointPlane.svg"
-m_dialog        = "/WF_UI_linePointPlane.ui"
-m_dialog_title  = "Define extension of the plane."
+M_ICON_NAME          = "/WF_perpendicularLinePointPlane.svg"
+M_DIALOG        = "/WF_UI_linePointPlane.ui"
+M_DIALOG_TITLE  = "Define extension of the plane."
 
-m_exception_msg = """Unable to create Plane :
+M_EXCEPTION_MSG = """Unable to create Plane :
     Select one Line and one Point only
     with the Point NOT on the Line !
 
 Go to Parameter(s) Window in Task Panel!"""
-m_result_msg    = " : Plane created !"
-m_menu_text     = "Plane = (Point, _|Line)"
-m_accel         = ""
-m_tool_tip      = """<b>Create Plane</b> given one Point and one perpendicular Line.<br>
+M_RESULT_MSG    = " : Plane created !"
+M_MENU_TEXT     = "Plane = (Point, _|Line)"
+M_ACCEL         = ""
+M_TOOL_TIP      = """<b>Create Plane</b> given one Point and one perpendicular Line.<br>
 ...<br>
 <i>Click in view window without selection will popup<br>
  - a Warning Window and<br> 
@@ -93,8 +93,8 @@ m_extension      = 100.0
 
 class PerpendicularLinePointPlanePanel:  
     def __init__(self):
-        self.form = Gui.PySideUic.loadUi(path_WF_ui + m_dialog)
-        self.form.setWindowTitle(m_dialog_title)
+        self.form = Gui.PySideUic.loadUi(PATH_WF_UI + M_DIALOG)
+        self.form.setWindowTitle(M_DIALOG_TITLE)
         self.form.UI_Plane_extension.setText(str(m_extension))
                         
     def accept(self):
@@ -105,9 +105,9 @@ class PerpendicularLinePointPlanePanel:
             print_msg("m_extension = " + str(m_extension))
             
         Gui.Control.closeDialog()
-        m_actDoc = App.activeDocument()
-        if m_actDoc is not None:
-            if len(Gui.Selection.getSelectionEx(m_actDoc.Name)) != 0:
+        m_act_doc = App.activeDocument()
+        if m_act_doc is not None:
+            if len(Gui.Selection.getSelectionEx(m_act_doc.Name)) != 0:
                 run()
         return True
     
@@ -252,7 +252,7 @@ Positive values lower than 100.0 will start to shrink it."""
     
             
 class ViewProviderPerpendicularLinePointPlane:
-    global path_WF_icons
+    global PATH_WF_ICONS
     icon = '/WF_perpendicularLinePointPlane.svg'  
     def __init__(self,vobj):
         """ Set this object to the proxy object of the actual view provider """
@@ -282,7 +282,7 @@ class ViewProviderPerpendicularLinePointPlane:
     # This method is optional and if not defined a default icon is shown.
     def getIcon(self):        
         """ Return the icon which will appear in the tree view. """
-        return (path_WF_icons + ViewProviderPerpendicularLinePointPlane.icon)
+        return (PATH_WF_ICONS + ViewProviderPerpendicularLinePointPlane.icon)
            
     def setIcon(self, icon = '/WF_perpendicularLinePointPlane.svg'):
         ViewProviderPerpendicularLinePointPlane.icon = icon
@@ -291,15 +291,15 @@ class ViewProviderPerpendicularLinePointPlane:
 class CommandPerpendicularLinePointPlane:
     """ Command to create PerpendicularLinePointPlane feature object. """
     def GetResources(self):
-        return {'Pixmap'  : path_WF_icons + m_icon,
-                'MenuText': m_menu_text,
-                'Accel'   : m_accel,
-                'ToolTip' : m_tool_tip}
+        return {'Pixmap'  : PATH_WF_ICONS + M_ICON_NAME,
+                'MenuText': M_MENU_TEXT,
+                'Accel'   : M_ACCEL,
+                'ToolTip' : M_TOOL_TIP}
 
     def Activated(self):
-        m_actDoc = App.activeDocument()
-        if m_actDoc is not None:
-            if len(Gui.Selection.getSelectionEx(m_actDoc.Name)) == 0:
+        m_act_doc = App.activeDocument()
+        if m_act_doc is not None:
+            if len(Gui.Selection.getSelectionEx(m_act_doc.Name)) == 0:
                 Gui.Control.showDialog(PerpendicularLinePointPlanePanel())
 
         run()
@@ -318,19 +318,19 @@ def run():
     m_sel, _ = getSel(WF.verbose())
       
     try:        
-        Number_of_Edges, Edge_List = m_sel.get_segmentsNames(getfrom=["Segments","Curves","Planes","Objects"])        
-        Number_of_Vertexes, Vertex_List = m_sel.get_pointsNames(getfrom=["Points","Curves","Objects"])
+        number_of_edges, edge_list = m_sel.get_segmentsNames(getfrom=["Segments","Curves","Planes","Objects"])        
+        number_of_vertexes, vertex_list = m_sel.get_pointsNames(getfrom=["Points","Curves","Objects"])
         
         if WF.verbose() != 0:
-            print_msg("Number_of_Edges = " + str(Number_of_Edges))
-            print_msg("Edge_List = " + str(Edge_List))        
-            print_msg("Number_of_Vertexes = " + str(Number_of_Vertexes))
-            print_msg("Vertex_List = " + str(Vertex_List))
+            print_msg("number_of_edges = " + str(number_of_edges))
+            print_msg("edge_list = " + str(edge_list))        
+            print_msg("number_of_vertexes = " + str(number_of_vertexes))
+            print_msg("vertex_list = " + str(vertex_list))
                 
-        if Number_of_Edges < 1:
-            raise Exception(m_exception_msg)
-        if Number_of_Vertexes < 1:
-            raise Exception(m_exception_msg)
+        if number_of_edges < 1:
+            raise Exception(M_EXCEPTION_MSG)
+        if number_of_vertexes < 1:
+            raise Exception(M_EXCEPTION_MSG)
         try:
             m_main_dir = "WorkPlanes_P"
             m_sub_dir  = "Set"    
@@ -342,8 +342,8 @@ def run():
             if WF.verbose() != 0:
                 print_msg("Group = " + str(m_group.Label))
                                
-            edge = Edge_List[0]
-            vertex =  Vertex_List [0] 
+            edge = edge_list[0]
+            vertex =  vertex_list [0] 
                
             App.ActiveDocument.openTransaction("Macro PerpendicularLinePointPlane")
             selfobj = makePerpendicularLinePointPlaneFeature(m_group)    
@@ -356,7 +356,7 @@ def run():
             App.ActiveDocument.commitTransaction()
             
     except Exception as err:
-        printError_msg(err.message, title="Macro PerpendicularLinePointPlane")
+        printError_msg(err.args[0], title="Macro PerpendicularLinePointPlane")
 
                            
 if __name__ == '__main__':

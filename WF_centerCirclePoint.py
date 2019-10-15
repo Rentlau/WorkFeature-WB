@@ -50,14 +50,14 @@ from WF_Objects_base import WF_Point
 # get the path of the current python script 
 path_WF = os.path.dirname(__file__)
  
-path_WF_icons     = os.path.join(path_WF, 'Resources', 'Icons')
-path_WF_utils     = os.path.join(path_WF, 'Utils')
+PATH_WF_ICONS     = os.path.join(path_WF, 'Resources', 'Icons')
+PATH_WF_UTILS     = os.path.join(path_WF, 'Utils')
 path_WF_resources = os.path.join(path_WF, 'Resources')
-path_WF_ui        = os.path.join(path_WF, 'Resources', 'Ui')
+PATH_WF_UI        = os.path.join(path_WF, 'Resources', 'Ui')
  
-if not sys.path.__contains__(str(path_WF_utils)):
-    sys.path.append(str(path_WF_utils))
-    sys.path.append(str(path_WF_ui))
+if not sys.path.__contains__(str(PATH_WF_UTILS)):
+    sys.path.append(str(PATH_WF_UTILS))
+    sys.path.append(str(PATH_WF_UI))
      
 try:
     from WF_selection import Selection, getSel
@@ -70,17 +70,17 @@ except:
     sys.exit(1)
 
 ###############
-m_icon          = "/WF_centerCirclePoint.svg"
-m_dialog        = None
-m_dialog_title  = "Nothing"
-m_exception_msg = """Unable to create Center Line Point(s) :
+M_ICON_NAME          = "/WF_centerCirclePoint.svg"
+M_DIALOG        = None
+M_DIALOG_TITLE  = "Nothing"
+M_EXCEPTION_MSG = """Unable to create Center Line Point(s) :
     Select at least one Edge of Circle !"""
    
  #Go to Parameter(s) Window in Task Panel!"""
-m_result_msg    = " : Center Circle Point(s) created !"
-m_menu_text     = "Point(s) = center(Arc)"
-m_accel         = ""
-m_tool_tip      = """<b>Create Point(s)</b> at Center location 
+M_RESULT_MSG    = " : Center Circle Point(s) created !"
+M_MENU_TEXT     = "Point(s) = center(Arc)"
+M_ACCEL         = ""
+M_TOOL_TIP      = """<b>Create Point(s)</b> at Center location 
 of each selected Circle(s).<br>
 <br>
 - Select one or several Circle(s), Arc(s) or Ellipse(s)<br>
@@ -93,14 +93,14 @@ of each selected Circle(s).<br>
 
 class CenterCirclePointPanel:  
     def __init__(self):
-        self.form = Gui.PySideUic.loadUi(path_WF_ui + m_dialog)
-        self.form.setWindowTitle(m_dialog_title)
+        self.form = Gui.PySideUic.loadUi(PATH_WF_UI + M_DIALOG)
+        self.form.setWindowTitle(M_DIALOG_TITLE)
                         
     def accept(self):
         Gui.Control.closeDialog()
-        m_actDoc = App.activeDocument()
-        if m_actDoc is not None:
-            if len(Gui.Selection.getSelectionEx(m_actDoc.Name)) != 0:
+        m_act_doc = App.activeDocument()
+        if m_act_doc is not None:
+            if len(Gui.Selection.getSelectionEx(m_act_doc.Name)) != 0:
                 run()
         return True
     
@@ -197,7 +197,7 @@ class CenterCirclePoint(WF_Point):
     
             
 class ViewProviderCenterCirclePoint:
-    global path_WF_icons
+    global PATH_WF_ICONS
     icon = '/WF_centerCirclePoint.svg'  
     def __init__(self,vobj):
         """ Set this object to the proxy object of the actual view provider """
@@ -227,7 +227,7 @@ class ViewProviderCenterCirclePoint:
     # This method is optional and if not defined a default icon is shown.
     def getIcon(self):        
         """ Return the icon which will appear in the tree view. """
-        return (path_WF_icons + ViewProviderCenterCirclePoint.icon)
+        return (PATH_WF_ICONS + ViewProviderCenterCirclePoint.icon)
            
     def setIcon(self, icon = '/WF_centerCirclePoint.svg'):
         ViewProviderCenterCirclePoint.icon = icon
@@ -236,15 +236,15 @@ class ViewProviderCenterCirclePoint:
 class CommandCenterCirclePoint:
     """ Command to create CenterCirclePoint feature object. """
     def GetResources(self):
-        return {'Pixmap'  : path_WF_icons + m_icon,
-                'MenuText': m_menu_text,
-                'Accel'   : m_accel,
-                'ToolTip' : m_tool_tip}
+        return {'Pixmap'  : PATH_WF_ICONS + M_ICON_NAME,
+                'MenuText': M_MENU_TEXT,
+                'Accel'   : M_ACCEL,
+                'ToolTip' : M_TOOL_TIP}
 
     def Activated(self):
-        m_actDoc = App.activeDocument()
-        if m_actDoc is not None:
-            if len(Gui.Selection.getSelectionEx(m_actDoc.Name)) == 0:
+        m_act_doc = App.activeDocument()
+        if m_act_doc is not None:
+            if len(Gui.Selection.getSelectionEx(m_act_doc.Name)) == 0:
                 pass
                 #Gui.Control.showDialog(CenterCirclePointPanel())
 
@@ -261,7 +261,7 @@ if App.GuiUp:
 
 
 def run():
-    m_sel, m_actDoc = getSel(WF.verbose())
+    m_sel, m_act_doc = getSel(WF.verbose())
       
     try: 
         Number_of_Curves, Curve_List = m_sel.get_curvesNames(
@@ -271,7 +271,7 @@ def run():
             print_msg("Curve_List = " + str(Curve_List))
             
         if Number_of_Curves == 0:
-            raise Exception(m_exception_msg)
+            raise Exception(M_EXCEPTION_MSG)
         try:
             m_main_dir = "WorkPoints_P"
             m_sub_dir  = "Set"   
@@ -281,7 +281,7 @@ def run():
             if Number_of_Curves > 1 :
                 try:
                     m_ob = App.ActiveDocument.getObject(str(m_main_dir)).newObject("App::DocumentObjectGroup", str(m_sub_dir))
-                    m_group = m_actDoc.getObject( str(m_ob.Label) )
+                    m_group = m_act_doc.getObject( str(m_ob.Label) )
                 except:
                     printError_msg("Could not Create '"+ str(m_sub_dir) +"' Objects Group!")           
             
@@ -299,7 +299,7 @@ def run():
             App.ActiveDocument.commitTransaction()
    
     except Exception as err:
-        printError_msg(err.message, title="Macro CenterCirclePoint")
+        printError_msg(err.args[0], title="Macro CenterCirclePoint")
 
                            
 if __name__ == '__main__':
