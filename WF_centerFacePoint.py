@@ -36,7 +36,7 @@ import Part
 from PySide import QtGui, QtCore
 import WF
 from WF_Objects_base import WF_Point
-# from InitGui import m_debug
+# from InitGui import M_DEBUG
 if App.GuiUp:
     import FreeCADGui as Gui
 
@@ -47,20 +47,20 @@ Macro CenterFacePoint.
 Creates a parametric CenterFacePoint from a  Plane
 '''
 ###############
-m_debug = False
+M_DEBUG = False
 ###############
 
 # get the path of the current python script
 path_WF = os.path.dirname(__file__)
 
-path_WF_icons = os.path.join(path_WF, 'Resources', 'Icons')
-path_WF_utils = os.path.join(path_WF, 'Utils')
+PATH_WF_ICONS = os.path.join(path_WF, 'Resources', 'Icons')
+PATH_WF_UTILS = os.path.join(path_WF, 'Utils')
 path_WF_resources = os.path.join(path_WF, 'Resources')
-path_WF_ui = os.path.join(path_WF, 'Resources', 'Ui')
+PATH_WF_UI = os.path.join(path_WF, 'Resources', 'Ui')
 
-if not sys.path.__contains__(str(path_WF_utils)):
-    sys.path.append(str(path_WF_utils))
-    sys.path.append(str(path_WF_ui))
+if not sys.path.__contains__(str(PATH_WF_UTILS)):
+    sys.path.append(str(PATH_WF_UTILS))
+    sys.path.append(str(PATH_WF_UI))
 
 try:
     from WF_selection import Selection, getSel
@@ -72,19 +72,19 @@ except ImportError:
     sys.exit(1)
 
 ###############
-m_icon = "/WF_centerFacePoint.svg"
-m_dialog = "/WF_UI_centerFacePoint.ui"
-m_dialog_title = "centerFacePoint Dialog"
-m_exception_msg = """
+M_ICON_NAME = "/WF_centerFacePoint.svg"
+M_DIALOG = "/WF_UI_centerFacePoint.ui"
+M_DIALOG_TITLE = "centerFacePoint Dialog"
+M_EXCEPTION_MSG = """
 Unable to create Center Face Point(s) :
 - Select one or several Plane/Face(s) and/or
 - Select one or several Object(s) to process all FAces at once;
 
 and go to Parameter(s) Window in Task Panel!"""
-m_result_msg = " : Center Face Point(s) created !"
-m_menu_text = "Point = center(Plane)"
-m_accel = ""
-m_tool_tip = """<b>Create Point(s)</b> at Center of mass location
+M_RESULT_MSG = " : Center Face Point(s) created !"
+M_MENU_TEXT = "Point = center(Plane)"
+M_ACCEL = ""
+M_TOOL_TIP = """<b>Create Point(s)</b> at Center of mass location
 of each selected Face(s).<br>
 <br>
 - Select one or several Plane/Face(s) to process and/or<br>
@@ -95,20 +95,20 @@ of each selected Face(s).<br>
  - a Warning Window !</i>
 """
 ###############
-m_macro = "Macro CenterFacePoint"
+M_MACRO = "Macro CenterFacePoint"
 ###############
 
 
 class CenterFacePointPanel:
     def __init__(self):
-        self.form = Gui.PySideUic.loadUi(path_WF_ui + m_dialog)
-        self.form.setWindowTitle(m_dialog_title)
+        self.form = Gui.PySideUic.loadUi(PATH_WF_UI + M_DIALOG)
+        self.form.setWindowTitle(M_DIALOG_TITLE)
 
     def accept(self):
         Gui.Control.closeDialog()
-        m_actDoc = App.activeDocument()
-        if m_actDoc is not None:
-            if len(Gui.Selection.getSelectionEx(m_actDoc.Name)) != 0:
+        m_act_doc = App.activeDocument()
+        if m_act_doc is not None:
+            if len(Gui.Selection.getSelectionEx(m_act_doc.Name)) != 0:
                 run()
         return True
 
@@ -136,7 +136,7 @@ def makeCenterFacePointFeature(group):
         ViewProviderCenterFacePoint(m_obj.ViewObject)
     except Exception as err:
         printError_msg("Not able to add an object to Model!")
-        printError_msg(err.args[0], title=m_macro)
+        printError_msg(err.args[0], title=M_MACRO)
         return None
 
     return m_obj
@@ -146,7 +146,7 @@ class CenterFacePoint(WF_Point):
     """ The CenterFacePoint feature object. """
     # this method is mandatory
     def __init__(self, selfobj):
-        if m_debug:
+        if M_DEBUG:
             print("running CenterFacePoint.__init__ !")
 
         self.name = "CenterFacePoint"
@@ -164,7 +164,7 @@ class CenterFacePoint(WF_Point):
     def execute(self, selfobj):
         """ Doing a recomputation.
         """
-        if m_debug:
+        if M_DEBUG:
             print("running CenterFacePoint.execute !")
 
         # To be compatible with previous version > 2019
@@ -180,23 +180,23 @@ class CenterFacePoint(WF_Point):
             m_msg = "Recompute Python CenterFacePoint feature\n"
             App.Console.PrintMessage(m_msg)
 
-        m_PropertiesList = ['Face',
+        m_properties_list = ['Face',
                             ]
-        for m_Property in m_PropertiesList:
-            if m_Property not in selfobj.PropertiesList:
+        for m_property in m_properties_list:
+            if m_property not in selfobj.PropertiesList:
                 return
 
         try:
             Vector_point = None
             if selfobj.Face is not None:
                 n = eval(selfobj.Face[1][0].lstrip('Face'))
-                if m_debug:
+                if M_DEBUG:
                     print_msg(str(selfobj.Face))
                     print_msg("n = " + str(n))
 
                 m_face = selfobj.Face[0].Shape.Faces[n - 1]
 
-                if m_debug:
+                if M_DEBUG:
                     print_msg("m_face = " + str(m_face))
 
                 Vector_point = m_face.CenterOfMass
@@ -212,13 +212,13 @@ class CenterFacePoint(WF_Point):
                 if 'Parametric' in selfobj.PropertiesList:
                     self.created = True
         except Exception as err:
-            printError_msg(err.args[0], title=m_macro)
+            printError_msg(err.args[0], title=M_MACRO)
 
     def onChanged(self, selfobj, prop):
         if WF.verbose():
             App.Console.PrintMessage("Change property : " + str(prop) + "\n")
 
-        if m_debug:
+        if M_DEBUG:
             print("running CenterFacePoint.onChanged !")
 
         WF_Point.onChanged(self, selfobj, prop)
@@ -233,7 +233,7 @@ class CenterFacePoint(WF_Point):
 
 
 class ViewProviderCenterFacePoint:
-    global path_WF_icons
+    global PATH_WF_ICONS
     icon = '/WF_centerFacePoint.svg'
 
     def __init__(self, vobj):
@@ -264,7 +264,7 @@ class ViewProviderCenterFacePoint:
     # This method is optional and if not defined a default icon is shown.
     def getIcon(self):
         """ Return the icon which will appear in the tree view. """
-        return (path_WF_icons + ViewProviderCenterFacePoint.icon)
+        return (PATH_WF_ICONS + ViewProviderCenterFacePoint.icon)
 
     def setIcon(self, icon='/WF_centerFacePoint.svg'):
         ViewProviderCenterFacePoint.icon = icon
@@ -273,15 +273,15 @@ class ViewProviderCenterFacePoint:
 class CommandCenterFacePoint:
     """ Command to create CenterFacePoint feature object. """
     def GetResources(self):
-        return {'Pixmap': path_WF_icons + m_icon,
-                'MenuText': m_menu_text,
-                'Accel': m_accel,
-                'ToolTip': m_tool_tip}
+        return {'Pixmap': PATH_WF_ICONS + M_ICON_NAME,
+                'MenuText': M_MENU_TEXT,
+                'Accel': M_ACCEL,
+                'ToolTip': M_TOOL_TIP}
 
     def Activated(self):
-        m_actDoc = App.activeDocument()
-        if m_actDoc is not None:
-            if len(Gui.Selection.getSelectionEx(m_actDoc.Name)) == 0:
+        m_act_doc = App.activeDocument()
+        if m_act_doc is not None:
+            if len(Gui.Selection.getSelectionEx(m_act_doc.Name)) == 0:
                 Gui.Control.showDialog(CenterFacePointPanel())
 
         run()
@@ -298,7 +298,7 @@ if App.GuiUp:
 
 
 def run():
-    m_sel, m_actDoc = getSel(WF.verbose())
+    m_sel, m_act_doc = getSel(WF.verbose())
 
     try:
         Number_of_Planes, Plane_List = m_sel.get_planesNames(
@@ -309,7 +309,7 @@ def run():
             print_msg("Plane_List = " + str(Plane_List))
 
         if Number_of_Planes == 0:
-            raise Exception(m_exception_msg)
+            raise Exception(M_EXCEPTION_MSG)
         try:
             m_main_dir = "WorkPoints_P"
             m_sub_dir = "Set001"
@@ -321,9 +321,9 @@ def run():
             if Number_of_Planes > 1:
                 try:
                     m_ob = App.ActiveDocument.getObject(str(m_main_dir)).newObject("App::DocumentObjectGroup", str(m_sub_dir))
-                    m_group = m_actDoc.getObject(str(m_ob.Label))
+                    m_group = m_act_doc.getObject(str(m_ob.Label))
                 except Exception as err:
-                    printError_msg(err.args[0], title=m_macro)
+                    printError_msg(err.args[0], title=M_MACRO)
                     printError_msg(m_error_msg)
 
             if WF.verbose():
@@ -331,18 +331,18 @@ def run():
 
             for i in range(Number_of_Planes):
                 plane = Plane_List[i]
-                App.ActiveDocument.openTransaction(m_macro)
+                App.ActiveDocument.openTransaction(M_MACRO)
                 selfobj = makeCenterFacePointFeature(m_group)
                 selfobj.Face = plane
                 selfobj.Proxy.execute(selfobj)
 
         except Exception as err:
-            printError_msg(err.args[0], title=m_macro)
+            printError_msg(err.args[0], title=M_MACRO)
 
         App.ActiveDocument.commitTransaction()
 
     except Exception as err:
-        printError_msg(err.args[0], title=m_macro)
+        printError_msg(err.args[0], title=M_MACRO)
 
 
 if __name__ == '__main__':

@@ -6,9 +6,6 @@ if App.GuiUp:
     import FreeCADGui as Gui
 
 
-tolerance = 1e-12
-
-
 def init_min_max():
     """ Return min and max values from System.
     min_val, max_val = init_min_max
@@ -24,27 +21,28 @@ def init_min_max():
     return min_val, max_val
 
 
-def isColinearVectors(A, B, C, tolerance=1e-12):
+def isColinearVectors(vect_a, vect_b, vect_c):
     """ Return true if the 3 points are aligned.
     """
-    Vector_1 = B - A
-    Vector_2 = C - B
+    Vector_1 = vect_b - vect_a
+    Vector_2 = vect_c - vect_b
     Vector_3 = Vector_1.cross(Vector_2)
+    m_tolerance = WF.tolerance()
 
-    if abs(Vector_3.x) <= tolerance and abs(
-            Vector_3.y) <= tolerance and abs(Vector_3.z) <= tolerance:
+    if abs(Vector_3.x) <= m_tolerance and abs(
+            Vector_3.y) <= m_tolerance and abs(Vector_3.z) <= m_tolerance:
         return True
 
     return False
 
 
-def isEqualVectors(A, B, tolerance=1e-12):
+def isEqualVectors(vect_a, vect_b):
     """ Return true if the 2 points are equal.
     """
-    Vector = B - A
-
-    if abs(Vector.x) <= tolerance and abs(
-            Vector.y) <= tolerance and abs(Vector.z) <= tolerance:
+    Vector = vect_b - vect_a
+    m_tolerance = WF.tolerance()
+    if abs(Vector.x) <= m_tolerance and abs(
+            Vector.y) <= m_tolerance and abs(Vector.z) <= m_tolerance:
         return True
 
     return False
@@ -60,13 +58,13 @@ def centerLinePoint(edge):
     return Vector_AB.multiply(0.5)
 
 
-def alongTwoPointsPoint(A, B, index, number):
-    """ Return the point at index/number of the Line defined by A and B.
+def alongTwoPointsPoint(vect_a, vect_b, index, number):
+    """ Return the point at index/number of the Line defined by vect_a and vect_b.
     1/2 means middle of the line.
     1/3 means one third of the line...
     """
-    Vector_A = A
-    Vector_B = B
+    Vector_A = vect_a
+    Vector_B = vect_b
     distance = Vector_B.sub(Vector_A).Length / 2
 
     if number != 0:
@@ -84,6 +82,8 @@ def alongLinePoint(edge, index, number):
     """
     Vector_A = edge.Vertexes[0].Point
     Vector_B = edge.Vertexes[-1].Point
+    if isEqualVectors(Vector_A, Vector_B):
+        return None
     distance = Vector_B.sub(Vector_A).Length / 2
 
     if number != 0:
@@ -113,6 +113,8 @@ def meanVectorsPoint(vertexes):
     Vector_mean = App.Vector(0.0, 0.0, 0.0)
     m_vertx = vertexes
     m_num = len(m_vertx)
+    if m_num == 0:
+        return None
 
     if vertexes is None:
         print_msg("ERROR : vertexes == None, leaving meanVectorsPoint()")
@@ -127,11 +129,11 @@ def meanVectorsPoint(vertexes):
         m_list.append(m_vert.z)
 
     import numpy
-    V = numpy.array(m_list)
-    Vre = V.reshape(m_num, 3)
-    C = sum(Vre, 0) / m_num
+    m_vect = numpy.array(m_list)
+    m_vect_re = m_vect.reshape(m_num, 3)
+    vect_c = sum(m_vect_re, 0) / m_num
 
-    Vector_mean = App.Vector(C[0], C[1], C[2])
+    Vector_mean = App.Vector(vect_c[0], vect_c[1], vect_c[2])
 
     return Vector_mean
 
@@ -166,8 +168,8 @@ def minMaxVectorsLimits(vertexes):
     return xmax, xmin, ymax, ymin, zmax, zmin
 
 
-def intersecLinePlane(A, B, Plane_Normal, Plane_Point):
-    """ Return the intersection between the Line L defined by A and B
+def intersecLinePlane(vect_a, vect_b, Plane_Normal, Plane_Point):
+    """ Return the intersection between the Line L defined by vect_a and vect_b
     and the Plane defined by Plane_Normal and Plane_Point.
     """
     # Plane Equation is eq(0) P(x, y, z):
@@ -187,18 +189,18 @@ def intersecLinePlane(A, B, Plane_Normal, Plane_Point):
     d = -((a * p1.x) + (b * p1.y) + (c * p1.z))
     # print("d = "+ str(d))
 
-    # L is the line defined by 2 points A(ax, ay, az) and B(bx, by, bz), and
-    # may be also defined as the line crossing A(ax, ay, az) and along
+    # L is the line defined by 2 points vect_a(ax, ay, az) and vect_b(bx, by, bz), and
+    # may be also defined as the line crossing vect_a(ax, ay, az) and along
     # the direction AB = U(bx-ax, by-ay, bz-az)
     # If U(ux, uy, uz) = U(bx-ax, by-ay, bz-az) the Line L is the set of
     # points M as defined by eq(1):
     # Vector(MA) = k * Vector(U)
     # with k Real
-    if isEqualVectors(A, B):
+    if isEqualVectors(vect_a, vect_b):
         print_msg("ERROR : The 2 given points are equals !")
         return None
-    ax, ay, az = A.x, A.y, A.z
-    bx, by, bz = B.x, B.y, B.z
+    ax, ay, az = vect_a.x, vect_a.y, vect_a.z
+    bx, by, bz = vect_b.x, vect_b.y, B.z
     ux, uy, uz = bx - ax, by - ay, bz - az
     U = App.Vector(ux, uy, uz)
 
@@ -207,11 +209,11 @@ def intersecLinePlane(A, B, Plane_Normal, Plane_Point):
     # print("U.dot(N) =" + str(U.dot(N)))
 
     if U.dot(N) == 0.0:
-        # if A belongs to P : the full Line L is included in the Plane
+        # if vect_a belongs to P : the full Line L is included in the Plane
         if (a * ax) + (b * ay) + (c * az) + d == 0.0:
             print_msg(
                 "WARNING : The full Line is included in the Plane, returning first Point !")
-            return A
+            return vect_a
         # if not the Plane and line are parallel without intersection
         else:
             print_msg(
@@ -247,26 +249,39 @@ def intersecLinePlane(A, B, Plane_Normal, Plane_Point):
         return T
 
 
-def intersectPerpendicularLine(A, B, C,):
-    """ Return the intersection between the Line L defined by A and B
-    and the Line perpendicular crossing the point C.
-    This is also the projection of C onto the Line L.
-    Return aso the distance between C and the the projection.
-    Return also the symmetric point of C versus the Line.
+def intersectPerpendicularLine(vect_a, vect_b, point_c,):
+    """ Return the projection of point_c onto line [vect_a,vect_b].
+
+    Calculate the intersection between the Line L defined by vect_a and vect_b
+    and the Line perpendicular crossing the point_c.
+    This is also the projection of point_c onto the Line L.
+
+    Return also the distance between point_cC and the the projection.
+    Return also the symetric point of point_c versus the Line.
+
+    RETURN:
+    -------
+    T, distance, Tprime
+    PARAMETERS:
+    -----------
+    vect_a    : (Vector, Mandatory)
+    vect_b    : (Vector, Mandatory)
+    point_c    : (Vector, Mandatory)
+>>>>>>> Build useful functions
     """
     import math
-    # L is the line defined by 2 points A(ax, ay, az) and B(bx, by, bz), and
-    # may be also defined as the line crossing A(ax, ay, az) and along the
+    # L is the line defined by 2 points vect_a(ax, ay, az) and vect_b(bx, by, bz), and
+    # may be also defined as the line crossing vect_a(ax, ay, az) and along the
     # direction AB = U(bx-ax, by-ay, bz-az)
     # If U(ux, uy, uz) = U(bx-ax, by-ay, bz-az) the Line L is the set of
     # points M as defined by eq(1):
     # Vector(MA) = k * Vector(U)
     # with k Real
-    if A == B:
+    if vect_a == vect_b:
         return None
-    ax, ay, az = A.x, A.y, A.z
-    bx, by, bz = B.x, B.y, B.z
-    cx, cy, cz = C.x, C.y, C.z
+    ax, ay, az = vect_a.x, vect_a.y, vect_a.z
+    bx, by, bz = vect_b.x, vect_b.y, vect_b.z
+    cx, cy, cz = point_c.x, point_c.y, point_c.z
     ux, uy, uz = bx - ax, by - ay, bz - az
     # U = App.Vector(ux, uy, uz)
     # We look for T(tx, ty, tz) on the Line L
@@ -326,7 +341,7 @@ def propertiesPoint(Point_User_Name,
         if isinstance(color, tuple):
             Gui.ActiveDocument.getObject(Point_User_Name).PointColor = color
     except Exception as err:
-        printError_msg(err.message, title="propertiesPoint")
+        printError_msg(err.args[0], title="propertiesPoint")
         print_msg("Not able to set PointColor !")
         print_msg("Color : " + str(color) + " !")
     try:
@@ -334,12 +349,12 @@ def propertiesPoint(Point_User_Name,
             Point_User_Name).PointSize = WF.pointSize()
 
     except Exception as err:
-        printError_msg(err.message, title="propertiesPoint")
+        printError_msg(err.args[0], title="propertiesPoint")
         print_msg("Not able to set PointSize !")
     try:
         Gui.ActiveDocument.getObject(Point_User_Name).Transparency = 0
     except Exception as err:
-        printError_msg(err.message, title="propertiesPoint")
+        printError_msg(err.args[0], title="propertiesPoint")
         print_msg("Not able to set Transparency !")
 
     return
@@ -358,32 +373,32 @@ def propertiesLine(Line_User_Name,
         if isinstance(color, tuple):
             Gui.ActiveDocument.getObject(Line_User_Name).PointColor = color
     except Exception as err:
-        printError_msg(err.message, title="propertiesLine")
+        printError_msg(err.args[0], title="propertiesLine")
         print_msg("Not able to set PointColor !")
         print_msg("Color : " + str(color) + " !")
     try:
         if isinstance(color, tuple):
             Gui.ActiveDocument.getObject(Line_User_Name).LineColor = color
     except Exception as err:
-        printError_msg(err.message, title="propertiesLine")
+        printError_msg(err.args[0], title="propertiesLine")
         print_msg("Not able to set LineColor !")
         print_msg("Color : " + str(color) + " !")
     try:
         Gui.ActiveDocument.getObject(
             Line_User_Name).LineWidth = WF.lineThickness()
     except Exception as err:
-        printError_msg(err.message, title="propertiesLine")
+        printError_msg(err.args[0], title="propertiesLine")
         print_msg("Not able to set LineWidth !")
     try:
         Gui.ActiveDocument.getObject(
             Line_User_Name).PointSize = WF.linePointSize()
     except Exception as err:
-        printError_msg(err.message, title="propertiesLine")
+        printError_msg(err.args[0], title="propertiesLine")
         print_msg("Not able to set PointSize !")
     try:
         Gui.ActiveDocument.getObject(Line_User_Name).Transparency = 0
     except Exception as err:
-        printError_msg(err.message, title="propertiesLine")
+        printError_msg(err.args[0], title="propertiesLine")
         print_msg("Not able to set Transparency !")
 
     return
@@ -402,24 +417,24 @@ def propertiesPlane(Plane_User_Name,
         if isinstance(color, tuple):
             Gui.ActiveDocument.getObject(Plane_User_Name).PointColor = color
     except Exception as err:
-        printError_msg(err.message, title="propertiesPlane")
+        printError_msg(err.args[0], title="propertiesPlane")
         print_msg("Not able to set PointColor !")
     try:
         if isinstance(color, tuple):
             Gui.ActiveDocument.getObject(Plane_User_Name).LineColor = color
     except Exception as err:
-        printError_msg(err.message, title="propertiesPlane")
+        printError_msg(err.args[0], title="propertiesPlane")
         print_msg("Not able to set LineColor !")
     try:
         if isinstance(s_color, tuple):
             Gui.ActiveDocument.getObject(Plane_User_Name).ShapeColor = s_color
     except Exception as err:
-        printError_msg(err.message, title="propertiesPlane")
+        printError_msg(err.args[0], title="propertiesPlane")
         print_msg("Not able to set ShapeColor !")
     try:
         Gui.ActiveDocument.getObject(Plane_User_Name).Transparency = 75
     except Exception as err:
-        printError_msg(err.message, title="propertiesPlane")
+        printError_msg(err.args[0], title="propertiesPlane")
         print_msg("Not able to set Transparency !")
 
     return

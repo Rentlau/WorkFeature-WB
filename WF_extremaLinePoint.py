@@ -3,91 +3,65 @@
 ***************************************************************************
 *   This file is part of Work Feature workbench                           *
 *                                                                         *
-*   Copyright (c) 2017-2019 <rentlau_64>                                  *
-*   https://github.com/Rentlau/WorkFeature-WB                             *
-*                                                                         *
-*   Code rewrite by <rentlau_64> from Work Features macro:                *
-*   https://github.com/Rentlau/WorkFeature                                *
-*                                                                         *
-*   This workbench is a supplement to the FreeCAD CAx development system. *
-*   http://www.freecadweb.org                                             *
-*                                                                         *
-*   This workbench is free software; you can redistribute it and/or modify*
-*   it under the terms of the GNU General Public License as published by  *
-*   the Free Software Foundation, either version 3 of the License, or     *
-*   (at your option) any later version.                                   *
-*   for detail see the LICENSE text file or:                              *
-*   https://www.gnu.org/licenses/gpl-3.0.html                             *
-*                                                                         *
-*   This workbench is distributed in the hope that it will be useful,     *
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the          *
-*   GNU Library General Public License for more details.                  *
-*                                                                         *
-*   You should have received a copy of the GNU Library General Public     *
-*   License along with this workbench;                                    *
-*   If not, see <https://www.gnu.org/licenses/>                           *
+*   Copyright (c) 2017-2019 <rentlau_64>                                  *                        *
 ***************************************************************************
+Create Point(s) at Start and End location of each selected Line(s).
 """
 import sys
 import os.path
+import re
 import FreeCAD as App
 import Part
 from PySide import QtGui, QtCore
+from WF_config import PATH_WF_ICONS, PATH_WF_UTILS, PATH_WF_UI
 import WF
 from WF_Objects_base import WF_Point
+
 if App.GuiUp:
     import FreeCADGui as Gui
 
-__title__= "Macro ExtremaLinePoint"
+__title__ = "Macro ExtremaLinePoint"
 __author__ = "Rentlau_64"
 __brief__ = '''
 Macro ExtremaLinePoint.
 Creates a parametric ExtremaLinePoint from an Edge
 '''
 ###############
-m_debug = False
+M_DEBUG = False
 ###############
-
-# get the path of the current python script
-path_WF = os.path.dirname(__file__)
-
-path_WF_icons = os.path.join(path_WF, 'Resources', 'Icons')
-path_WF_utils = os.path.join(path_WF, 'Utils')
-path_WF_resources = os.path.join(path_WF, 'Resources')
-path_WF_ui = os.path.join(path_WF, 'Resources', 'Ui')
-
-if not sys.path.__contains__(str(path_WF_utils)):
-    sys.path.append(str(path_WF_utils))
-    sys.path.append(str(path_WF_ui))
+if not sys.path.__contains__(str(PATH_WF_UTILS)):
+    sys.path.append(str(PATH_WF_UTILS))
+    sys.path.append(str(PATH_WF_UI))
 
 try:
-    from WF_selection import Selection, getSel
-    from WF_print import printError_msg, print_msg
+    from WF_selection import getSel
+    from WF_print import printError_msg, print_msg, printError_msgWithTimer
     from WF_directory import createFolders, addObjectToGrp
-    from WF_geometry import *
+    from WF_geometry import propertiesPoint
+    from WF_command import Command
 except ImportError:
     print("ERROR: Cannot load WF modules !")
     sys.exit(1)
 
 ###############
-m_icon = "/WF_extremaLinePoint.svg"
-m_icons = ["/WF_startLinePoint.svg",
-           "/WF_endLinePoint.svg",
-           "/WF_extremaLinePoint.svg"]
-m_dialog = "/WF_UI_extremaLinePoint.ui"
-m_dialog_title = "Define location(s)."
-m_exception_msg = """
+M_ICON_NAME = "/WF_extremaLinePoint.svg"
+M_ICON_NAME_FILE = os.path.join(PATH_WF_ICONS, M_ICON_NAME)
+M_ICON_NAMES = ["/WF_startLinePoint.svg",
+                "/WF_endLinePoint.svg",
+                "/WF_extremaLinePoint.svg"]
+M_DIALOG = "/WF_UI_extremaLinePoint.ui"
+M_DIALOG_TITLE = "Define location(s)."
+M_EXCEPTION_MSG = """
 Unable to create Extrema Line Point(s) :
 - Select one or several Line/Edge(s) and/or
 - Select one Plane/Face to process all (4) Edges and/or
 - Select one Object to process all Edges at once !
 
 Go to Parameter(s) Window in Task Panel!"""
-m_result_msg = " : Extrema Line Point(s) created !"
-m_menu_text = "Point(s) = Extrema(Line) "
-m_accel = ""
-m_tool_tip = """<b>Create Point(s)</b> at Start and End location<br>
+M_RESULT_MSG = " : Extrema Line Point(s) created !"
+M_MENU_TEXT = "Point(s) = Extrema(Line) "
+M_ACCEL = ""
+M_TOOL_TIP = """<b>Create Point(s)</b> at Start and End location<br>
 of each selected Line(s).<br>
 <br>
 - Select one or several Line/Edge(s) and/or<br>
@@ -100,39 +74,79 @@ of each selected Line(s).<br>
  - a Parameter(s) Window in Task Panel!</i>
 """
 ###############
-m_macro = "Macro ExtremaLinePoint"
-m_location = "Both ends"
-m_locationList = ["Begin",
-                  "End",
-                  # "Both ends"
-                  ]
+M_MACRO = "Macro ExtremaLinePoint"
+M_LOCATION = "Both ends"
+M_LOCATIONS = ["Begin",
+               "End",
+               # "Both ends"
+               ]
 ###############
 
 
-class ExtremaLinePointPanel:
-    def __init__(self):
-        self.form = Gui.PySideUic.loadUi(path_WF_ui + m_dialog)
-        self.form.setWindowTitle(m_dialog_title)
+def setLocation(location):
+    """ Set location of the point.
 
-        self.form.UI_ExtremaLinePoint_comboBox.setCurrentIndex(self.form.UI_ExtremaLinePoint_comboBox.findText(m_location))
+    Parameters
+    -------
+    *location* : (String, Mandatory)
+            either "Single" or "All"
+            "either" for creation of one point only.
+            "all" for creation all points at end of all parts.
+    """
+    global M_LOCATION
+    if location in M_LOCATIONS:
+        M_LOCATION = location
+
+
+def getLocation():
+    """ Get location of the point.
+
+    Return
+    -------
+    either "Single" or "All"
+
+    """
+    return M_LOCATION
+
+
+class ExtremaLinePointPanel:
+    """ The ExtremaLinePointPanel (GUI).
+    """
+
+    def __init__(self):
+        self.form = Gui.PySideUic.loadUi(PATH_WF_UI + M_DIALOG)
+        self.form.setWindowTitle(M_DIALOG_TITLE)
+
+        self.form.UI_ExtremaLinePoint_comboBox.setCurrentIndex(
+            self.form.UI_ExtremaLinePoint_comboBox.findText(M_LOCATION))
 
     def accept(self):
-        global m_location
-        m_location = self.form.UI_ExtremaLinePoint_comboBox.currentText()
+        """ Run when click on OK button.
+        """
+        global M_LOCATION
+        M_LOCATION = self.form.UI_ExtremaLinePoint_comboBox.currentText()
+
+        if WF.verbose():
+            print_msg("M_LOCATION = " + str(M_LOCATION))
 
         Gui.Control.closeDialog()
-        m_actDoc = App.activeDocument()
-        if m_actDoc is not None:
-            if len(Gui.Selection.getSelectionEx(m_actDoc.Name)) != 0:
-                run()
+        m_act_doc = App.activeDocument()
+        if m_act_doc is not None:
+            if Gui.Selection.getSelectionEx(m_act_doc.Name):
+                extrema_line_point_command()
         return True
 
     def reject(self):
+        """ Run when click on CANCEL button.
+        """
         Gui.Control.closeDialog()
         return False
 
     def shouldShow(self):
-        return (len(Gui.Selection.getSelectionEx(App.activeDocument().Name)) == 0)
+        """ Must show when nothing selected.
+        """
+        return (len(Gui.Selection.getSelectionEx(
+            App.activeDocument().Name)) == 0)
 
 
 def makeExtremaLinePointFeature(group):
@@ -143,6 +157,8 @@ def makeExtremaLinePointFeature(group):
     m_name = "ExtremaLinePoint_P"
     m_part = "Part::FeaturePython"
 
+    if group is None:
+        return None
     try:
         m_obj = App.ActiveDocument.addObject(str(m_part), str(m_name))
         if group is not None:
@@ -151,7 +167,7 @@ def makeExtremaLinePointFeature(group):
         ViewProviderExtremaLinePoint(m_obj.ViewObject)
     except Exception as err:
         printError_msg("Not able to add an object to Model!")
-        printError_msg(err.args[0], title=m_macro)
+        printError_msg(err.args[0], title=M_MACRO)
         return None
 
     return m_obj
@@ -160,13 +176,14 @@ def makeExtremaLinePointFeature(group):
 class ExtremaLinePoint(WF_Point):
     """ The ExtremaLinePoint feature object. """
     # this method is mandatory
+
     def __init__(self, selfobj):
-        if m_debug:
+        if M_DEBUG:
             print("running ExtremaLinePoint.__init__ !")
 
         self.name = "ExtremaLinePoint"
         WF_Point.__init__(self, selfobj, self.name)
-        # Add some custom properties to our CenterLinePoint feature object.
+        # Add some custom properties to our feature object.
         selfobj.addProperty("App::PropertyLinkSub",
                             "Edge",
                             self.name,
@@ -178,13 +195,14 @@ relative to the parent Line.
                             "At",
                             self.name,
                             m_tooltip)
-        if (sys.version_info > (3, 0)):
+        if sys.version_info > (3, 0):
             # Python 3 code in this block
-            selfobj.At = [v.encode('utf8').decode('utf-8') for v in m_locationList]
+            selfobj.At = [v.encode('utf8').decode('utf-8')
+                          for v in M_LOCATIONS]
             selfobj.At = 'Begin'.encode('utf8').decode('utf-8')
         else:
             # Python 2 code in this block
-            selfobj.At = [v.encode('utf8') for v in m_locationList]
+            selfobj.At = [v.encode('utf8') for v in M_LOCATIONS]
             selfobj.At = 'Begin'.encode('utf8')
 
         selfobj.setEditorMode("Edge", 1)
@@ -195,7 +213,14 @@ relative to the parent Line.
     def execute(self, selfobj):
         """ Doing a recomputation.
         """
-        if m_debug:
+        m_properties_list = ['Edge',
+                             'At',
+                             ]
+        for m_property in m_properties_list:
+            if m_property not in selfobj.PropertiesList:
+                return
+
+        if M_DEBUG:
             print("running ExtremaLinePoint.execute !")
 
         # To be compatible with previous version > 2019
@@ -207,52 +232,45 @@ relative to the parent Line.
             if selfobj.Parametric == 'Interactive' and self.created:
                 return
 
-        if WF.verbose():
-            m_msg = "Recompute Python ExtremaLinePoint feature\n"
-            App.Console.PrintMessage(m_msg)
+        try:
+            vector_point = None
+            m_n = re.sub('[^0-9]', '', selfobj.Edge[1][0])
+            m_n = int(m_n)
+            if M_DEBUG:
+                print_msg(str(selfobj.Edge))
+                print_msg("m_n = " + str(m_n))
 
-        m_PropertiesList = ['Edge',
-                            'At',
-                            ]
-        for m_Property in m_PropertiesList:
-            if m_Property not in selfobj.PropertiesList:
+            if not selfobj.Edge[0].Shape.Edges:
                 return
 
-        try:
-            Vector_point = None
-            n = eval(selfobj.Edge[1][0].lstrip('Edge'))
-            if m_debug:
-                print_msg(str(selfobj.Edge))
-                print_msg("n = " + str(n))
-                print_msg(str(selfobj.Edge[0].Shape.Edges))
-
-            if len(selfobj.Edge[0].Shape.Edges) == 0:
-                    return
-
             if selfobj.At == "Begin":
-                Vector_point = selfobj.Edge[0].Shape.Edges[n - 1].Vertexes[0].Point
+                vector_point = selfobj.Edge[0].Shape.Edges[m_n -
+                                                           1].Vertexes[0].Point
             else:
-                Vector_point = selfobj.Edge[0].Shape.Edges[n - 1].Vertexes[-1].Point
+                vector_point = selfobj.Edge[0].Shape.Edges[m_n -
+                                                           1].Vertexes[-1].Point
 
-            if Vector_point is not None:
-                point = Part.Point(Vector_point)
+            if vector_point is not None:
+                point = Part.Point(vector_point)
                 selfobj.Shape = point.toShape()
                 propertiesPoint(selfobj.Label, self.color)
-                selfobj.X = float(Vector_point.x)
-                selfobj.Y = float(Vector_point.y)
-                selfobj.Z = float(Vector_point.z)
+                selfobj.X = float(vector_point.x)
+                selfobj.Y = float(vector_point.y)
+                selfobj.Z = float(vector_point.z)
                 # To be compatible with previous version 2018
                 if 'Parametric' in selfobj.PropertiesList:
                     self.created = True
+        except AttributeError as err:
+            print("AttributeError" + str(err))
         except Exception as err:
-            printError_msg(err.args[0], title=m_macro)
+            printError_msg(err.args[0], title=M_MACRO)
 
     def onChanged(self, selfobj, prop):
-        if WF.verbose() != 0:
-            App.Console.PrintMessage("Change property: " + str(prop) + "\n")
-
-        if m_debug:
+        """ Run when a proterty change.
+        """
+        if M_DEBUG:
             print("running CenterLinePoint.onChanged !")
+            print("Change property : " + str(prop))
 
         WF_Point.onChanged(self, selfobj, prop)
 
@@ -269,8 +287,8 @@ relative to the parent Line.
 
 
 class ViewProviderExtremaLinePoint:
-    global path_WF_icons
-    icon = "/WF_extremaLinePoint.svg"
+    global PATH_WF_ICONS
+    icon = M_ICON_NAME
 
     def __init__(self, vobj):
         """ Set this object to the proxy object of the actual view provider """
@@ -300,81 +318,55 @@ class ViewProviderExtremaLinePoint:
     # This method is optional and if not defined a default icon is shown.
     def getIcon(self):
         """ Return the icon which will appear in the tree view. """
-        return (path_WF_icons + ViewProviderExtremaLinePoint.icon)
+        return PATH_WF_ICONS + ViewProviderExtremaLinePoint.icon
 
-    def setIcon(self, icon='/WF_extremaLinePoint.svg'):
+    def setIcon(self, icon=M_ICON_NAME):
         ViewProviderExtremaLinePoint.icon = icon
 
 
-class CommandExtremaLinePoint:
-    """ Command to create ExtremaLinePoint feature object. """
-    def GetResources(self):
-        return {'Pixmap': path_WF_icons + m_icon,
-                'MenuText': m_menu_text,
-                'Accel': m_accel,
-                'ToolTip': m_tool_tip}
+def extrema_line_point_command():
+    """ This command use the selected object(s) to try to build a
+    ExtremaLinePoint feature object.
+    """
+    m_sel, m_act_doc = getSel(WF.verbose())
 
-    def Activated(self):
-        m_actDoc = App.activeDocument()
-        if m_actDoc is not None:
-            if len(Gui.Selection.getSelectionEx(m_actDoc.Name)) == 0:
-                Gui.Control.showDialog(ExtremaLinePointPanel())
-
-        run()
-
-    def IsActive(self):
-        if App.ActiveDocument:
-            return True
-        else:
-            return False
-
-
-if App.GuiUp:
-    Gui.addCommand("ExtremaLinePoint", CommandExtremaLinePoint())
-
-
-def run():
-    m_sel, m_actDoc = getSel(WF.verbose())
-
+    edges_from = ["Segments", "Curves", "Planes", "Shells", "Objects"]
     try:
-        Number_of_Edges, Edge_List = m_sel.get_segmentsNames(
-            getfrom=["Segments",
-                     "Curves",
-                     "Planes",
-                     "Objects"])
-        if WF.verbose():
-            print_msg("Number_of_Edges = " + str(Number_of_Edges))
-            print_msg("Edge_List = " + str(Edge_List))
+        number_of_edges, edge_list = m_sel.get_segmentsWithNames(
+            get_from=edges_from)
 
-        if Number_of_Edges == 0:
-            raise Exception(m_exception_msg)
+        if number_of_edges == 0:
+            raise Exception(M_EXCEPTION_MSG)
+
         try:
             m_main_dir = "WorkPoints_P"
-            m_sub_dir = "Set001"
+            m_sub_dir = "Set000"
             m_group = createFolders(str(m_main_dir))
             m_error_msg = "Could not Create '"
             m_error_msg += str(m_sub_dir) + "' Objects Group!"
 
+            if WF.verbose():
+                print_msg("Location = " + str(M_LOCATION))
+
             # Create a sub group if needed
-            if Number_of_Edges > 1 or m_location == "Both ends":
+            if number_of_edges > 1 or M_LOCATION == "Both ends":
                 try:
-                    m_ob = App.ActiveDocument.getObject(str(m_main_dir)).newObject("App::DocumentObjectGroup", str(m_sub_dir))
-                    m_group = m_actDoc.getObject(str(m_ob.Label))
+                    m_ob = App.ActiveDocument.getObject(
+                        str(m_main_dir)).newObject(
+                        "App::DocumentObjectGroup", str(m_sub_dir))
+                    m_group = m_act_doc.getObject(str(m_ob.Label))
                 except Exception as err:
-                    printError_msg(err.args[0], title=m_macro)
+                    printError_msg(err.args[0], title=M_MACRO)
                     printError_msg(m_error_msg)
 
             if WF.verbose():
                 print_msg("Group = " + str(m_group.Label))
 
-            for i in range(Number_of_Edges):
-                edge = Edge_List[i]
+            for i in range(number_of_edges):
+                edge = edge_list[i]
 
-                if WF.verbose():
-                    print_msg("Location = " + str(m_location))
-
-                if m_location in ["Begin", "Both ends"]:
-                    App.ActiveDocument.openTransaction(m_macro)
+                if M_LOCATION in ["Begin", "Both ends"]:
+                    App.ActiveDocument.openTransaction(M_MACRO)
                     selfobj1 = makeExtremaLinePointFeature(m_group)
                     selfobj1.Edge = edge
                     selfobj1.At = "Begin"
@@ -387,8 +379,8 @@ def run():
                         selfobj1.Parametric = 'Dynamic'
                         selfobj1.touch()
                         selfobj1.Parametric = 'Not'
-                if m_location in ["End", "Both ends"]:
-                    App.ActiveDocument.openTransaction(m_macro)
+                if M_LOCATION in ["End", "Both ends"]:
+                    App.ActiveDocument.openTransaction(M_MACRO)
                     selfobj2 = makeExtremaLinePointFeature(m_group)
                     selfobj2.Edge = edge
                     selfobj2.At = "End"
@@ -403,13 +395,22 @@ def run():
                         selfobj2.Parametric = 'Not'
 
         except Exception as err:
-            printError_msg(err.args[0], title=m_macro)
-
-        App.ActiveDocument.commitTransaction()
+            printError_msg(err.args[0], title=M_MACRO)
 
     except Exception as err:
-        printError_msg(err.args[0], title=m_macro)
+        printError_msgWithTimer(err.args[0], title=M_MACRO)
 
+    App.ActiveDocument.commitTransaction()
+    App.activeDocument().recompute()
+
+
+if App.GuiUp:
+    Gui.addCommand("ExtremaLinePoint", Command(M_ICON_NAME_FILE,
+                                               M_MENU_TEXT,
+                                               M_ACCEL,
+                                               M_TOOL_TIP,
+                                               ExtremaLinePointPanel,
+                                               extrema_line_point_command))
 
 if __name__ == '__main__':
-    run()
+    extrema_line_point_command()

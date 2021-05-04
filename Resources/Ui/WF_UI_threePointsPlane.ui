@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>242</width>
-    <height>59</height>
+    <width>252</width>
+    <height>47</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,6 +36,13 @@
        </property>
        <property name="text">
         <string>100.0</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Units</string>
        </property>
       </widget>
      </item>

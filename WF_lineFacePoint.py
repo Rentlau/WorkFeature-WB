@@ -50,14 +50,14 @@ from WF_Objects_base import WF_Point
 # get the path of the current python script 
 path_WF = os.path.dirname(__file__)
  
-path_WF_icons     = os.path.join(path_WF, 'Resources', 'Icons')
-path_WF_utils     = os.path.join(path_WF, 'Utils')
+PATH_WF_ICONS     = os.path.join(path_WF, 'Resources', 'Icons')
+PATH_WF_UTILS     = os.path.join(path_WF, 'Utils')
 path_WF_resources = os.path.join(path_WF, 'Resources')
-path_WF_ui        = os.path.join(path_WF, 'Resources', 'Ui')
+PATH_WF_UI        = os.path.join(path_WF, 'Resources', 'Ui')
  
-if not sys.path.__contains__(str(path_WF_utils)):
-    sys.path.append(str(path_WF_utils))
-    sys.path.append(str(path_WF_ui))
+if not sys.path.__contains__(str(PATH_WF_UTILS)):
+    sys.path.append(str(PATH_WF_UTILS))
+    sys.path.append(str(PATH_WF_UI))
      
 try:
     from WF_selection import Selection, getSel
@@ -70,19 +70,19 @@ except:
     sys.exit(1)
 
 ###############
-m_icon          = "/WF_lineFacePoint.svg"
-m_dialog        = None
-m_dialog_title  = "Nothing"
-m_exception_msg = """Unable to create (Line,Face) Intersection(s) :
+M_ICON_NAME          = "/WF_lineFacePoint.svg"
+M_DIALOG        = None
+M_DIALOG_TITLE  = "Nothing"
+M_EXCEPTION_MSG = """Unable to create (Line,Face) Intersection(s) :
     - Select one or several Line/Edge(s) 
     and Second 
     - Select one or several Plane/Face(s) to process and/or
     - Select one or several Object(s) to process all Faces at once
 """
-m_result_msg    = " : (Line,Face) Intersection(s) created !"
-m_menu_text     = "Point(s) = (Line, Plane)"
-m_accel         = ""
-m_tool_tip      = """<b>Create Point(s)</b> at the intersection of 
+M_RESULT_MSG    = " : (Line,Face) Intersection(s) created !"
+M_MENU_TEXT     = "Point(s) = (Line, Plane)"
+M_ACCEL         = ""
+M_TOOL_TIP      = """<b>Create Point(s)</b> at the intersection of 
 the Line(s) and Plane(s) selected.<br>
 <br>
 First<br>
@@ -102,14 +102,14 @@ intersection Point is still created (as if).<br>
 
 class LineFacePointPanel:  
     def __init__(self):
-        self.form = Gui.PySideUic.loadUi(path_WF_ui + m_dialog)
-        self.form.setWindowTitle(m_dialog_title)
+        self.form = Gui.PySideUic.loadUi(PATH_WF_UI + M_DIALOG)
+        self.form.setWindowTitle(M_DIALOG_TITLE)
                         
     def accept(self):
         Gui.Control.closeDialog()
-        m_actDoc = App.activeDocument()
-        if m_actDoc is not None:
-            if len(Gui.Selection.getSelectionEx(m_actDoc.Name)) != 0:
+        m_act_doc = App.activeDocument()
+        if m_act_doc is not None:
+            if len(Gui.Selection.getSelectionEx(m_act_doc.Name)) != 0:
                 run()
         return True
     
@@ -209,7 +209,7 @@ class LineFacePoint(WF_Point):
     
             
 class ViewProviderLineFacePoint:
-    global path_WF_icons
+    global PATH_WF_ICONS
     icon = '/WF_lineFacePoint.svg'  
     def __init__(self,vobj):
         """ Set this object to the proxy object of the actual view provider """
@@ -239,7 +239,7 @@ class ViewProviderLineFacePoint:
     # This method is optional and if not defined a default icon is shown.
     def getIcon(self):        
         """ Return the icon which will appear in the tree view. """
-        return (path_WF_icons + ViewProviderLineFacePoint.icon)
+        return (PATH_WF_ICONS + ViewProviderLineFacePoint.icon)
            
     def setIcon(self, icon = '/WF_lineFacePoint.svg'):
         ViewProviderLineFacePoint.icon = icon
@@ -248,15 +248,15 @@ class ViewProviderLineFacePoint:
 class CommandLineFacePoint:
     """ Command to create LineFacePoint feature object. """
     def GetResources(self):
-        return {'Pixmap'  : path_WF_icons + m_icon,
-                'MenuText': m_menu_text,
-                'Accel'   : m_accel,
-                'ToolTip' : m_tool_tip}
+        return {'Pixmap'  : PATH_WF_ICONS + M_ICON_NAME,
+                'MenuText': M_MENU_TEXT,
+                'Accel'   : M_ACCEL,
+                'ToolTip' : M_TOOL_TIP}
 
     def Activated(self):
-        m_actDoc = App.activeDocument()
-        if m_actDoc is not None:
-            if len(Gui.Selection.getSelectionEx(m_actDoc.Name)) == 0:
+        m_act_doc = App.activeDocument()
+        if m_act_doc is not None:
+            if len(Gui.Selection.getSelectionEx(m_act_doc.Name)) == 0:
                 pass
                 #Gui.Control.showDialog(LineFacePointPanel())
 
@@ -273,14 +273,14 @@ if App.GuiUp:
 
 
 def run():
-    m_sel, m_actDoc = getSel(WF.verbose())
+    m_sel, m_act_doc = getSel(WF.verbose())
       
     try:         
-        Number_of_Edges, Edge_List = m_sel.get_segmentsNames(
+        number_of_edges, edge_list = m_sel.get_segmentsNames(
             getfrom=["Segments","Curves"])
         if WF.verbose() != 0:
-            print_msg("Number_of_Edges = " + str(Number_of_Edges))
-            print_msg("Edge_List = " + str(Edge_List))
+            print_msg("number_of_edges = " + str(number_of_edges))
+            print_msg("edge_list = " + str(edge_list))
              
         Number_of_Planes, Plane_List = m_sel.get_planesNames(
             getfrom=["Planes","Objects"])
@@ -288,26 +288,26 @@ def run():
             print_msg("Number_of_Planes = " + str(Number_of_Planes))
             print_msg("Plane_List = " + str(Plane_List))
             
-        if Number_of_Edges == 0 or Number_of_Planes == 0 :
-            raise Exception(m_exception_msg)
+        if number_of_edges == 0 or Number_of_Planes == 0 :
+            raise Exception(M_EXCEPTION_MSG)
         try:
             m_main_dir = "WorkPoints_P"
             m_sub_dir  = "Set"   
             m_group = createFolders(str(m_main_dir))
 
             # Create a sub group if needed
-            if Number_of_Edges > 1 or Number_of_Planes > 1:
+            if number_of_edges > 1 or Number_of_Planes > 1:
                 try:
                     m_ob = App.ActiveDocument.getObject(str(m_main_dir)).newObject("App::DocumentObjectGroup", str(m_sub_dir))
-                    m_group = m_actDoc.getObject( str(m_ob.Label) )
+                    m_group = m_act_doc.getObject( str(m_ob.Label) )
                 except:
                     printError_msg("Could not Create '"+ str(m_sub_dir) +"' Objects Group!")           
                         
             if WF.verbose() != 0:
                 print_msg("Group = " + str(m_group.Label))
                 
-            for i in range( Number_of_Edges ):
-                edge = Edge_List[i]
+            for i in range( number_of_edges ):
+                edge = edge_list[i]
                 if WF.verbose() != 0:
                     print_msg("edge = " + str(edge))
                 
@@ -329,7 +329,7 @@ def run():
 
             
     except Exception as err:
-        printError_msg(err.message, title="Macro LineFacePoint")
+        printError_msg(err.args[0], title="Macro LineFacePoint")
 
                            
 if __name__ == '__main__':

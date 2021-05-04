@@ -30,5 +30,5 @@
 ***************************************************************************
 """
 
-version_info = ('2019', '03', '11', 'dev')
-__version__ = '.'.join(map(str, version_info))
+VERSION_INFO = ('2019', '10', '03', 'dev')
+__version__ = '.'.join(map(str, VERSION_INFO))

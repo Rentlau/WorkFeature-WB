@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ###############
-m_debug = True
+M_DEBUG = True
 ###############
 import sys
 import os.path
@@ -12,15 +12,15 @@ m_current_path = os.path.realpath(__file__)
 # ./Src            
 m_parent_path = os.path.dirname(m_current_path)
 # ./Src/Utils
-path_WF_utils =  os.path.join(m_parent_path, 'Utils')
+PATH_WF_UTILS =  os.path.join(m_parent_path, 'Utils')
 # Go up in directories once
 # ./
 m_parent2_path = os.path.dirname(m_parent_path)    
 # ./Icons
-path_WF_icons =  os.path.join(m_parent2_path, 'Icons')
+PATH_WF_ICONS =  os.path.join(m_parent2_path, 'Icons')
     
-if not sys.path.__contains__(str(path_WF_utils)):
-    sys.path.append(str(path_WF_utils))
+if not sys.path.__contains__(str(PATH_WF_UTILS)):
+    sys.path.append(str(PATH_WF_UTILS))
     
 def get_icon(icon_path, icon_name):
     """  Return the icon file or a default one if the file do not exists!
@@ -35,7 +35,7 @@ def get_icon(icon_path, icon_name):
     if m_full_name and os.path.exists(m_full_name):
         return (m_full_name)
     else :
-        if m_debug:
+        if M_DEBUG:
             print "DEBUG :" + str(m_full_name) + " not a valid file !"  
         return default_icon()
 
@@ -179,10 +179,10 @@ def default_icon():
         """
 
 if __name__ == '__main__':
-    if m_debug:
+    if M_DEBUG:
         print "DEBUG : m_current_path is " +  str(m_current_path)
         print "DEBUG : m_parent_path  is " +  str(m_parent_path)
         print "DEBUG : m_parent2_path is " +  str(m_parent2_path)
-        print "DEBUG : path_WF_utils  is " +  str(path_WF_utils)
-        print "DEBUG : path_WF_icons  is " +  str(path_WF_icons) 
-    print get_icon(path_WF_icons, '/WF_point.svg')
+        print "DEBUG : PATH_WF_UTILS  is " +  str(PATH_WF_UTILS)
+        print "DEBUG : PATH_WF_ICONS  is " +  str(PATH_WF_ICONS) 
+    print get_icon(PATH_WF_ICONS, '/WF_point.svg')

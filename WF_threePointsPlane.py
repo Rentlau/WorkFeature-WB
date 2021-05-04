@@ -4,39 +4,25 @@
 *   This file is part of Work Feature workbench                           *
 *                                                                         *
 *   Copyright (c) 2017-2019 <rentlau_64>                                  *
-*   https://github.com/Rentlau/WorkFeature-WB                             *
-*                                                                         *
-*   Code rewrite by <rentlau_64> from Work Features macro:                *
-*   https://github.com/Rentlau/WorkFeature                                *
-*                                                                         *
-*   This workbench is a supplement to the FreeCAD CAx development system. *
-*   http://www.freecadweb.org                                             *
-*                                                                         *
-*   This workbench is free software; you can redistribute it and/or modify*
-*   it under the terms of the GNU General Public License as published by  *
-*   the Free Software Foundation, either version 3 of the License, or     *
-*   (at your option) any later version.                                   *
-*   for detail see the LICENSE text file or:                              *
-*   https://www.gnu.org/licenses/gpl-3.0.html                             *
-*                                                                         *
-*   This workbench is distributed in the hope that it will be useful,     *
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the          *
-*   GNU Library General Public License for more details.                  *
-*                                                                         *
-*   You should have received a copy of the GNU Library General Public     *
-*   License along with this workbench;                                    *
-*   If not, see <https://www.gnu.org/licenses/>                           *
 ***************************************************************************
+Create Plane from three selected Points.
+
+Extension :  (100 by default)
+Width and Length of the plane in current units.
+
+- Select three Points only
+- Then Click on the Button/Icon
 """
 import sys
 import os.path
+import re
 import FreeCAD as App
 import Part
-from PySide import QtGui, QtCore
+from PySide import QtCore
+from WF_config import PATH_WF_ICONS, PATH_WF_UTILS, PATH_WF_UI
 import WF
 from WF_Objects_base import WF_Plane
-# from InitGui import m_debug
+
 if App.GuiUp:
     import FreeCADGui as Gui
 
@@ -47,44 +33,40 @@ Macro ThreePointsPlane.
 Creates a parametric ThreePointsPlane from 3 points
 '''
 ###############
-m_debug = False
+M_DEBUG = True
 ###############
-# get the path of the current python script
-path_WF = os.path.dirname(__file__)
-
-path_WF_icons = os.path.join(path_WF, 'Resources', 'Icons')
-path_WF_utils = os.path.join(path_WF, 'Utils')
-path_WF_resources = os.path.join(path_WF, 'Resources')
-path_WF_ui = os.path.join(path_WF, 'Resources', 'Ui')
-
-if not sys.path.__contains__(str(path_WF_utils)):
-    sys.path.append(str(path_WF_utils))
-    sys.path.append(str(path_WF_ui))
+if not sys.path.__contains__(str(PATH_WF_UTILS)):
+    sys.path.append(str(PATH_WF_UTILS))
+    sys.path.append(str(PATH_WF_UI))
 
 try:
-    from WF_selection import Selection, getSel
-    from WF_print import printError_msg, print_msg
-    from WF_directory import createFolders, addObjectToGrp
-    from WF_geometry import *
-
+    from WF_selection import getSel
+    from WF_print import printError_msg, print_msg, printError_msgWithTimer
+    from WF_directory import createFolders, addObjectToGrp, createSubGroup
+    from WF_geometry import isEqualVectors, isColinearVectors, minMaxVectorsLimits, meanVectorsPoint, propertiesPlane
+    from WF_command import Command
 except ImportError:
     print("ERROR: cannot load WF modules !")
     sys.exit(1)
 
 ###############
-m_icon = "/WF_threePointsPlane.svg"
-m_dialog = "/WF_UI_threePointsPlane.ui"
-m_dialog_title = "Define extension of the plane."
-
-m_exception_msg = """
+M_ICON_NAME = "/WF_threePointsPlane.svg"
+M_ICON_NAME_FILE = os.path.join(PATH_WF_ICONS, M_ICON_NAME)
+M_DIALOG = "/WF_UI_threePointsPlane.ui"
+M_DIALOG_TITLE = "Define extension of the plane."
+M_EXCEPTION_MSG = """
 Unable to create Plane from 3 Points :
 - Select three separated Points !
 
 Go to Parameter(s) Window in Task Panel!"""
-m_result_msg = " : Plane from 3 Points created !"
-m_menu_text = "Plane = (3 Points)"
-m_accel = ""
-m_tool_tip = """<b>Create Plane</b> from three selected Points.<br>
+M_RESULT_MSG = " : Plane from 3 Points created !"
+M_MENU_TEXT = "Plane = (3 Points)"
+M_ACCEL = ""
+M_TOOL_TIP = """<b>Create Plane</b> from three selected Points.<br>
+<br>
+Extension :  (100 by default)<br>
+Width and Length of the plane in current units.<br>
+<br>
 <br>
 - Select three Points only<br>
 - Then Click on the Button/Icon<br>
@@ -94,37 +76,69 @@ m_tool_tip = """<b>Create Plane</b> from three selected Points.<br>
  - a Parameter(s) Window in Task Panel!</i>
 """
 ###############
-m_macro = "Macro ThreePointsPlane"
-m_extension = 100.0
+M_MACRO = "Macro ThreePointsPlane"
+M_PLANE_EXT = 100.0
 ###############
 
 
+def setPlaneExtension(ext):
+    """ Set Extension of the plane.
+
+    Parameters
+    -------
+    *ext*       : (Float, Mandatory)
+                Distance for the extensions.
+    """
+    global M_PLANE_EXT
+    M_PLANE_EXT = float(ext)
+
+
+def getExtension():
+    """ Get Extension of plane.
+
+    Return
+    -------
+    A Float.
+    """
+    return M_PLANE_EXT
+
+
 class ThreePointsPlanePanel:
+    """ The ThreePointsPlanePanel (GUI).
+    """
+
     def __init__(self):
-        self.form = Gui.PySideUic.loadUi(path_WF_ui + m_dialog)
-        self.form.setWindowTitle(m_dialog_title)
-        self.form.UI_Plane_extension.setText(str(m_extension))
+        self.form = Gui.PySideUic.loadUi(PATH_WF_UI + M_DIALOG)
+        self.form.setWindowTitle(M_DIALOG_TITLE)
+        self.form.UI_Plane_extension.setText(str(M_PLANE_EXT))
 
     def accept(self):
-        global m_extension
-        m_extension = float(self.form.UI_Plane_extension.text())
+        """ Run when click on OK button.
+        """
+        global M_PLANE_EXT
+        M_PLANE_EXT = float(self.form.UI_Plane_extension.text())
 
         if WF.verbose():
-            print_msg("m_extension = " + str(m_extension))
+            print_msg("M_PLANE_EXT = " + str(M_PLANE_EXT))
 
         Gui.Control.closeDialog()
-        m_actDoc = App.activeDocument()
-        if m_actDoc is not None:
-            if len(Gui.Selection.getSelectionEx(m_actDoc.Name)) != 0:
-                run()
+        m_act_doc = App.activeDocument()
+        if m_act_doc is not None:
+            if Gui.Selection.getSelectionEx(m_act_doc.Name):
+                three_points_plane_command()
         return True
 
     def reject(self):
+        """ Run when click on CANCEL button.
+        """
         Gui.Control.closeDialog()
         return False
 
     def shouldShow(self):
-        return (len(Gui.Selection.getSelectionEx(App.activeDocument().Name)) == 0)
+        """ Must show when nothing selected.
+        """
+        return (len(Gui.Selection.getSelectionEx(
+            App.activeDocument().Name)) == 0)
 
 
 def makeThreePointsPlaneFeature(group):
@@ -135,6 +149,8 @@ def makeThreePointsPlaneFeature(group):
     m_name = "ThreePointsPlane_P"
     m_part = "Part::FeaturePython"
 
+    if group is None:
+        return None
     try:
         m_obj = App.ActiveDocument.addObject(str(m_part), str(m_name))
         if group is not None:
@@ -143,17 +159,18 @@ def makeThreePointsPlaneFeature(group):
         ViewProviderThreePointsPlane(m_obj.ViewObject)
     except Exception as err:
         printError_msg("Not able to add an object to Model!")
-        printError_msg(err.args[0], title=m_macro)
+        printError_msg(err.args[0], title=M_MACRO)
         return None
 
     return m_obj
 
 
 class ThreePointsPlane(WF_Plane):
-    """ The ThreePointsPlane feature object. """
-    # this method is mandatory
+    """ The ThreePointsPlane feature object.
+    """
+
     def __init__(self, selfobj):
-        if m_debug:
+        if M_DEBUG:
             print("running ThreePointsPlane.__init__ !")
 
         self.name = "ThreePointsPlane"
@@ -176,7 +193,7 @@ class ThreePointsPlane(WF_Plane):
         selfobj.addProperty("App::PropertyFloat",
                             "Extension",
                             self.name,
-                            m_tooltip).Extension = m_extension
+                            m_tooltip).Extension = M_PLANE_EXT
         # 0 -- default mode, read and write
         # 1 -- read-only
         # 2 -- hidden
@@ -186,11 +203,18 @@ class ThreePointsPlane(WF_Plane):
 
         selfobj.Proxy = self
 
-    # this method is mandatory
     def execute(self, selfobj):
         """ Doing a recomputation.
         """
-        if m_debug:
+        m_properties_list = ['Point1',
+                             'Point2',
+                             'Point3'
+                             ]
+        for m_property in m_properties_list:
+            if m_property not in selfobj.PropertiesList:
+                return
+
+        if M_DEBUG:
             print("running ThreePointsPlane.execute !")
 
         # To be compatible with previous version > 2019
@@ -202,108 +226,104 @@ class ThreePointsPlane(WF_Plane):
             if selfobj.Parametric == 'Interactive' and self.created:
                 return
 
-        if WF.verbose():
-            m_msg = "Recompute Python ThreePointsPlane feature\n"
-            App.Console.PrintMessage(m_msg)
-
-        m_PropertiesList = ['Point1',
-                            'Point2',
-                            'Point3'
-                            ]
-        for m_Property in m_PropertiesList:
-            if m_Property not in selfobj.PropertiesList:
-                return
         try:
-            Plane = None
+            plane = None
             if selfobj.Point1 is not None and selfobj.Point2 is not None and selfobj.Point3 is not None:
-                n1 = eval(selfobj.Point1[1][0].lstrip('Vertex'))
-                n2 = eval(selfobj.Point2[1][0].lstrip('Vertex'))
-                n3 = eval(selfobj.Point3[1][0].lstrip('Vertex'))
-                if m_debug:
+                # n1 = eval(selfobj.Point1[1][0].lstrip('Vertex'))
+                # n2 = eval(selfobj.Point2[1][0].lstrip('Vertex'))
+                # n3 = eval(selfobj.Point3[1][0].lstrip('Vertex'))
+                m_n1 = re.sub('[^0-9]', '', selfobj.Point1[1][0])
+                m_n2 = re.sub('[^0-9]', '', selfobj.Point2[1][0])
+                m_n3 = re.sub('[^0-9]', '', selfobj.Point3[1][0])
+                m_n1 = int(m_n1)
+                m_n2 = int(m_n2)
+                m_n3 = int(m_n3)
+                if M_DEBUG:
                     print_msg(str(selfobj.Point1))
                     print_msg(str(selfobj.Point2))
                     print_msg(str(selfobj.Point3))
-                    print_msg("n1 = " + str(n1))
-                    print_msg("n2 = " + str(n2))
-                    print_msg("n3 = " + str(n3))
+                    print_msg("m_n1 = " + str(m_n1))
+                    print_msg("m_n2 = " + str(m_n2))
+                    print_msg("m_n3 = " + str(m_n3))
 
                 points = []
-                point_A = selfobj.Point1[0].Shape.Vertexes[n1 - 1].Point
-                point_B = selfobj.Point2[0].Shape.Vertexes[n2 - 1].Point
-                point_C = selfobj.Point3[0].Shape.Vertexes[n3 - 1].Point
+                point_a = selfobj.Point1[0].Shape.Vertexes[m_n1 - 1].Point
+                point_b = selfobj.Point2[0].Shape.Vertexes[m_n2 - 1].Point
+                point_c = selfobj.Point3[0].Shape.Vertexes[m_n3 - 1].Point
 
-                if isEqualVectors(point_A, point_B):
+                if isEqualVectors(point_a, point_b):
                     m_msg = """Unable to create Plane from 2 equals Points :
                     Points 1 and 2 are equals !
                     """
-                    printError_msg(m_msg, title=m_macro)
+                    printError_msg(m_msg, title=M_MACRO)
                     return
 
-                if isEqualVectors(point_A, point_C):
+                if isEqualVectors(point_a, point_c):
                     m_msg = """Unable to create Plane from 2 equals Points :
                     Points 1 an 3 are equals !
                     """
-                    printError_msg(m_msg, title=m_macro)
+                    printError_msg(m_msg, title=M_MACRO)
                     return
 
-                if isEqualVectors(point_B, point_C):
+                if isEqualVectors(point_b, point_c):
                     m_msg = """Unable to create Plane from 2 equals Points :
                     Points 2 an 3 are equals !
                     """
-                    printError_msg(m_msg, title=m_macro)
+                    printError_msg(m_msg, title=M_MACRO)
                     return
 
-                if isColinearVectors(point_A, point_B, point_C, tolerance=1e-12):
-                    printError_msg(m_exception_msg, title=m_macro)
+                if isColinearVectors(point_a, point_b, point_c):
+                    printError_msg(M_EXCEPTION_MSG, title=M_MACRO)
                     return
 
-                points.append(point_A)
-                points.append(point_B)
-                points.append(point_C)
+                points.append(point_a)
+                points.append(point_b)
+                points.append(point_c)
 
-                Vector_Center = meanVectorsPoint(points)
-                xmax, xmin, ymax, ymin, zmax, zmin = minMaxVectorsLimits(points)
+                vector_center = meanVectorsPoint(points)
 
-                Vector21 = point_B - point_A
-                Vector31 = point_C - point_A
-                Plane_Point = Vector_Center
-                Plane_Normal = Vector21.cross(Vector31)
+                vector21 = point_b - point_a
+                vector31 = point_c - point_a
+                plane_point = vector_center
+                plane_normal = vector21.cross(vector31)
 
-                Edge_Length = selfobj.Extension
-                Plane = Part.makePlane(Edge_Length,
-                                       Edge_Length,
-                                       Plane_Point,
-                                       Plane_Normal)
-                Plane_Center = Plane.CenterOfMass
-                Plane_Translate = Plane_Point - Plane_Center
-                Plane.translate(Plane_Translate)
+                edge_length = selfobj.Extension
+                plane = Part.makePlane(edge_length,
+                                       edge_length,
+                                       plane_point,
+                                       plane_normal)
+                plane_center = plane.CenterOfMass
+                plane_translate = plane_point - plane_center
+                plane.translate(plane_translate)
 
-#                 Plane = Part.Plane(point_A, point_B, point_C)
+#                 plane = Part.Plane(point_a, point_b, point_c)
 #                 .toShape()
-            if Plane is not None:
-                selfobj.Shape = Plane
+            if plane is not None:
+                selfobj.Shape = plane
                 propertiesPlane(selfobj.Label, self.color)
-                selfobj.Point1_X = float(point_A.x)
-                selfobj.Point1_Y = float(point_A.y)
-                selfobj.Point1_Z = float(point_A.z)
-                selfobj.Point2_X = float(point_B.x)
-                selfobj.Point2_Y = float(point_B.y)
-                selfobj.Point2_Z = float(point_B.z)
-                selfobj.Point3_X = float(point_C.x)
-                selfobj.Point3_Y = float(point_C.y)
-                selfobj.Point3_Z = float(point_C.z)
+                selfobj.Point1_X = float(point_a.x)
+                selfobj.Point1_Y = float(point_a.y)
+                selfobj.Point1_Z = float(point_a.z)
+                selfobj.Point2_X = float(point_b.x)
+                selfobj.Point2_Y = float(point_b.y)
+                selfobj.Point2_Z = float(point_b.z)
+                selfobj.Point3_X = float(point_c.x)
+                selfobj.Point3_Y = float(point_c.y)
+                selfobj.Point3_Z = float(point_c.z)
                 # To be compatible with previous version 2018
                 if 'Parametric' in selfobj.PropertiesList:
                     self.created = True
+        except AttributeError as err:
+            print("AttributeError" + str(err))
         except Exception as err:
-            printError_msg(err.args[0], title=m_macro)
+            printError_msg(err.args[0], title=M_MACRO)
 
     def onChanged(self, selfobj, prop):
-        if WF.verbose():
-            App.Console.PrintMessage("Change property : " + str(prop) + "\n")
-
-        if m_debug:
+        """ Run when a proterty change.
+        """
+        if M_DEBUG:
             print("running ThreePointsPlane.onChanged !")
+            print("Change property : " + str(prop))
 
         WF_Plane.onChanged(self, selfobj, prop)
 
@@ -320,8 +340,7 @@ class ThreePointsPlane(WF_Plane):
 
 
 class ViewProviderThreePointsPlane:
-    global path_WF_icons
-    icon = '/WF_threePointsPlane.svg'
+    icon = M_ICON_NAME
 
     def __init__(self, vobj):
         """ Set this object to the proxy object of the actual view provider """
@@ -351,105 +370,80 @@ class ViewProviderThreePointsPlane:
     # This method is optional and if not defined a default icon is shown.
     def getIcon(self):
         """ Return the icon which will appear in the tree view. """
-        return (path_WF_icons + ViewProviderThreePointsPlane.icon)
+        return PATH_WF_ICONS + ViewProviderThreePointsPlane.icon
 
-    def setIcon(self, icon='/WF_threePointsPlane.svg'):
+    def setIcon(self, icon=M_ICON_NAME):
         ViewProviderThreePointsPlane.icon = icon
 
 
-class CommandThreePointsPlane:
-    """ Command to create ThreePointsPlane feature object. """
-    def GetResources(self):
-        return {'Pixmap': path_WF_icons + m_icon,
-                'MenuText': m_menu_text,
-                'Accel': m_accel,
-                'ToolTip': m_tool_tip}
+def buildFromThreePoints(macro, group, vertexes, extension):
+    """ Build a ThreePointsPlane feature object using three points.
+    """
+    vertex1 = vertexes[0]
+    vertex2 = vertexes[1]
+    vertex3 = vertexes[2]
+    if WF.verbose():
+        print_msg("vertex1 = " + str(vertex1))
+        print_msg("vertex2 = " + str(vertex2))
+        print_msg("vertex3 = " + str(vertex3))
 
-    def Activated(self):
-        m_actDoc = App.activeDocument()
-        if m_actDoc is not None:
-            if len(Gui.Selection.getSelectionEx(m_actDoc.Name)) == 0:
-                Gui.Control.showDialog(ThreePointsPlanePanel())
-
-        run()
-
-    def IsActive(self):
-        if App.ActiveDocument:
-            return True
-        else:
-            return False
+    App.ActiveDocument.openTransaction(macro)
+    selfobj = makeThreePointsPlaneFeature(group)
+    selfobj.Point1 = vertex1
+    selfobj.Point2 = vertex2
+    selfobj.Point3 = vertex3
+    selfobj.Extension = extension
+    selfobj.Proxy.execute(selfobj)
+    WF.touch(selfobj)
 
 
-if App.GuiUp:
-    Gui.addCommand("ThreePointsPlane", CommandThreePointsPlane())
+def three_points_plane_command():
+    """ This command use the selected object(s) to try to build a
+    ThreePointsPlane feature object.
+    """
+    m_sel, m_act_doc = getSel(WF.verbose())
 
-
-def run():
-    m_sel, m_actDoc = getSel(WF.verbose())
-
+    points_from = ["Points", "Curves", "Objects"]
     try:
-        Number_of_Vertexes, Vertex_List = m_sel.get_pointsNames(
-            getfrom=["Points",
-                     "Curves",
-                     "Objects"])
-        if WF.verbose():
-            print_msg("Number_of_Vertexes = " + str(Number_of_Vertexes))
-            print_msg("Vertex_List = " + str(Vertex_List))
+        number_of_vertexes, vertex_list = m_sel.get_pointsWithNames(
+            get_from=points_from)
 
-        if Number_of_Vertexes < 3:
-            raise Exception(m_exception_msg)
+        if number_of_vertexes < 3:
+            raise Exception(M_EXCEPTION_MSG)
 
         try:
             m_main_dir = "WorkPlanes_P"
-            m_sub_dir = "Set001"
+            m_sub_dir = "Set000"
             m_group = createFolders(str(m_main_dir))
-            m_error_msg = "Could not Create '"
-            m_error_msg += str(m_sub_dir) + "' Objects Group!"
 
             # Create a sub group if needed
-            if Number_of_Vertexes > 6:
-                try:
-                    m_ob = App.ActiveDocument.getObject(str(m_main_dir)).newObject("App::DocumentObjectGroup", str(m_sub_dir))
-                    m_group = m_actDoc.getObject(str(m_ob.Label))
-                except Exception as err:
-                    printError_msg(err.args[0], title=m_macro)
-                    printError_msg(m_error_msg)
-
-            if WF.verbose():
-                print_msg("Group = " + str(m_group.Label))
+            if number_of_vertexes > 6:
+                m_group = createSubGroup(m_act_doc, m_main_dir, m_sub_dir)
 
             # Case of only 3 points
-            if Number_of_Vertexes == 3:
-                if WF.verbose():
-                    print_msg("Process only 3 points")
-
-                vertex1 = Vertex_List[0]
-                vertex2 = Vertex_List[1]
-                vertex3 = Vertex_List[2]
-
-                if WF.verbose():
-                    print_msg("vertex1 = " + str(vertex1))
-                    print_msg("vertex2 = " + str(vertex2))
-                    print_msg("vertex3 = " + str(vertex3))
-
-                App.ActiveDocument.openTransaction(m_macro)
-                selfobj = makeThreePointsPlaneFeature(m_group)
-                selfobj.Point1 = vertex1
-                selfobj.Point2 = vertex2
-                selfobj.Point3 = vertex3
-                selfobj.Extension = m_extension
-                selfobj.Proxy.execute(selfobj)
+            if number_of_vertexes == 3:
+                buildFromThreePoints(
+                    M_MACRO, m_group, vertex_list, M_PLANE_EXT)
             else:
-                raise Exception(m_exception_msg)
+                raise Exception(M_EXCEPTION_MSG)
 
         except Exception as err:
-            printError_msg(err.args[0], title=m_macro)
-
-        App.ActiveDocument.commitTransaction()
+            printError_msg(err.args[0], title=M_MACRO)
 
     except Exception as err:
-        printError_msg(err.args[0], title=m_macro)
+        printError_msgWithTimer(err.args[0], title=M_MACRO)
 
+    App.ActiveDocument.commitTransaction()
+    App.activeDocument().recompute()
+
+
+if App.GuiUp:
+    Gui.addCommand("ThreePointsPlane", Command(M_ICON_NAME_FILE,
+                                               M_MENU_TEXT,
+                                               M_ACCEL,
+                                               M_TOOL_TIP,
+                                               ThreePointsPlanePanel,
+                                               three_points_plane_command))
 
 if __name__ == '__main__':
-    run()
+    three_points_plane_command()

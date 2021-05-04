@@ -4,40 +4,28 @@
 *   This file is part of Work Feature workbench                           *
 *                                                                         *
 *   Copyright (c) 2017-2019 <rentlau_64>                                  *
-*   https://github.com/Rentlau/WorkFeature-WB                             *
-*                                                                         *
-*   Code rewrite by <rentlau_64> from Work Features macro:                *
-*   https://github.com/Rentlau/WorkFeature                                *
-*                                                                         *
-*   This workbench is a supplement to the FreeCAD CAx development system. *
-*   http://www.freecadweb.org                                             *
-*                                                                         *
-*   This workbench is free software; you can redistribute it and/or modify*
-*   it under the terms of the GNU General Public License as published by  *
-*   the Free Software Foundation, either version 3 of the License, or     *
-*   (at your option) any later version.                                   *
-*   for detail see the LICENSE text file or:                              *
-*   https://www.gnu.org/licenses/gpl-3.0.html                             *
-*                                                                         *
-*   This workbench is distributed in the hope that it will be useful,     *
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the          *
-*   GNU Library General Public License for more details.                  *
-*                                                                         *
-*   You should have received a copy of the GNU Library General Public     *
-*   License along with this workbench;                                    *
-*   If not, see <https://www.gnu.org/licenses/>                           *
 ***************************************************************************
+Create a "best fit" Line from a set of Points using
+Singular Value Decomposition (SVD).
+
+How to
+- Select several Points and/or
+- Select several Line/Edge(s) to process 2 ends points and/or
+- Select one or several Plane/Face(s) to process all Points at once and/or
+- Select one or several Object(s) to process all Points at once;
+- Then Click on the icon
 """
 import sys
 import os.path
+import re
 import FreeCAD as App
 import Part
-from PySide import QtGui, QtCore
+from PySide import QtCore
 from FreeCAD import Base
+from WF_config import PATH_WF_ICONS, PATH_WF_UTILS, PATH_WF_UI
 import WF
 from WF_Objects_base import WF_Line
-# from InitGui import m_debug
+
 if App.GuiUp:
     import FreeCADGui as Gui
 
@@ -48,35 +36,29 @@ Macro NPointsLine.
 Creates a parametric NPointsLine from a list of Points
 '''
 ###############
-m_debug = True
+M_DEBUG = True
 ###############
-
-# get the path of the current python script
-path_WF = os.path.dirname(__file__)
-
-path_WF_icons = os.path.join(path_WF, 'Resources', 'Icons')
-path_WF_utils = os.path.join(path_WF, 'Utils')
-path_WF_resources = os.path.join(path_WF, 'Resources')
-path_WF_ui = os.path.join(path_WF, 'Resources', 'Ui')
-
-if not sys.path.__contains__(str(path_WF_utils)):
-    sys.path.append(str(path_WF_utils))
-    sys.path.append(str(path_WF_ui))
+if not sys.path.__contains__(str(PATH_WF_UTILS)):
+    sys.path.append(str(PATH_WF_UTILS))
+    sys.path.append(str(PATH_WF_UI))
 
 try:
-    from WF_selection import Selection, getSel
-    from WF_print import printError_msg, print_msg
-    from WF_directory import createFolders, addObjectToGrp
-    from WF_geometry import *
+    from WF_selection import getSel
+    from WF_print import printError_msg, print_msg, printError_msgWithTimer
+    from WF_directory import createFolders, addObjectToGrp, createSubGroup
+    from WF_geometry import coordVectorPoint, propertiesLine
+    from WF_utils import linkSubList_convertToOldStyle
+    from WF_command import Command
 except ImportError:
     print("ERROR: Cannot load WF modules !")
     sys.exit(1)
 
 ###############
-m_icon = "/WF_nPointsLine.svg"
-m_dialog = "/WF_UI_nPointsLine.ui"
-m_dialog_title = ""
-m_exception_msg = """
+M_ICON_NAME = "/WF_nPointsLine.svg"
+M_ICON_NAME_FILE = os.path.join(PATH_WF_ICONS, M_ICON_NAME)
+M_DIALOG = "/WF_UI_nPointsLine.ui"
+M_DIALOG_TITLE = ""
+M_EXCEPTION_MSG = """
 Unable to create a Line :
 - Select several Points(s) and/or
 - Select several Line/Edge(s) to process 2 ends points and/or
@@ -84,10 +66,10 @@ Unable to create a Line :
 - Select one or several Object(s) to process all Points at once;
 
 and go to Parameter(s) Window in Task Panel!"""
-m_result_msg = " : N Points Lines created!"
-m_menu_text = "Line = SVD(Points)"
-m_accel = ""
-m_tool_tip = """<b>Create a "best fit" Line</b> from a set of Points using Singular Value Decomposition (SVD).<br>
+M_RESULT_MSG = " : N Points Lines created!"
+M_MENU_TEXT = "Line = SVD(Points)"
+M_ACCEL = ""
+M_TOOL_TIP = """<b>Create a "best fit" Line</b> from a set of Points using Singular Value Decomposition (SVD).<br>
 
 <br>
 - Select several Points(s) and/or<br>
@@ -101,53 +83,74 @@ m_tool_tip = """<b>Create a "best fit" Line</b> from a set of Points using Singu
  - a Parameter(s) Window in Task Panel!</i>
 """
 ###############
-m_macro = "Macro NPointsLine"
-m_svd_flag = False
+M_MACRO = "Macro NPointsLine"
+M_SVD_FLAG = False
 ###############
 
 
-def linkSubList_convertToOldStyle(references):
-    """("input: [(obj1, (sub1, sub2)), (obj2, (sub1, sub2))]\n"
-    "output: [(obj1, sub1), (obj1, sub2), (obj2, sub1), (obj2, sub2)]")"""
-    result = []
-    for tup in references:
-        if type(tup[1]) is tuple or type(tup[1]) is list:
-            for subname in tup[1]:
-                result.append((tup[0], subname))
-            if len(tup[1]) == 0:
-                result.append((tup[0], ''))
-        else:
-            # old style references, no conversion required
-            result.append(tup)
-    return result
+def setSvd(flag):
+    """ Set SVD flag to generate all 3 vectors from SVD decomposition.
+
+    Parameters
+    -------
+    *flag*      : (Boolean, mandatory)
+                If False:
+                Generate only main vector.
+                If True:
+                Generate all 3 vectors from SVD decomposition
+    """
+    global M_SVD_FLAG
+    M_SVD_FLAG = flag
+
+
+def isSvd():
+    """ Get SVD flag.
+
+    Return
+    -------
+    A Boolean
+    """
+    return M_SVD_FLAG
 
 
 class NPointsLinePanel:
+    """ The NPointsLinePanel (GUI).
+    """
+
     def __init__(self):
-        self.form = Gui.PySideUic.loadUi(path_WF_ui + m_dialog)
-        self.form.setWindowTitle(m_dialog_title)
-        self.form.UI_nPointsLine_checkBox.setCheckState(QtCore.Qt.Unchecked)
-        if m_svd_flag:
-            self.form.UI_nPointsLine_checkBox.setCheckState(QtCore.Qt.Checked)
+        self.form = Gui.PySideUic.loadUi(PATH_WF_UI + M_DIALOG)
+        self.form.setWindowTitle(M_DIALOG_TITLE)
+        self.form.UI_nPointsLine_checkBox.setCheckState(
+            QtCore.Qt.Unchecked)
+        if M_SVD_FLAG:
+            self.form.UI_nPointsLine_checkBox.setCheckState(
+                QtCore.Qt.Checked)
 
     def accept(self):
-        global m_svd_flag
+        """ Run when click on OK button.
+        """
+        global M_SVD_FLAG
 
-        m_svd_flag = self.form.UI_nPointsLine_checkBox.isChecked()
+        M_SVD_FLAG = self.form.UI_nPointsLine_checkBox.isChecked()
 
         Gui.Control.closeDialog()
-        m_actDoc = App.activeDocument()
-        if m_actDoc is not None:
-            if len(Gui.Selection.getSelectionEx(m_actDoc.Name)) != 0:
-                run()
+        m_act_doc = App.activeDocument()
+        if m_act_doc is not None:
+            if Gui.Selection.getSelectionEx(m_act_doc.Name):
+                n_points_line_command()
         return True
 
     def reject(self):
+        """ Run when click on CANCEL button.
+        """
         Gui.Control.closeDialog()
         return False
 
     def shouldShow(self):
-        return (len(Gui.Selection.getSelectionEx(App.activeDocument().Name)) == 0)
+        """ Must show when nothing selected.
+        """
+        return len(Gui.Selection.getSelectionEx(
+            App.activeDocument().Name)) == 0
 
 
 def makeNPointsLineFeature(group):
@@ -158,6 +161,8 @@ def makeNPointsLineFeature(group):
     m_name = "NPointsLine_P"
     m_part = "Part::FeaturePython"
 
+    if group is None:
+        return None
     try:
         m_obj = App.ActiveDocument.addObject(str(m_part), str(m_name))
         if group is not None:
@@ -166,23 +171,23 @@ def makeNPointsLineFeature(group):
         ViewProviderNPointsLine(m_obj.ViewObject)
     except Exception as err:
         printError_msg("Not able to add an object to Model!")
-        printError_msg(err.args[0], title=m_macro)
+        printError_msg(err.args[0], title=M_MACRO)
         return None
 
     return m_obj, m_inst
 
 
 class NPointsLine(WF_Line):
-    """ The NPointsLine feature object. """
-    # this method is mandatory
+    """ The NPointsLine feature object.
+    """
+
     def __init__(self, selfobj):
-        if m_debug:
+        if M_DEBUG:
             print("running NPointsLine.__init__ !")
 
         self.name = "NPointsLine"
         WF_Line.__init__(self, selfobj, self.name)
-
-        # Add some custom properties to our NPointsLine feature object.
+        # Add some custom properties to our feature object.
         selfobj.addProperty("App::PropertyLinkSubList",
                             "Points",
                             self.name,
@@ -200,7 +205,8 @@ of the Singular Value Decomposition (SVD).
                             m_tooltip)
         if (sys.version_info > (3, 0)):
             # Python 3 code in this block
-            selfobj.VectorIndex = [v.encode('utf8').decode('utf-8') for v in ['1', '2', '3']]
+            selfobj.VectorIndex = [v.encode('utf8').decode(
+                'utf-8') for v in ['1', '2', '3']]
             selfobj.VectorIndex = '1'.encode('utf8').decode('utf-8')
         else:
             # Python 2 code in this block
@@ -211,11 +217,17 @@ of the Singular Value Decomposition (SVD).
         # from within the class
         # self.Object = selfobj
 
-    # this method is mandatory
     def execute(self, selfobj):
         """ Doing a recomputation.
         """
-        if m_debug:
+        m_properties_list = ['Points',
+                             "VectorIndex",
+                             ]
+        for m_property in m_properties_list:
+            if m_property not in selfobj.PropertiesList:
+                return
+
+        if M_DEBUG:
             print("running NPointsLine.execute !")
 
         # To be compatible with previous version > 2019
@@ -227,42 +239,28 @@ of the Singular Value Decomposition (SVD).
             if selfobj.Parametric == 'Interactive' and self.created:
                 return
 
-        if WF.verbose():
-            m_msg = "Recompute Python NPointsLine feature\n"
-            App.Console.PrintMessage(m_msg)
-
-        if m_debug:
-            print("selfobj.PropertiesList = " + str(selfobj.PropertiesList))
-
-        m_PropertiesList = ['Points',
-                            "VectorIndex",
-                            ]
-        for m_Property in m_PropertiesList:
-            if m_Property not in selfobj.PropertiesList:
-                return
-
         try:
             import numpy as np
         except ImportError:
             m_msg = "You MUST install numpy to use this function !"
-            printError_msg(m_msg, title=m_macro)
+            printError_msg(m_msg, title=M_MACRO)
 
         try:
-            Line = None
-            if m_debug:
-                print("selfobj.Points = " + str(selfobj.Points))
-
+            line = None
             m_points = []
             m_x = []
             m_y = []
             m_z = []
             if selfobj.Points is not None:
                 for p in linkSubList_convertToOldStyle(selfobj.Points):
-                    n = eval(p[1].lstrip('Vertex'))
-                    if m_debug:
+                    # n = eval(p[1].lstrip('Vertex'))
+                    m_n = re.sub('[^0-9]', '', p[1])
+                    m_n = int(m_n)
+                    if M_DEBUG:
                         print("p " + str(p))
-                        print_msg("n = " + str(n))
-                    m_point = p[0].Shape.Vertexes[n - 1].Point
+                        print_msg("m_n = " + str(m_n))
+
+                    m_point = p[0].Shape.Vertexes[m_n - 1].Point
                     m_points.append(m_point)
                     m_x.append(m_point.x)
                     m_y.append(m_point.y)
@@ -271,56 +269,60 @@ of the Singular Value Decomposition (SVD).
                 m_np_x = np.asfarray(m_x)
                 m_np_y = np.asfarray(m_y)
                 m_np_z = np.asfarray(m_z)
-                if m_debug:
+                if M_DEBUG:
                     print_msg(" m_np_x=" + str(m_np_x))
                     print_msg(" m_np_y=" + str(m_np_y))
                     print_msg(" m_np_z=" + str(m_np_z))
 
                 m_data = np.concatenate((m_np_x[:, np.newaxis],
-                                        m_np_y[:, np.newaxis],
-                                        m_np_z[:, np.newaxis]),
+                                         m_np_y[:, np.newaxis],
+                                         m_np_z[:, np.newaxis]),
                                         axis=1)
-                if m_debug:
+                if M_DEBUG:
                     print_msg(" m_data=" + str(m_data))
 
-                # Calculate the mean of the points, i.e. the 'center' of the cloud
-                m_datamean = m_data.mean(axis=0)
-                Axis_E0 = Base.Vector(m_datamean[0], m_datamean[1], m_datamean[2])
+                # Calculate the mean of the points, i.e. the 'center' of the
+                # cloud
+                m_data_mean = m_data.mean(axis=0)
+                axis_eo = Base.Vector(
+                    m_data_mean[0], m_data_mean[1], m_data_mean[2])
 
                 # Do an SVD on the mean-centered data.
-                m_uu, m_dd, m_vv = np.linalg.svd(m_data - m_datamean)
-                if m_debug:
+                m_uu, m_dd, m_vv = np.linalg.svd(m_data - m_data_mean)
+                if M_DEBUG:
                     print_msg(" m_uu=" + str(m_uu))
                     print_msg(" m_dd=" + str(m_dd))
                     print_msg(" m_vv=" + str(m_vv))
 
                 # Now vv[0] contains the first principal component, i.e. the direction
                 # vector of the 'best fit' line in the least squares sense.
-                Axis_dir = Base.Vector(m_vv[0][0], m_vv[0][1], m_vv[0][2])
-                point1 = Axis_E0 - Axis_dir.normalize().multiply(m_dd[0] / 2.)
+                axis_dir = Base.Vector(m_vv[0][0], m_vv[0][1], m_vv[0][2])
+                point1 = axis_eo - axis_dir.normalize().multiply(m_dd[0] / 2.)
 
                 if selfobj.VectorIndex == '1':
-                    point2 = Axis_E0 + Axis_dir.normalize().multiply(m_dd[0] / 2.)
+                    point2 = axis_eo + \
+                        axis_dir.normalize().multiply(m_dd[0] / 2.)
 
                 if selfobj.VectorIndex == '2':
-                    Axis_dir = Base.Vector(m_vv[1][0], m_vv[1][1], m_vv[1][2])
-                    point1 = Axis_E0 - Axis_dir.normalize().multiply(m_dd[0] / 2.)
-                    point2 = Axis_E0 + Axis_dir.normalize().multiply(m_dd[1] / 2.)
-                    # point2 = Axis_E0 + Axis_dir
+                    axis_dir = Base.Vector(m_vv[1][0], m_vv[1][1], m_vv[1][2])
+                    point1 = axis_eo - \
+                        axis_dir.normalize().multiply(m_dd[0] / 2.)
+                    point2 = axis_eo + \
+                        axis_dir.normalize().multiply(m_dd[1] / 2.)
+                    # point2 = axis_eo + axis_dir
 
                 if selfobj.VectorIndex == '3':
-                    Axis_dir = Base.Vector(m_vv[2][0], m_vv[2][1], m_vv[2][2])
-                    point1 = Axis_E0 - Axis_dir.normalize().multiply(m_dd[0] / 2.)
-                    point2 = Axis_E0 + Axis_dir.normalize().multiply(m_dd[2] / 2.)
-                    # point2 = Axis_E0 + Axis_dir
+                    axis_dir = Base.Vector(m_vv[2][0], m_vv[2][1], m_vv[2][2])
+                    point1 = axis_eo - \
+                        axis_dir.normalize().multiply(m_dd[0] / 2.)
+                    point2 = axis_eo + \
+                        axis_dir.normalize().multiply(m_dd[2] / 2.)
+                    # point2 = axis_eo + axis_dir
 
-                Point_E1 = point2
-                Point_E2 = point1
-
-                Line = Part.makeLine(coordVectorPoint(Point_E2),
-                                     coordVectorPoint(Point_E1))
-            if Line is not None:
-                selfobj.Shape = Line
+                line = Part.makeLine(coordVectorPoint(point1),
+                                     coordVectorPoint(point2))
+            if line is not None:
+                selfobj.Shape = line
                 propertiesLine(selfobj.Label, self.color)
                 selfobj.Point1_X = float(point1.x)
                 selfobj.Point1_Y = float(point1.y)
@@ -331,15 +333,17 @@ of the Singular Value Decomposition (SVD).
                 # To be compatible with previous version 2018
                 if 'Parametric' in selfobj.PropertiesList:
                     self.created = True
+        except AttributeError as err:
+            print("AttributeError" + str(err))
         except Exception as err:
-            printError_msg(err.args[0], title=m_macro)
+            printError_msg(err.args[0], title=M_MACRO)
 
     def onChanged(self, selfobj, prop):
-        if WF.verbose():
-            App.Console.PrintMessage("Change property : " + str(prop) + "\n")
-
-        if m_debug:
+        """ Run when a proterty change.
+        """
+        if M_DEBUG:
             print("running NPointsLine.onChanged !")
+            print("Change property : " + str(prop))
 
         WF_Line.onChanged(self, selfobj, prop)
 
@@ -354,16 +358,9 @@ of the Singular Value Decomposition (SVD).
         if prop == "Points":
             selfobj.Proxy.execute(selfobj)
 
-#         if prop == 'VectorIndex':
-#             if selfobj.VectorIndex <= 1:
-#                 selfobj.VectorIndex = 1
-#             if selfobj.VectorIndex >= 3:
-#                 selfobj.VectorIndex = 3
-#
-#             selfobj.Proxy.execute(selfobj)
-
     def addSubobjects(self, selfobj, points_list=[]):
-        "adds pointlinks to this TwoPointsLine object"
+        """ Adds pointlinks to this NPointsLine object
+        """
         objs = selfobj.Points
         if points_list:
             s1 = []
@@ -383,8 +380,7 @@ of the Singular Value Decomposition (SVD).
 
 
 class ViewProviderNPointsLine:
-    global path_WF_icons
-    icon = '/WF_nPointsLine.svg'
+    icon = M_ICON_NAME
 
     def __init__(self, vobj):
         """ Set this object to the proxy object of the actual view provider """
@@ -414,80 +410,42 @@ class ViewProviderNPointsLine:
     # This method is optional and if not defined a default icon is shown.
     def getIcon(self):
         """ Return the icon which will appear in the tree view. """
-        return (path_WF_icons + ViewProviderNPointsLine.icon)
+        return PATH_WF_ICONS + ViewProviderNPointsLine.icon
 
-    def setIcon(self, icon='/WF_nPointsLine.svg'):
+    def setIcon(self, icon=M_ICON_NAME):
         ViewProviderNPointsLine.icon = icon
 
 
-class CommandNPointsLine:
-    """ Command to create NPointsLine feature object. """
-    def GetResources(self):
-        return {'Pixmap': path_WF_icons + m_icon,
-                'MenuText': m_menu_text,
-                'Accel': m_accel,
-                'ToolTip': m_tool_tip}
+def n_points_line_command():
+    """ This command use the selected object(s) to try to build a
+    NPointsLine feature object.
+    """
+    m_sel, m_act_doc = getSel(WF.verbose())
 
-    def Activated(self):
-        m_actDoc = App.activeDocument()
-        if m_actDoc is not None:
-            if len(Gui.Selection.getSelectionEx(m_actDoc.Name)) == 0:
-                Gui.Control.showDialog(NPointsLinePanel())
-
-        run()
-
-    def IsActive(self):
-        if App.ActiveDocument:
-            return True
-        else:
-            return False
-
-
-if App.GuiUp:
-    Gui.addCommand("NPointsLine", CommandNPointsLine())
-
-
-def run():
-    m_sel, m_actDoc = getSel(WF.verbose())
-
+    points_from = ["Points", "Curves", "Objects"]
     try:
-        Number_of_Vertexes, Vertex_List = m_sel.get_pointsNames(
-            getfrom=["Points",
-                     "Curves",
-                     "Objects"])
-        if WF.verbose():
-            print_msg("Number_of_Vertexes = " + str(Number_of_Vertexes))
-            print_msg("Vertex_List = " + str(Vertex_List))
+        number_of_vertexes, vertex_list = m_sel.get_pointsWithNames(
+            get_from=points_from)
 
-        if Number_of_Vertexes < 2:
-            raise Exception(m_exception_msg)
+        if number_of_vertexes < 2:
+            raise Exception(M_EXCEPTION_MSG)
 
         try:
             m_main_dir = "WorkAxis_P"
-            m_sub_dir = "Set001"
+            m_sub_dir = "Set000"
             m_group = createFolders(str(m_main_dir))
-            m_error_msg = "Could not Create '"
-            m_error_msg += str(m_sub_dir) + "' Objects Group!"
 
             # Create a sub group if needed
-            if m_svd_flag:
-                try:
-                    m_ob = App.ActiveDocument.getObject(str(m_main_dir)).newObject("App::DocumentObjectGroup", str(m_sub_dir))
-                    m_group = m_actDoc.getObject(str(m_ob.Label))
-                except Exception as err:
-                    printError_msg(err.args[0], title=m_macro)
-                    printError_msg(m_error_msg)
-
-            if WF.verbose():
-                print_msg("Group = " + str(m_group.Label))
+            if M_SVD_FLAG:
+                m_group = createSubGroup(m_act_doc, m_main_dir, m_sub_dir)
 
             points = []
             # Case of only 2 points
-            if Number_of_Vertexes == 2:
+            if number_of_vertexes == 2:
                 if WF.verbose():
                     print_msg("Process only 2 points")
-                vertex1 = Vertex_List[0]
-                vertex2 = Vertex_List[1]
+                vertex1 = vertex_list[0]
+                vertex2 = vertex_list[1]
                 points.append(vertex1)
                 points.append(vertex2)
 
@@ -495,22 +453,20 @@ def run():
                     print_msg("vertex1 = " + str(vertex1))
                     print_msg("vertex2 = " + str(vertex2))
 
-                App.ActiveDocument.openTransaction(m_macro)
+                App.ActiveDocument.openTransaction(M_MACRO)
                 selfobj, m_inst = makeNPointsLineFeature(m_group)
-                if m_debug:
-                    print("selfobj : " + str(selfobj))
                 m_inst.addSubobjects(selfobj, points)
                 selfobj.VectorIndex = '1'
                 selfobj.Proxy.execute(selfobj)
 
-                if m_svd_flag:
-                    App.ActiveDocument.openTransaction(m_macro)
+                if M_SVD_FLAG:
+                    App.ActiveDocument.openTransaction(M_MACRO)
                     selfobj, m_inst = makeNPointsLineFeature(m_group)
                     m_inst.addSubobjects(selfobj, points)
                     selfobj.VectorIndex = '2'
                     selfobj.Proxy.execute(selfobj)
 
-                    App.ActiveDocument.openTransaction(m_macro)
+                    App.ActiveDocument.openTransaction(M_MACRO)
                     selfobj, m_inst = makeNPointsLineFeature(m_group)
                     m_inst.addSubobjects(selfobj, points)
                     selfobj.VectorIndex = '3'
@@ -519,41 +475,48 @@ def run():
             else:
                 if WF.verbose():
                     print_msg("Process more than 2 points")
-                for i in range(Number_of_Vertexes):
-                    vertex = Vertex_List[i]
+                for i in range(number_of_vertexes):
+                    vertex = vertex_list[i]
                     points.append(vertex)
                     if WF.verbose():
                         print_msg("vertex = " + str(vertex))
 
-                App.ActiveDocument.openTransaction(m_macro)
+                App.ActiveDocument.openTransaction(M_MACRO)
                 selfobj, m_inst = makeNPointsLineFeature(m_group)
-                if m_debug:
-                    print("selfobj : " + str(selfobj))
                 m_inst.addSubobjects(selfobj, points)
                 selfobj.VectorIndex = '1'
                 selfobj.Proxy.execute(selfobj)
 
-                if m_svd_flag:
-                    App.ActiveDocument.openTransaction(m_macro)
+                if M_SVD_FLAG:
+                    App.ActiveDocument.openTransaction(M_MACRO)
                     selfobj, m_inst = makeNPointsLineFeature(m_group)
                     m_inst.addSubobjects(selfobj, points)
                     selfobj.VectorIndex = '2'
                     selfobj.Proxy.execute(selfobj)
 
-                    App.ActiveDocument.openTransaction(m_macro)
+                    App.ActiveDocument.openTransaction(M_MACRO)
                     selfobj, m_inst = makeNPointsLineFeature(m_group)
                     m_inst.addSubobjects(selfobj, points)
                     selfobj.VectorIndex = '3'
                     selfobj.Proxy.execute(selfobj)
 
         except Exception as err:
-            printError_msg(err.args[0], title=m_macro)
-
-        App.ActiveDocument.commitTransaction()
+            printError_msg(err.args[0], title=M_MACRO)
 
     except Exception as err:
-        printError_msg(err.args[0], title=m_macro)
+        printError_msgWithTimer(err.args[0], title=M_MACRO)
 
+    App.ActiveDocument.commitTransaction()
+    App.activeDocument().recompute()
+
+
+if App.GuiUp:
+    Gui.addCommand("NPointsLine", Command(M_ICON_NAME_FILE,
+                                          M_MENU_TEXT,
+                                          M_ACCEL,
+                                          M_TOOL_TIP,
+                                          NPointsLinePanel,
+                                          n_points_line_command))
 
 if __name__ == '__main__':
-    run()
+    n_points_line_command()

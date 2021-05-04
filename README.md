@@ -6,7 +6,7 @@ Author: [@Rentlau_64](https://github.com/Rentlau)
 GitHub Repo: https://github.com/Rentlau/WorkFeature-WB  
 FreeCAD Forum thread discussion: https://forum.freecadweb.org/viewtopic.php?f=9&t=27195  
 
-**Updated**: March 2019
+**Updated**: August 2019
 
 
 [![forthebadge made-with-python](http://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/)
@@ -30,9 +30,9 @@ A FreeCAD Workbench utility to create:
 - Lines (From 2 points),
 - Planes (From 1 point and 1 Line, From 3 points)
 
-<img src="./Doc/Images/Title02.png?1">
+![alt](./Doc/Images/Title02.png?1)
 
-**Version 2019-03-13-dev**
+**Version 2019-08-28-dev**
 
 [[back to top](#Sections)]
 
@@ -128,30 +128,29 @@ The **"Parametric"** property can be changed for each single object in it's own 
 |:------|:------|
 |In General menu click the **`Update`** Button to update all **WorkFeature-WB Interactive** objects | ![alt](./Resources/Icons/WF_refresh.svg) |
 
-General preferences can be set in `Edit/Preferences` menu.
+After **activation** of the workbench, general preferences can be set in `Edit/Preferences` menu.
 
 In this panel you can choose by example to set the **Parametric behavior**:
 
-![alt](./Doc/Images/Preferences.png?1)
+![alt](./Doc/Images/Preferences.png?2)
 
 Hereafter the Graph of relationship shows that the parametric **WorkFeature-WB** Object **CenterLinePoint_P001** is depending on 
 **Line002** object, but not the **MidPoint001**!
 
-
-<img src="./Doc/Images/Graph.png" alt="drawing" style="width:500px;"/>
+![alt](./Doc/Images/Graph.png?2)
 
 [[back to top](#Sections)]
 
 ## List of available functions
 
-Functions are organised by submenus:
+Functions are organised by categories in submenus:
 
 | Name                           | Icons  |
 |:------|:------|
 | **WF General** | ![alt](./Doc/Images/WF_General.png) |
-| **WF Points** | ![alt](./Doc/Images/WF_Points.png?1) |
-| **WF Lines** | ![alt](./Doc/Images/WF_Lines.png) |
-| **WF Planes** | ![alt](./Doc/Images/WF_Planes.png) |
+| **WF Points** to create Points entities| ![alt](./Doc/Images/WF_Points.png) |
+| **WF Lines** to create Lines entities| ![alt](./Doc/Images/WF_Lines.png) |
+| **WF Planes** to create Planes entities| ![alt](./Doc/Images/WF_Planes.png) |
 
 ### WF_General
 
@@ -188,6 +187,15 @@ Functions are organised by submenus:
 |![alt](./Resources/Icons/WF_threePointsPlane.svg)  | Create a Plane from three selected Points.|
 |![alt](./Resources/Icons/WF_linePointPlane.svg)  | Create Plane(s) crossing a Point and a Line.|
 |![alt](./Resources/Icons/WF_perpendicularLinePointPlane.svg)  | Create Planes(s) crossing a Point and perpendicular to a Line. **<span style="color:red">Unsuppported as of 2019 release</span>**|
+
+Most of the time a click on a button without any a prior selection will end up with a
+Popup window message:
+
+![alt](./Doc/Images/Message.png) 
+
+This Window by default will close after a few seconds.
+
+This behavior can be changed or deactivated (with Time Out=0) in **general preferences Menu**.
 
 [[back to top](#Sections)]
 

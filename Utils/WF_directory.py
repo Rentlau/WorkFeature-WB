@@ -2,20 +2,30 @@
 import FreeCAD as App
 
 from WF_print import printError_msg, print_msg
+import WF
 
 
 def addObjectToGrp(obj,
                    grp,
                    info=0):
-    """ Add an object to the group
+    """ Adds an object 'obj' to the group 'grp'
     """
-    m_obj = obj
-    m_grp = grp
-    # adds object to the group
-    m_grp.addObject(m_obj)
+    grp.addObject(obj)
     if info != 0:
-        m_msg = "Object " + str(m_obj.Label)
-        m_msg += " added to Group : " + str(m_grp.Label)
+        m_msg = "Object " + str(obj.Label)
+        m_msg += " added to Group : " + str(grp.Label)
+        print_msg(m_msg)
+
+
+def rmObjectFromGrp(obj,
+                    grp,
+                    info=0):
+    """ Removes an object 'obj' from the group 'grp'
+    """
+    grp.removeObject(obj)
+    if info != 0:
+        m_msg = "Object " + str(obj.Label)
+        m_msg += " removed from Group : " + str(grp.Label)
         print_msg(m_msg)
 
 
@@ -28,7 +38,7 @@ def createFolders(folder=None):
             App.ActiveDocument.addObject("App::DocumentObjectGroup",
                                          m_main_dir)
         except Exception as err:
-            printError_msg(err.message, title="createFolders")
+            printError_msg(err.args[0], title="createFolders")
             m_msg = "Could not Create '" + str(m_main_dir) + "' Objects Group!"
             printError_msg(m_msg)
 
@@ -47,14 +57,38 @@ def createFolders(folder=None):
     m_group = None
     for m_dir in m_list_dirs:
         if folder == m_dir:
-            m_group = App.ActiveDocument.getObject(m_main_dir).getObject(str(m_dir))
+            m_group = App.ActiveDocument.getObject(
+                m_main_dir).getObject(str(m_dir))
             if not(m_group):
                 try:
-                    m_group = App.ActiveDocument.getObject(m_main_dir).newObject("App::DocumentObjectGroup", str(m_dir))
+                    m_group = App.ActiveDocument.getObject(m_main_dir).newObject(
+                        "App::DocumentObjectGroup", str(m_dir))
                 except Exception as err:
-                    printError_msg(err.message, title="createFolders")
+                    printError_msg(err.args[0], title="createFolders")
                     m_msg = "Could not Create '" + str(m_dir)
                     m_msg += "' Objects Group!"
                     printError_msg(m_msg)
+
+    if WF.verbose():
+        print_msg("Group = " + str(m_group.Label) + " created!")
+
+    return m_group
+
+
+def createSubGroup(actDoc, main_dir, sub_dir):
+    """ Create a sub directory group into main directory if needed
+    """
+    m_error_msg = "Could not Create '"
+    m_error_msg += str(sub_dir) + "' Objects Group!"
+    try:
+        m_ob_dir = App.ActiveDocument.getObject(str(main_dir))
+        m_ob = m_ob_dir.newObject("App::DocumentObjectGroup", str(sub_dir))
+        m_group = actDoc.getObject(str(m_ob.Label))
+    except Exception as err:
+        printError_msg(err.args[0], title="createSubGroup")
+        printError_msg(m_error_msg)
+
+    if WF.verbose():
+        print_msg("Group = " + str(m_group.Label))
 
     return m_group
