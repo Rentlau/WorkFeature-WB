@@ -45,7 +45,7 @@ Unable to Update parametric Objects !
 M_RESULT_MSG_refresh = ""
 M_MENU_TEXT_refresh = "Update parametric Objects"
 M_ACCEL_refresh = ""
-M_TOOL_TIP_refresh = """Click to force  update
+M_TOOL_TIP_refresh = """Click to force the update
 of all Interactive parametric Objects !
 """
 
@@ -288,7 +288,7 @@ Unable to Hide/Show Interactive parametric Objects !
 M_RESULT_MSG_showhideno = ""
 M_MENU_TEXT_showhideno = "Hide/Show Interactive parametric Objects"
 M_ACCEL_showhideno = ""
-M_TOOL_TIP_showhideno = """Click to Hide/Show all Interactive
+M_TOOL_TIP_showhideno = """Click to Hide/Show all Not
 parametric Objects !
 """
 
