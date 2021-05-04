@@ -72,7 +72,7 @@ if M_DEBUG:
     print("DEBUG : PATH_WF_UI        is " + str(PATH_WF_UI))
 
 
-class WorkFeatureWorkbenchDev(Workbench):
+class WorkFeatureWorkbench(Workbench):
     """ WorkFeature workbench object
     """
     global PATH_WF_ICONS
@@ -81,7 +81,7 @@ class WorkFeatureWorkbenchDev(Workbench):
 
     def __init__(self):
         self.__class__.Icon = PATH_WF_ICONS + "/WF_wf16x16.svg"
-        self.__class__.MenuText = "WorkFeatureDev"
+        self.__class__.MenuText = "WorkFeature"
         m_tooltip = "WorkFeature workbench (allowing parametric objects)"
         self.__class__.ToolTip = m_tooltip
         self.General_menu = None
@@ -226,7 +226,7 @@ class WorkFeatureWorkbenchDev(Workbench):
         return "Gui::PythonWorkbench"
 
 
-Gui.addWorkbench(WorkFeatureWorkbenchDev)
+Gui.addWorkbench(WorkFeatureWorkbench)
 
 if __name__ == '__main__':
     pass

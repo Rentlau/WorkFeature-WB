@@ -6,7 +6,7 @@ Author: [@Rentlau_64](https://github.com/Rentlau)
 GitHub Repo: https://github.com/Rentlau/WorkFeature-WB  
 FreeCAD Forum thread discussion: https://forum.freecadweb.org/viewtopic.php?f=9&t=27195  
 
-**Updated**: August 2019
+**Updated**: May 2021
 
 
 [![forthebadge made-with-python](http://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/)
@@ -32,7 +32,7 @@ A FreeCAD Workbench utility to create:
 
 ![alt](./Doc/Images/Title02.png?1)
 
-**Version 2019-08-28-dev**
+**Version 2021-05-04-prod**
 
 [[back to top](#Sections)]
 
@@ -169,9 +169,8 @@ Functions are organised by categories in submenus:
 |![alt](./Resources/Icons/WF_extremaLinePoint.svg)  | Create Point(s) at edges of selected Line(s).|
 |![alt](./Resources/Icons/WF_alongLinePoint.svg)  | Create Point(s) along Line(s) <br>at a defined distance of intersection from selected Point(s)/Line(s).|
 |![alt](./Resources/Icons/WF_nPointsPoint.svg)  | Create a Point at MEAN location of all selected points.|
-|![alt](./Resources/Icons/WF_projectedPoint.svg)  | Create projected point(s) on chosen or main Planes.|
-|![alt](./Resources/Icons/WF_centerCirclePoint.svg)  | Create Point(s) at center location of selected Circle(s). **<span style="color:red">Unsuppported as of 2019 release</span>** |
 |![alt](./Resources/Icons/WF_centerFacePoint.svg)  | Create Point(s) at center of mass location of selected Plane(s). |
+|![alt](./Resources/Icons/WF_projectedPoint.svg)  | Create projected point(s) on chosen or main Planes.|
 
 ### WF_Lines submenu
 
@@ -186,7 +185,7 @@ Functions are organised by categories in submenus:
 |:------|:------|
 |![alt](./Resources/Icons/WF_threePointsPlane.svg)  | Create a Plane from three selected Points.|
 |![alt](./Resources/Icons/WF_linePointPlane.svg)  | Create Plane(s) crossing a Point and a Line.|
-|![alt](./Resources/Icons/WF_perpendicularLinePointPlane.svg)  | Create Planes(s) crossing a Point and perpendicular to a Line. **<span style="color:red">Unsuppported as of 2019 release</span>**|
+**<span style="color:red">Unsuppported as of 2019 release</span>**|
 
 Most of the time a click on a button without any a prior selection will end up with a
 Popup window message:
@@ -208,10 +207,16 @@ Find some more detailed documentations in the `./Doc` directory:
 
 ## Releases
 
-[January 2019](https://github.com/Rentlau/WorkFeature-WB/tree/release2019_01)
-Second release with **Not**, **Interactive** and **Dynamic** parametric objects. Not all Functions available but in active development.
+[May 2021](https://github.com/Rentlau/WorkFeature-WB.git)
+Production Branch: Start again active developpement after 2 years stop.
 
-[March 2018](https://github.com/Rentlau/WorkFeature-WB/tree/V18.03)
+[October 2019](https://github.com/Rentlau/WorkFeature-WB/releases/tag/V19.10)
+Third release with parametric objects.
+
+[January 2019](https://github.com/Rentlau/WorkFeature-WB/tree/release2019_01)
+Second release with **Not**, **Interactive** and **Dynamic** parametric objects. Not all Functions available but in active developpement.
+
+[Mars 2018](https://github.com/Rentlau/WorkFeature-WB/releases/tag/V18.03)
 First release with only dynamic parametric objects
 
 [[back to top](#Sections)]
