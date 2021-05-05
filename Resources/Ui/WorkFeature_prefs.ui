@@ -161,7 +161,7 @@
              </sizepolicy>
             </property>
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Change the time out (in seconds) for some Dialogs with timer.&lt;/p&gt;&lt;p&gt;A Timout of zero will prevent to show Dialogs !&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Change the time out (in seconds) for some Dialogs with timer.&lt;/p&gt;&lt;p&gt;A Timeout of zero will prevent to show Dialogs !&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
              <string>Time Out</string>

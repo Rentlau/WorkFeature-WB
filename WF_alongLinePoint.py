@@ -480,7 +480,7 @@ def buildFromEdgeAndPoint(macro, group, edge, point, distance):
 
 def buildFromEdges(macro, group, edge, other_edge, distance):
     """ Build a AlongLinePoint feature object using an edge.
-    and an other egde if any.
+    and an other edge if any.
     """
     if WF.verbose():
         print_msg("edge = " + str(edge))

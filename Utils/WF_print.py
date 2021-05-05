@@ -112,7 +112,7 @@ def printError_msgWithTimer(message, title=None):
     """
     m_msg = str(inspect.stack()[1][3]) + " : " + str(message)
     App.Console.PrintError(m_msg + "\n")
-    # recover timout value from preferences
+    # recover timeout value from preferences
     timeout = WF.timeout()
     if timeout == 0:
         return

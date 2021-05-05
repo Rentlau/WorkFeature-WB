@@ -136,7 +136,7 @@ def timeout():
 
 
 def set_timeout(value):
-    """ Sets the timout to WF user settings
+    """ Sets the timeout to WF user settings
     """
     setParam("timeout", value)
 

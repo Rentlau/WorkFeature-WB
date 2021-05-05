@@ -208,13 +208,13 @@ Find some more detailed documentations in the `./Doc` directory:
 ## Releases
 
 [May 2021](https://github.com/Rentlau/WorkFeature-WB.git)
-Production Branch: Start again active developpement after 2 years stop.
+Production Branch: Start again active development after 2 years stop.
 
 [October 2019](https://github.com/Rentlau/WorkFeature-WB/releases/tag/V19.10)
 Third release with parametric objects.
 
 [January 2019](https://github.com/Rentlau/WorkFeature-WB/tree/release2019_01)
-Second release with **Not**, **Interactive** and **Dynamic** parametric objects. Not all Functions available but in active developpement.
+Second release with **Not**, **Interactive** and **Dynamic** parametric objects. Not all Functions available but in active development.
 
 [Mars 2018](https://github.com/Rentlau/WorkFeature-WB/releases/tag/V18.03)
 First release with only dynamic parametric objects
