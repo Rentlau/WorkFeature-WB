@@ -229,7 +229,7 @@ def intersecLinePlane(vect_a, vect_b, Plane_Normal, Plane_Point):
         # and T(tx, ty, tz) on the plane too so eq(1) is
         # a * tx + b * ty + c * tz + d = 0
         # by pasting the tx, ty and tz expressions into eq(1) we have a first
-        # deg equation with one unknow 'k':
+        # deg equation with one unknown 'k':
         # a * (ax + k * ux) + b * (ay + k * uy) + c * (az + k * uz) + d = 0
         # so
         # a * ax + a * k * ux + b * ay + b * k * uy + c * az + c * k * uz + d = 0
@@ -257,7 +257,7 @@ def intersectPerpendicularLine(vect_a, vect_b, point_c,):
     This is also the projection of point_c onto the Line L.
 
     Return also the distance between point_cC and the the projection.
-    Return also the symetric point of point_c versus the Line.
+    Return also the symmetric point of point_c versus the Line.
 
     RETURN:
     -------

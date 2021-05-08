@@ -56,7 +56,7 @@ def getSel(verbose=0):
 
     if M_DEBUG:
         print("Document      = " + str(m_doc))
-        print("Documant.Name = " + str(m_doc.Name))
+        print("Document.Name = " + str(m_doc.Name))
         printObjectStructure()
 
     m_selEx = Gui.Selection.getSelectionEx(m_doc.Name)
@@ -185,7 +185,7 @@ class Selection():
             self.__selectedShellsNames.append("Shell" + str(index))
             return True
             # TO DO insert Object type
-        print("Unknow ShapeType !")
+        print("Unknown ShapeType !")
         return False
 
     def initialize(self):
