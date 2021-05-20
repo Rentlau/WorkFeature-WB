@@ -9,7 +9,7 @@ ERROR_MSG_NOT_YET = "Not yet Developed !"
 
 
 class TimerMessageBox(QtGui.QMessageBox):
-    def __init__(self, msg, timeout=5, parent=None):
+    def __init__(self, msg, timeout=15, parent=None):
         super(TimerMessageBox, self).__init__(parent)
         # self.setWindowTitle("wait")
         self.time_to_wait = timeout
@@ -34,7 +34,7 @@ class TimerMessageBox(QtGui.QMessageBox):
         event.accept()
 
 
-def gui_errorDialogWithTimer(msg, title=None, timeout=5):
+def gui_errorDialogWithTimer(msg, title=None, timeout=15):
     """ Create a QMessageBox dialog with timer for error messages.
     """
     m_script = os.path.basename(os.path.realpath(__file__))

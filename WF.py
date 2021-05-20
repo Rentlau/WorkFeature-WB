@@ -132,7 +132,7 @@ def verbose():
 def timeout():
     """ Returns the timeout from WF user settings
     """
-    return int(getParam("timeout", "5"))
+    return int(getParam("timeout", "15"))
 
 
 def set_timeout(value):
