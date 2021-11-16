@@ -70,8 +70,8 @@ except:
     sys.exit(1)
 
 ###############
-M_ICON_NAME          = "/WF_centerCirclePoint.svg"
-M_DIALOG        = None
+M_ICON_NAME = "WF_centerCirclePoint.svg"
+M_DIALOG = None
 M_DIALOG_TITLE  = "Nothing"
 M_EXCEPTION_MSG = """Unable to create Center Line Point(s) :
     Select at least one Edge of Circle !"""
@@ -93,7 +93,7 @@ of each selected Circle(s).<br>
 
 class CenterCirclePointPanel:  
     def __init__(self):
-        self.form = Gui.PySideUic.loadUi(PATH_WF_UI + M_DIALOG)
+        self.form = Gui.PySideUic.loadUi(os.path.join(PATH_WF_UI, M_DIALOG))
         self.form.setWindowTitle(M_DIALOG_TITLE)
                         
     def accept(self):
@@ -198,7 +198,7 @@ class CenterCirclePoint(WF_Point):
             
 class ViewProviderCenterCirclePoint:
     global PATH_WF_ICONS
-    icon = '/WF_centerCirclePoint.svg'  
+    icon = M_ICON_NAME
     def __init__(self,vobj):
         """ Set this object to the proxy object of the actual view provider """
         vobj.Proxy = self
@@ -227,16 +227,16 @@ class ViewProviderCenterCirclePoint:
     # This method is optional and if not defined a default icon is shown.
     def getIcon(self):        
         """ Return the icon which will appear in the tree view. """
-        return (PATH_WF_ICONS + ViewProviderCenterCirclePoint.icon)
+        return os.path.join(PATH_WF_ICONS, self.icon)
            
-    def setIcon(self, icon = '/WF_centerCirclePoint.svg'):
-        ViewProviderCenterCirclePoint.icon = icon
+    def setIcon(self, icon=M_ICON_NAME):
+        self.icon = icon
   
             
 class CommandCenterCirclePoint:
     """ Command to create CenterCirclePoint feature object. """
     def GetResources(self):
-        return {'Pixmap'  : PATH_WF_ICONS + M_ICON_NAME,
+        return {'Pixmap'  : os.path.join(PATH_WF_ICONS, M_ICON_NAME),
                 'MenuText': M_MENU_TEXT,
                 'Accel'   : M_ACCEL,
                 'ToolTip' : M_TOOL_TIP}

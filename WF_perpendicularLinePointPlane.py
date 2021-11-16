@@ -70,8 +70,8 @@ except:
     sys.exit(1)
 
 ###############
-M_ICON_NAME          = "/WF_perpendicularLinePointPlane.svg"
-M_DIALOG        = "/WF_UI_linePointPlane.ui"
+M_ICON_NAME = "WF_perpendicularLinePointPlane.svg"
+M_DIALOG = "WF_UI_linePointPlane.ui"
 M_DIALOG_TITLE  = "Define extension of the plane."
 
 M_EXCEPTION_MSG = """Unable to create Plane :
@@ -93,7 +93,7 @@ m_extension      = 100.0
 
 class PerpendicularLinePointPlanePanel:  
     def __init__(self):
-        self.form = Gui.PySideUic.loadUi(PATH_WF_UI + M_DIALOG)
+        self.form = Gui.PySideUic.loadUi(os.path.join(PATH_WF_UI, M_DIALOG))
         self.form.setWindowTitle(M_DIALOG_TITLE)
         self.form.UI_Plane_extension.setText(str(m_extension))
                         
@@ -253,7 +253,7 @@ Positive values lower than 100.0 will start to shrink it."""
             
 class ViewProviderPerpendicularLinePointPlane:
     global PATH_WF_ICONS
-    icon = '/WF_perpendicularLinePointPlane.svg'  
+    icon = M_ICON_NAME
     def __init__(self,vobj):
         """ Set this object to the proxy object of the actual view provider """
         vobj.Proxy = self
@@ -282,16 +282,16 @@ class ViewProviderPerpendicularLinePointPlane:
     # This method is optional and if not defined a default icon is shown.
     def getIcon(self):        
         """ Return the icon which will appear in the tree view. """
-        return (PATH_WF_ICONS + ViewProviderPerpendicularLinePointPlane.icon)
+        return os.path.join(PATH_WF_ICONS, self.icon)
            
-    def setIcon(self, icon = '/WF_perpendicularLinePointPlane.svg'):
-        ViewProviderPerpendicularLinePointPlane.icon = icon
+    def setIcon(self, icon=M_ICON_NAME):
+        self.icon = icon
   
             
 class CommandPerpendicularLinePointPlane:
     """ Command to create PerpendicularLinePointPlane feature object. """
     def GetResources(self):
-        return {'Pixmap'  : PATH_WF_ICONS + M_ICON_NAME,
+        return {'Pixmap'  : os.path.join(PATH_WF_ICONS, M_ICON_NAME),
                 'MenuText': M_MENU_TEXT,
                 'Accel'   : M_ACCEL,
                 'ToolTip' : M_TOOL_TIP}

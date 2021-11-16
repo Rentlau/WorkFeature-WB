@@ -80,7 +80,7 @@ class WorkFeatureWorkbench(Workbench):
     global M_DEBUG
 
     def __init__(self):
-        self.__class__.Icon = PATH_WF_ICONS + "/WF_wf16x16.svg"
+        self.__class__.Icon = os.path.join(PATH_WF_ICONS, "WF_wf16x16.svg")
         self.__class__.MenuText = "WorkFeature"
         m_tooltip = "WorkFeature workbench (allowing parametric objects)"
         self.__class__.ToolTip = m_tooltip

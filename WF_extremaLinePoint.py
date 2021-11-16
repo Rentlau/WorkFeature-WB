@@ -44,12 +44,11 @@ except ImportError:
     sys.exit(1)
 
 ###############
-M_ICON_NAME = "/WF_extremaLinePoint.svg"
-M_ICON_NAME_FILE = os.path.join(PATH_WF_ICONS, M_ICON_NAME)
-M_ICON_NAMES = ["/WF_startLinePoint.svg",
-                "/WF_endLinePoint.svg",
-                "/WF_extremaLinePoint.svg"]
-M_DIALOG = "/WF_UI_extremaLinePoint.ui"
+M_ICON_NAME = "WF_extremaLinePoint.svg"
+M_ICON_NAMES = ["WF_startLinePoint.svg",
+                "WF_endLinePoint.svg",
+                "WF_extremaLinePoint.svg"]
+M_DIALOG = "WF_UI_extremaLinePoint.ui"
 M_DIALOG_TITLE = "Define location(s)."
 M_EXCEPTION_MSG = """
 Unable to create Extrema Line Point(s) :
@@ -114,7 +113,7 @@ class ExtremaLinePointPanel:
     """
 
     def __init__(self):
-        self.form = Gui.PySideUic.loadUi(PATH_WF_UI + M_DIALOG)
+        self.form = Gui.PySideUic.loadUi(os.path.join(PATH_WF_UI, M_DIALOG))
         self.form.setWindowTitle(M_DIALOG_TITLE)
 
         self.form.UI_ExtremaLinePoint_comboBox.setCurrentIndex(
@@ -318,10 +317,10 @@ class ViewProviderExtremaLinePoint:
     # This method is optional and if not defined a default icon is shown.
     def getIcon(self):
         """ Return the icon which will appear in the tree view. """
-        return PATH_WF_ICONS + ViewProviderExtremaLinePoint.icon
+        return os.path.join(PATH_WF_ICONS + self.icon)
 
     def setIcon(self, icon=M_ICON_NAME):
-        ViewProviderExtremaLinePoint.icon = icon
+        self.icon = icon
 
 
 def extrema_line_point_command():
@@ -405,7 +404,7 @@ def extrema_line_point_command():
 
 
 if App.GuiUp:
-    Gui.addCommand("ExtremaLinePoint", Command(M_ICON_NAME_FILE,
+    Gui.addCommand("ExtremaLinePoint", Command(M_ICON_NAME,
                                                M_MENU_TEXT,
                                                M_ACCEL,
                                                M_TOOL_TIP,
