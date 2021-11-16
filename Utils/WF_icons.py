@@ -12,12 +12,12 @@ m_current_path = os.path.realpath(__file__)
 # ./Src            
 m_parent_path = os.path.dirname(m_current_path)
 # ./Src/Utils
-PATH_WF_UTILS =  os.path.join(m_parent_path, 'Utils')
+PATH_WF_UTILS = os.path.join(m_parent_path, 'Utils')
 # Go up in directories once
 # ./
 m_parent2_path = os.path.dirname(m_parent_path)    
 # ./Icons
-PATH_WF_ICONS =  os.path.join(m_parent2_path, 'Icons')
+PATH_WF_ICONS = os.path.join(m_parent2_path, 'Icons')
     
 if not sys.path.__contains__(str(PATH_WF_UTILS)):
     sys.path.append(str(PATH_WF_UTILS))
@@ -31,7 +31,7 @@ def get_icon(icon_path, icon_name):
     *icon_path* : (string) full path name.
     *icon_name* : (string) file name.      
     """
-    m_full_name = icon_path + icon_name
+    m_full_name = os.path.join(icon_path, icon_name)
     if m_full_name and os.path.exists(m_full_name):
         return (m_full_name)
     else :
@@ -185,4 +185,4 @@ if __name__ == '__main__':
         print "DEBUG : m_parent2_path is " +  str(m_parent2_path)
         print "DEBUG : PATH_WF_UTILS  is " +  str(PATH_WF_UTILS)
         print "DEBUG : PATH_WF_ICONS  is " +  str(PATH_WF_ICONS) 
-    print get_icon(PATH_WF_ICONS, '/WF_point.svg')
+    print get_icon(PATH_WF_ICONS, 'WF_point.svg')

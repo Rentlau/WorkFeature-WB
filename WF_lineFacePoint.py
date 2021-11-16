@@ -70,8 +70,8 @@ except:
     sys.exit(1)
 
 ###############
-M_ICON_NAME          = "/WF_lineFacePoint.svg"
-M_DIALOG        = None
+M_ICON_NAME = "WF_lineFacePoint.svg"
+M_DIALOG = None
 M_DIALOG_TITLE  = "Nothing"
 M_EXCEPTION_MSG = """Unable to create (Line,Face) Intersection(s) :
     - Select one or several Line/Edge(s) 
@@ -102,7 +102,7 @@ intersection Point is still created (as if).<br>
 
 class LineFacePointPanel:  
     def __init__(self):
-        self.form = Gui.PySideUic.loadUi(PATH_WF_UI + M_DIALOG)
+        self.form = Gui.PySideUic.loadUi(os.path.join(PATH_WF_UI, M_DIALOG))
         self.form.setWindowTitle(M_DIALOG_TITLE)
                         
     def accept(self):
@@ -210,7 +210,7 @@ class LineFacePoint(WF_Point):
             
 class ViewProviderLineFacePoint:
     global PATH_WF_ICONS
-    icon = '/WF_lineFacePoint.svg'  
+    icon = M_ICON_NAME
     def __init__(self,vobj):
         """ Set this object to the proxy object of the actual view provider """
         vobj.Proxy = self
@@ -239,16 +239,16 @@ class ViewProviderLineFacePoint:
     # This method is optional and if not defined a default icon is shown.
     def getIcon(self):        
         """ Return the icon which will appear in the tree view. """
-        return (PATH_WF_ICONS + ViewProviderLineFacePoint.icon)
+        return os.path.join(PATH_WF_ICONS, self.icon)
            
-    def setIcon(self, icon = '/WF_lineFacePoint.svg'):
-        ViewProviderLineFacePoint.icon = icon
+    def setIcon(self, icon=M_ICON_NAME):
+        self.icon = icon
   
             
 class CommandLineFacePoint:
     """ Command to create LineFacePoint feature object. """
     def GetResources(self):
-        return {'Pixmap'  : PATH_WF_ICONS + M_ICON_NAME,
+        return {'Pixmap'  : os.path.join(PATH_WF_ICONS, M_ICON_NAME),
                 'MenuText': M_MENU_TEXT,
                 'Accel'   : M_ACCEL,
                 'ToolTip' : M_TOOL_TIP}

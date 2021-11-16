@@ -60,9 +60,8 @@ except ImportError:
     sys.exit(1)
 
 ###############
-M_ICON_NAME = "/WF_projectedPoint.svg"
-M_ICON_NAME_FILE = os.path.join(PATH_WF_ICONS, M_ICON_NAME)
-M_DIALOG = "/WF_UI_projectedPoint.ui"
+M_ICON_NAME = "WF_projectedPoint.svg"
+M_DIALOG = "WF_UI_projectedPoint.ui"
 M_DIALOG_TITLE = ""
 M_EXCEPTION_MSG = """
 Unable to create a Projected Point(s) :
@@ -189,7 +188,7 @@ class ProjectedPointPanel:
     """
 
     def __init__(self):
-        self.form = Gui.PySideUic.loadUi(PATH_WF_UI + M_DIALOG)
+        self.form = Gui.PySideUic.loadUi(os.path.join(PATH_WF_UI, M_DIALOG))
         self.form.setWindowTitle(M_DIALOG_TITLE)
         self.form.UI_ProjectePoint_comboBox.setCurrentIndex(
             self.form.UI_ProjectePoint_comboBox.findText(M_SEL_PLANE))
@@ -437,7 +436,7 @@ class ProjectedPoint(WF_Point):
 
 class ViewProviderProjectedPoint:
     global PATH_WF_ICONS
-    icon = '/WF_projectedPoint.svg'
+    icon = M_ICON_NAME
 
     def __init__(self, vobj):
         """ Set this object to the proxy object of the actual view provider """
@@ -467,17 +466,17 @@ class ViewProviderProjectedPoint:
     # This method is optional and if not defined a default icon is shown.
     def getIcon(self):
         """ Return the icon which will appear in the tree view. """
-        return (PATH_WF_ICONS + ViewProviderProjectedPoint.icon)
+        return os.path.join(PATH_WF_ICONS, self.icon)
 
-    def setIcon(self, icon='/WF_projectedPoint.svg'):
-        ViewProviderProjectedPoint.icon = icon
+    def setIcon(self, icon=M_ICON_NAME):
+        self.icon = icon
 
 
 class CommandProjectedPoint:
     """ Command to create ProjectedPoint feature object. """
 
     def GetResources(self):
-        return {'Pixmap': PATH_WF_ICONS + M_ICON_NAME,
+        return {'Pixmap': os.path.join(PATH_WF_ICONS, M_ICON_NAME),
                 'MenuText': M_MENU_TEXT,
                 'Accel': M_ACCEL,
                 'ToolTip': M_TOOL_TIP}

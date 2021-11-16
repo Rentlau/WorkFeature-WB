@@ -54,9 +54,8 @@ except ImportError:
     sys.exit(1)
 
 ###############
-M_ICON_NAME = "/WF_nPointsLine.svg"
-M_ICON_NAME_FILE = os.path.join(PATH_WF_ICONS, M_ICON_NAME)
-M_DIALOG = "/WF_UI_nPointsLine.ui"
+M_ICON_NAME = "WF_nPointsLine.svg"
+M_DIALOG = "WF_UI_nPointsLine.ui"
 M_DIALOG_TITLE = ""
 M_EXCEPTION_MSG = """
 Unable to create a Line :
@@ -118,7 +117,7 @@ class NPointsLinePanel:
     """
 
     def __init__(self):
-        self.form = Gui.PySideUic.loadUi(PATH_WF_UI + M_DIALOG)
+        self.form = Gui.PySideUic.loadUi(os.path.join(PATH_WF_UI, M_DIALOG))
         self.form.setWindowTitle(M_DIALOG_TITLE)
         self.form.UI_nPointsLine_checkBox.setCheckState(
             QtCore.Qt.Unchecked)
@@ -410,10 +409,10 @@ class ViewProviderNPointsLine:
     # This method is optional and if not defined a default icon is shown.
     def getIcon(self):
         """ Return the icon which will appear in the tree view. """
-        return PATH_WF_ICONS + ViewProviderNPointsLine.icon
+        return os.path.join(PATH_WF_ICONS + self.icon)
 
     def setIcon(self, icon=M_ICON_NAME):
-        ViewProviderNPointsLine.icon = icon
+        self.icon = icon
 
 
 def n_points_line_command():
@@ -511,7 +510,7 @@ def n_points_line_command():
 
 
 if App.GuiUp:
-    Gui.addCommand("NPointsLine", Command(M_ICON_NAME_FILE,
+    Gui.addCommand("NPointsLine", Command(M_ICON_NAME,
                                           M_MENU_TEXT,
                                           M_ACCEL,
                                           M_TOOL_TIP,

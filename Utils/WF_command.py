@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os.path
 from WF_config import PATH_WF_ICONS
 import FreeCAD as App
 from WF_gui import raiseComboView
@@ -26,7 +27,7 @@ class Command:
         self.active = False
 
     def GetResources(self):
-        return {'Pixmap': PATH_WF_ICONS + self.icon,
+        return {'Pixmap': os.path.join(PATH_WF_ICONS, self.icon),
                 'MenuText': self.menu_text,
                 'Accel': self.accel,
                 'ToolTip': self.tool_tip}
