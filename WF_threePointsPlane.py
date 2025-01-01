@@ -50,9 +50,8 @@ except ImportError:
     sys.exit(1)
 
 ###############
-M_ICON_NAME = "/WF_threePointsPlane.svg"
-M_ICON_NAME_FILE = os.path.join(PATH_WF_ICONS, M_ICON_NAME)
-M_DIALOG = "/WF_UI_threePointsPlane.ui"
+M_ICON_NAME = "WF_threePointsPlane.svg"
+M_DIALOG = "WF_UI_threePointsPlane.ui"
 M_DIALOG_TITLE = "Define extension of the plane."
 M_EXCEPTION_MSG = """
 Unable to create Plane from 3 Points :
@@ -108,7 +107,7 @@ class ThreePointsPlanePanel:
     """
 
     def __init__(self):
-        self.form = Gui.PySideUic.loadUi(PATH_WF_UI + M_DIALOG)
+        self.form = Gui.PySideUic.loadUi(os.path.join(PATH_WF_UI, M_DIALOG))
         self.form.setWindowTitle(M_DIALOG_TITLE)
         self.form.UI_Plane_extension.setText(str(M_PLANE_EXT))
 
@@ -370,10 +369,10 @@ class ViewProviderThreePointsPlane:
     # This method is optional and if not defined a default icon is shown.
     def getIcon(self):
         """ Return the icon which will appear in the tree view. """
-        return PATH_WF_ICONS + ViewProviderThreePointsPlane.icon
+        return os.path.join(PATH_WF_ICONS, self.icon)
 
     def setIcon(self, icon=M_ICON_NAME):
-        ViewProviderThreePointsPlane.icon = icon
+        self.icon = icon
 
 
 def buildFromThreePoints(macro, group, vertexes, extension):
@@ -438,7 +437,7 @@ def three_points_plane_command():
 
 
 if App.GuiUp:
-    Gui.addCommand("ThreePointsPlane", Command(M_ICON_NAME_FILE,
+    Gui.addCommand("ThreePointsPlane", Command(M_ICON_NAME,
                                                M_MENU_TEXT,
                                                M_ACCEL,
                                                M_TOOL_TIP,

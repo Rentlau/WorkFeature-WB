@@ -75,9 +75,8 @@ except ImportError:
     sys.exit(1)
 
 ###############
-M_ICON_NAME = "/WF_centerLinePoint.svg"
-M_ICON_NAME_FILE = os.path.join(PATH_WF_ICONS, M_ICON_NAME)
-M_DIALOG = "/WF_UI_centerLinePoint.ui"
+M_ICON_NAME = "WF_centerLinePoint.svg"
+M_DIALOG = "WF_UI_centerLinePoint.ui"
 M_DIALOG_TITLE = "Define number of parts and location(s)."
 M_EXCEPTION_MSG = """
 Unable to create Center Line Point(s) :
@@ -197,7 +196,7 @@ class CenterLinePointPanel:
     """
 
     def __init__(self):
-        self.form = Gui.PySideUic.loadUi(PATH_WF_UI + M_DIALOG)
+        self.form = Gui.PySideUic.loadUi(os.path.join(PATH_WF_UI, M_DIALOG))
         self.form.setWindowTitle(M_DIALOG_TITLE)
 
         self.form.UI_CenterLinePoint_spin_numberLinePart.setValue(
@@ -501,10 +500,10 @@ class ViewProviderCenterLinePoint:
     # This method is optional and if not defined a default icon is shown.
     def getIcon(self):
         """ Return the icon which will appear in the tree view. """
-        return PATH_WF_ICONS + ViewProviderCenterLinePoint.icon
+        return os.path.join(PATH_WF_ICONS, self.icon)
 
     def setIcon(self, icon=M_ICON_NAME):
-        ViewProviderCenterLinePoint.icon = icon
+        self.icon = icon
 
 
 def buildFromEdge(macro, group, edge, number_line_part, index_part):
@@ -680,7 +679,7 @@ def center_line_point_command():
 
 
 if App.GuiUp:
-    Gui.addCommand("CenterLinePoint", Command(M_ICON_NAME_FILE,
+    Gui.addCommand("CenterLinePoint", Command(M_ICON_NAME,
                                               M_MENU_TEXT,
                                               M_ACCEL,
                                               M_TOOL_TIP,

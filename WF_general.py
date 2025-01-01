@@ -36,7 +36,7 @@ except ImportError:
     sys.exit(1)
 
 ###############
-M_ICON_NAME_refresh = "/WF_refresh.svg"
+M_ICON_NAME_refresh = "WF_refresh.svg"
 M_DIALOG_refresh = ""
 M_DIALOG_TITLE_refresh = ""
 M_EXCEPTION_MSG_refresh = """
@@ -58,7 +58,7 @@ class Refresh():
 
 class ViewProviderRefresh:
     global PATH_WF_ICONS
-    icon = '/WF_refresh.svg'
+    icon = M_ICON_NAME_refresh
 
     def __init__(self, vobj):
         """ Set this object to the proxy object of the actual view provider """
@@ -88,15 +88,15 @@ class ViewProviderRefresh:
     # This method is optional and if not defined a default icon is shown.
     def getIcon(self):
         """ Return the icon which will appear in the tree view. """
-        return (PATH_WF_ICONS + ViewProviderRefresh.icon)
+        return os.path.join(PATH_WF_ICONS, self.icon)
 
-    def setIcon(self, icon='/WF_refresh.svg'):
-        ViewProviderRefresh.icon = icon
+    def setIcon(self, icon=M_ICON_NAME_refresh):
+        self.icon = icon
 
 
 class CommandRefresh:
     def GetResources(self):
-        return {'Pixmap': PATH_WF_ICONS + M_ICON_NAME_refresh,
+        return {'Pixmap': os.path.join(PATH_WF_ICONS, M_ICON_NAME_refresh),
                 'MenuText': M_MENU_TEXT_refresh,
                 'Accel': M_ACCEL_refresh,
                 'ToolTip': M_TOOL_TIP_refresh}
@@ -117,7 +117,7 @@ class CommandRefresh:
 
 
 ###############
-M_ICON_NAME_showhidedynamic = "/WF_showHideDynamic.svg"
+M_ICON_NAME_showhidedynamic = "WF_showHideDynamic.svg"
 M_DIALOG_showhidedynamic = ""
 M_DIALOG_TITLE_showhidedynamic = ""
 M_EXCEPTION_MSG_showhidedynamic = """
@@ -139,7 +139,7 @@ class ShowHideDynamic():
 
 class ViewProviderShowHideDynamic:
     global PATH_WF_ICONS
-    icon = '/WF_showHideDynamic.svg'
+    icon = M_ICON_NAME_showhidedynamic
 
     def __init__(self, vobj):
         """ Set this object to the proxy object of the actual view provider """
@@ -169,15 +169,15 @@ class ViewProviderShowHideDynamic:
     # This method is optional and if not defined a default icon is shown.
     def getIcon(self):
         """ Return the icon which will appear in the tree view. """
-        return (PATH_WF_ICONS + ViewProviderRefresh.icon)
+        return os.path.join(PATH_WF_ICONS, self.icon)
 
-    def setIcon(self, icon='/WF_showHideDynamic.svg'):
-        ViewProviderRefresh.icon = icon
+    def setIcon(self, icon=M_ICON_NAME_showhidedynamic):
+        self.icon = icon
 
 
 class CommandShowHideDynamic:
     def GetResources(self):
-        return {'Pixmap': PATH_WF_ICONS + M_ICON_NAME_showhidedynamic,
+        return {'Pixmap': os.path.join(PATH_WF_ICONS, M_ICON_NAME_showhidedynamic),
                 'MenuText': M_MENU_TEXT_showhidedynamic,
                 'Accel': M_ACCEL_showhidedynamic,
                 'ToolTip': M_TOOL_TIP_showhidedynamic}
@@ -198,7 +198,7 @@ class CommandShowHideDynamic:
 
 
 ###############
-M_ICON_NAME_showhideinteractive = "/WF_showHideInteractive.svg"
+M_ICON_NAME_showhideinteractive = "WF_showHideInteractive.svg"
 M_DIALOG_showhideinteractive = ""
 M_DIALOG_TITLE_showhideinteractive = ""
 M_EXCEPTION_MSG_showhideinteractive = """
@@ -220,7 +220,7 @@ class ShowHideInteractive():
 
 class ViewProviderShowHideInteractive:
     global PATH_WF_ICONS
-    icon = '/WF_showHideInteractive.svg'
+    icon = M_ICON_NAME_showhideinteractive
 
     def __init__(self, vobj):
         """ Set this object to the proxy object of the actual view provider """
@@ -250,15 +250,15 @@ class ViewProviderShowHideInteractive:
     # This method is optional and if not defined a default icon is shown.
     def getIcon(self):
         """ Return the icon which will appear in the tree view. """
-        return (PATH_WF_ICONS + ViewProviderRefresh.icon)
+        return os.path.join(PATH_WF_ICONS, self.icon)
 
-    def setIcon(self, icon='/WF_showHideInteractive.svg'):
-        ViewProviderRefresh.icon = icon
+    def setIcon(self, icon=M_ICON_NAME_showhideinteractive):
+        self.icon = icon
 
 
 class CommandShowHideInteractive:
     def GetResources(self):
-        return {'Pixmap': PATH_WF_ICONS + M_ICON_NAME_showhideinteractive,
+        return {'Pixmap': os.path.join(PATH_WF_ICONS, M_ICON_NAME_showhideinteractive),
                 'MenuText': M_MENU_TEXT_showhideinteractive,
                 'Accel': M_ACCEL_showhideinteractive,
                 'ToolTip': M_TOOL_TIP_showhideinteractive}
@@ -279,7 +279,7 @@ class CommandShowHideInteractive:
 
 
 ###############
-M_ICON_NAME_showhideno = "/WF_showHideNot.svg"
+M_ICON_NAME_showhideno = "WF_showHideNot.svg"
 M_DIALOG_showhideno = ""
 M_DIALOG_TITLE_showhideno = ""
 M_EXCEPTION_MSG_showhideno = """
@@ -301,7 +301,7 @@ class ShowHideNo():
 
 class ViewProviderShowHideNo:
     global PATH_WF_ICONS
-    icon = '/WF_showHideNo.svg'
+    icon = M_ICON_NAME_showhideno
 
     def __init__(self, vobj):
         """ Set this object to the proxy object of the actual view provider """
@@ -331,15 +331,15 @@ class ViewProviderShowHideNo:
     # This method is optional and if not defined a default icon is shown.
     def getIcon(self):
         """ Return the icon which will appear in the tree view. """
-        return (PATH_WF_ICONS + ViewProviderRefresh.icon)
+        return os.path.join(PATH_WF_ICONS, self.icon)
 
-    def setIcon(self, icon='/WF_showHideNo.svg'):
-        ViewProviderRefresh.icon = icon
+    def setIcon(self, icon=M_ICON_NAME_showhideno):
+        self.icon = icon
 
 
 class CommandShowHideNot:
     def GetResources(self):
-        return {'Pixmap': PATH_WF_ICONS + M_ICON_NAME_showhideno,
+        return {'Pixmap': os.path.join(PATH_WF_ICONS, M_ICON_NAME_showhideno),
                 'MenuText': M_MENU_TEXT_showhideno,
                 'Accel': M_ACCEL_showhideno,
                 'ToolTip': M_TOOL_TIP_showhideno}

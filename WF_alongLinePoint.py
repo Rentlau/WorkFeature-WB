@@ -70,9 +70,8 @@ except ImportError:
 
 
 ###############
-M_ICON_NAME = "/WF_alongLinePoint.svg"
-M_ICON_NAME_FILE = os.path.join(PATH_WF_ICONS, M_ICON_NAME)
-M_DIALOG = "/WF_UI_alongLinePoint.ui"
+M_ICON_NAME = "WF_alongLinePoint.svg"
+M_DIALOG = "WF_UI_alongLinePoint.ui"
 M_DIALOG_TITLE = "Define distance"
 M_EXCEPTION_MSG = """
 Unable to create Point along a Line :
@@ -152,7 +151,7 @@ class AlongLinePointPanel:
     """
 
     def __init__(self):
-        self.form = Gui.PySideUic.loadUi(PATH_WF_UI + M_DIALOG)
+        self.form = Gui.PySideUic.loadUi(os.path.join(PATH_WF_UI, M_DIALOG))
         self.form.setWindowTitle(M_DIALOG_TITLE)
 
         self.form.UI_Distance.setText(str(M_DISTANCELINEPOINT))
@@ -419,10 +418,10 @@ class ViewProviderAlongLinePoint:
     # This method is optional and if not defined a default icon is shown.
     def getIcon(self):
         """ Return the icon which will appear in the tree view. """
-        return PATH_WF_ICONS + ViewProviderAlongLinePoint.icon
+        return os.path.join(PATH_WF_ICONS + self.icon)
 
     def setIcon(self, icon=M_ICON_NAME):
-        ViewProviderAlongLinePoint.icon = icon
+        self.icon = icon
 
 
 def buildFromTwoPoints(vertex1, vertex2, index, object1, group):
@@ -587,7 +586,7 @@ def along_line_point_command():
 
 
 if App.GuiUp:
-    Gui.addCommand("AlongLinePoint", Command(M_ICON_NAME_FILE,
+    Gui.addCommand("AlongLinePoint", Command(M_ICON_NAME,
                                              M_MENU_TEXT,
                                              M_ACCEL,
                                              M_TOOL_TIP,

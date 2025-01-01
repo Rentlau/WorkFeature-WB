@@ -63,8 +63,8 @@ except ImportError:
     sys.exit(1)
 
 ###############
-M_ICON_NAME = "/WF_twoPointsLine.svg"
-M_DIALOG = "/WF_UI_twoPointsLine.ui"
+M_ICON_NAME = "WF_twoPointsLine.svg"
+M_DIALOG = "WF_UI_twoPointsLine.ui"
 M_DIALOG_TITLE = "Define extension."
 M_EXCEPTION_MSG = """
 Unable to create Line(s) from 2 Points :
@@ -144,7 +144,7 @@ class TwoPointsLinePanel:
     """
 
     def __init__(self):
-        self.form = Gui.PySideUic.loadUi(PATH_WF_UI + M_DIALOG)
+        self.form = Gui.PySideUic.loadUi(os.path.join(PATH_WF_UI, M_DIALOG))
         self.form.setWindowTitle(M_DIALOG_TITLE)
         self.form.UI_Line_extension.setText(str(M_LINE_EXT))
         self.form.UI_Point_by_Pair_checkBox.setCheckState(
@@ -421,10 +421,10 @@ class ViewProviderTwoPointsLine:
     # This method is optional and if not defined a default icon is shown.
     def getIcon(self):
         """ Return the icon which will appear in the tree view. """
-        return PATH_WF_ICONS + ViewProviderTwoPointsLine.icon
+        return os.path.join(PATH_WF_ICONS, self.icon)
 
     def setIcon(self, icon=M_ICON_NAME):
-        ViewProviderTwoPointsLine.icon = icon
+        self.icon = icon
 
 
 def buildFromOnePointAndOneObject(vertex1, object1, group):

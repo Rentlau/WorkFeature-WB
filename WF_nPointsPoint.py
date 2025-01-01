@@ -52,9 +52,8 @@ except ImportError:
     sys.exit(1)
 
 ###############
-M_ICON_NAME = "/WF_nPointsPoint.svg"
-M_ICON_NAME_FILE = os.path.join(PATH_WF_ICONS, M_ICON_NAME)
-M_DIALOG = "/WF_UI_nPointsPoint.ui"
+M_ICON_NAME = "WF_nPointsPoint.svg"
+M_DIALOG = "WF_UI_nPointsPoint.ui"
 M_DIALOG_TITLE = ""
 M_EXCEPTION_MSG = """
 Unable to create a Mean Point :
@@ -90,7 +89,7 @@ class NPointsPointPanel:
     """
 
     def __init__(self):
-        self.form = Gui.PySideUic.loadUi(PATH_WF_UI + M_DIALOG)
+        self.form = Gui.PySideUic.loadUi(os.path.join(PATH_WF_UI, M_DIALOG))
         self.form.setWindowTitle(M_DIALOG_TITLE)
 
     def accept(self):
@@ -291,10 +290,10 @@ class ViewProviderNPointsPoint:
     # This method is optional and if not defined a default icon is shown.
     def getIcon(self):
         """ Return the icon which will appear in the tree view. """
-        return PATH_WF_ICONS + ViewProviderNPointsPoint.icon
+        return os.path.join(PATH_WF_ICONS, self.icon)
 
     def setIcon(self, icon=M_ICON_NAME):
-        ViewProviderNPointsPoint.icon = icon
+        self.icon = icon
 
 
 def buildFromPoints(macro, group, vertexes):
@@ -358,7 +357,7 @@ def n_points_point_comand():
 
 
 if App.GuiUp:
-    Gui.addCommand("NPointsPoint", Command(M_ICON_NAME_FILE,
+    Gui.addCommand("NPointsPoint", Command(M_ICON_NAME,
                                            M_MENU_TEXT,
                                            M_ACCEL,
                                            M_TOOL_TIP,
